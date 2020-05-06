@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/sliding_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="@color/black">
+
+    <ImageView
+        android:id="@+id/ivDragIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/icon"
+        android:src="@drawable/ic_arrow_up_white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clSearchBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:alpha="0"
+        app:layout_constraintBottom_toTopOf="@id/rvApps"
+        app:layout_constraintTop_toBottomOf="@id/ivDragIcon">
+
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="30dp"
+            android:background="@null"
+            android:drawableStart="@drawable/ic_search_white"
+            android:drawablePadding="10dp"
+            android:drawableTint="@color/search_bar"
+            android:gravity="center"
+            android:hint="@string/search_apps"
+            android:padding="4dp"
+            android:textColor="@color/search_bar"
+            android:textColorHint="@color/search_bar"
+            android:textSize="@dimen/font_large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/ivSeparator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="20dp"
+            android:background="@color/search_bar"
+            android:contentDescription="@string/image"
+            app:layout_constraintTop_toBottomOf="@id/etSearch"
+            tools:layout_marginBottom="20dp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.l4digital.fastscroll.FastScrollRecyclerView
+        android:id="@+id/rvApps"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:bubbleColor="@color/search_bar"
+        app:bubbleTextColor="@color/white"
+        app:handleColor="@color/search_bar"
+        app:hideScrollbar="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/clSearchBar"
+        app:showTrack="false"
+        tools:itemCount="25"
+        tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        tools:listitem="@layout/cell_app_info"
+        tools:spanCount="4" />
+</androidx.constraintlayout.widget.ConstraintLayout>

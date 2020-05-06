@@ -1,0 +1,258 @@
+package com.sasuke.launcheroneplus.ui.launcher
+
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.view.MotionEvent
+import android.view.View
+import android.widget.EdgeEffect
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.github.nisrulz.sensey.Sensey
+import com.github.nisrulz.sensey.TouchTypeDetector
+import com.sasuke.launcheroneplus.R
+import com.sasuke.launcheroneplus.ui.base.BaseActivity
+import com.sasuke.launcheroneplus.ui.base.ItemDecorator
+import com.sasuke.launcheroneplus.ui.launcher.apps.AppAdapter
+import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
+import com.sasuke.launcheroneplus.util.Constants
+import com.sothree.slidinguppanel.SlidingUpPanelLayout
+import kotlinx.android.synthetic.main.activity_launcher.*
+import kotlinx.android.synthetic.main.layout_sliding.*
+import javax.inject.Inject
+
+class LauncherActivity : BaseActivity() {
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    @Inject
+    lateinit var adapter: AppAdapter
+
+    @Inject
+    lateinit var layoutManager: GridLayoutManager
+
+    @Inject
+    lateinit var itemDecoration: ItemDecorator
+
+    private lateinit var launcherActivityViewModel: LauncherActivityViewModel
+
+    private lateinit var handler: Handler
+
+    companion object {
+        /** The magnitude of rotation while the list is scrolled. */
+        private const val SCROLL_ROTATION_MAGNITUDE = 0.25f
+        /** The magnitude of rotation while the list is over-scrolled. */
+        private const val OVERSCROLL_ROTATION_MAGNITUDE = -10
+        /** The magnitude of translation distance while the list is over-scrolled. */
+        private const val OVERSCROLL_TRANSLATION_MAGNITUDE = 0.2f
+        /** The magnitude of translation distance when the list reaches the edge on fling. */
+        private const val FLING_TRANSLATION_MAGNITUDE = 0.5f
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_launcher)
+        inject()
+        setWindowInsets()
+        setupRecyclerView()
+        setupListeners()
+        getAppList()
+        observeLiveData()
+    }
+
+    private fun inject() {
+        launcherActivityViewModel =
+            ViewModelProvider(this, viewModelFactory).get(LauncherActivityViewModel::class.java)
+        Sensey.getInstance().init(this)
+        handler = Handler()
+    }
+
+    private fun setWindowInsets() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            clParent.setOnApplyWindowInsetsListener { v, insets ->
+                v.setPadding(0, 0, 0, insets.systemWindowInsetBottom)
+                insets
+            }
+        }
+    }
+
+    private fun setupRecyclerView() {
+        rvApps.layoutManager = layoutManager
+        rvApps.addItemDecoration(itemDecoration)
+        rvApps.adapter = adapter
+
+        rvApps.edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
+            override fun createEdgeEffect(recyclerView: RecyclerView, direction: Int): EdgeEffect {
+                return object : EdgeEffect(recyclerView.context) {
+
+                    override fun onPull(deltaDistance: Float) {
+                        super.onPull(deltaDistance)
+                        handlePull(deltaDistance)
+                    }
+
+                    override fun onPull(deltaDistance: Float, displacement: Float) {
+                        super.onPull(deltaDistance, displacement)
+                        handlePull(deltaDistance)
+                    }
+
+                    private fun handlePull(deltaDistance: Float) {
+                        // This is called on every touch event while the list is scrolled with a finger.
+                        // We simply update the view properties without animation.
+                        val sign = if (direction == DIRECTION_BOTTOM) -1 else 1
+                        val rotationDelta = sign * deltaDistance * OVERSCROLL_ROTATION_MAGNITUDE
+                        val translationYDelta =
+                            sign * recyclerView.width * deltaDistance * OVERSCROLL_TRANSLATION_MAGNITUDE
+                        recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
+                            holder.rotation.cancel()
+                            holder.translationY.cancel()
+                            holder.itemView.rotation += rotationDelta
+                            holder.itemView.translationY += translationYDelta
+                        }
+                    }
+
+                    override fun onRelease() {
+                        super.onRelease()
+                        // The finger is lifted. This is when we should start the animations to bring
+                        // the view property values back to their resting states.
+                        recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
+                            holder.rotation.start()
+                            holder.translationY.start()
+                        }
+                    }
+
+                    override fun onAbsorb(velocity: Int) {
+                        super.onAbsorb(velocity)
+                        val sign = if (direction == DIRECTION_BOTTOM) -1 else 1
+                        // The list has reached the edge on fling.
+                        val translationVelocity = sign * velocity * FLING_TRANSLATION_MAGNITUDE
+                        recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
+                            holder.translationY
+                                .setStartVelocity(translationVelocity)
+                                .start()
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    private fun setupListeners() {
+        val touchTypeDetector = object : TouchTypeDetector.TouchTypListener {
+            override fun onDoubleTap() {
+
+            }
+
+            override fun onSwipe(p0: Int) {
+
+            }
+
+            override fun onSingleTap() {
+
+            }
+
+            override fun onScroll(scrollDirection: Int) {
+                when (scrollDirection) {
+                    TouchTypeDetector.SCROLL_DIR_UP -> {
+                        handler.postDelayed({
+                            clParent.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
+                        }, 50)
+                    }
+                }
+            }
+
+            override fun onLongPress() {
+
+            }
+
+            override fun onThreeFingerSingleTap() {
+
+            }
+
+            override fun onTwoFingerSingleTap() {
+
+            }
+
+        }
+
+        Sensey.getInstance().startTouchTypeDetection(this, touchTypeDetector)
+
+        clParent.addPanelSlideListener(object : SlidingUpPanelLayout.PanelSlideListener {
+            override fun onPanelSlide(panel: View?, slideOffset: Float) {
+                ivDragIcon.alpha = 1 - slideOffset
+                clSearchBar.alpha = slideOffset
+            }
+
+            override fun onPanelStateChanged(
+                panel: View?,
+                previousState: SlidingUpPanelLayout.PanelState?,
+                newState: SlidingUpPanelLayout.PanelState?
+            ) {
+                when (newState) {
+                    SlidingUpPanelLayout.PanelState.EXPANDED -> {
+                        Sensey.getInstance().stopTouchTypeDetection()
+                    }
+                    SlidingUpPanelLayout.PanelState.COLLAPSED -> {
+                        Sensey.getInstance().startTouchTypeDetection(
+                            this@LauncherActivity,
+                            touchTypeDetector
+                        )
+                    }
+                }
+            }
+
+        })
+
+        rvApps.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+
+                if (layoutManager.findFirstCompletelyVisibleItemPosition() >= Constants.APP_LIST_SPAN_COUNT)
+                    ivSeparator.visibility = View.GONE
+                else
+                    ivSeparator.visibility = View.VISIBLE
+
+                recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
+                    holder.rotation
+                        // Update the velocity.
+                        // The velocity is calculated by the horizontal scroll offset.
+                        .setStartVelocity(holder.currentVelocity - dx * SCROLL_ROTATION_MAGNITUDE)
+                        // Start the animation. This does nothing if the animation is already running.
+                        .start()
+                }
+            }
+        })
+    }
+
+    private fun getAppList() {
+        launcherActivityViewModel.getAppsList()
+    }
+
+    private fun observeLiveData() {
+        launcherActivityViewModel.appList.observe(this, Observer {
+            it?.let {
+                adapter.setApps(it)
+            }
+        })
+    }
+
+    private inline fun <reified T : RecyclerView.ViewHolder> RecyclerView.forEachVisibleHolder(
+        action: (T) -> Unit
+    ) {
+        for (i in 0 until childCount) {
+            action(getChildViewHolder(getChildAt(i)) as T)
+        }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        Sensey.getInstance().setupDispatchTouchEvent(ev)
+        return super.dispatchTouchEvent(ev)
+    }
+
+    override fun onDestroy() {
+        Sensey.getInstance().stop()
+        super.onDestroy()
+    }
+}

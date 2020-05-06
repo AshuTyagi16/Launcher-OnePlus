@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+
+    <!-- Solid -->
+    <color name="black">#ff000000</color>
+    <color name="black_transparent">#cc000000</color>
+    <color name="white">#ffffffff</color>
+
+    <!-- Text Colors -->
+    <color name="color_text_primary">@color/black</color>
+    <color name="color_text_secondary">#80000000</color>
+    <color name="color_text_disabled">#66ffffff</color>
+
+    <!-- App Search Bar -->
+    <color name="search_bar">#ff0080ff</color>
+</resources>

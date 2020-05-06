@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Launcher OnePlus</string>
+
+    <!-- Content Description -->
+    <string name="icon">Icon</string>
+    <string name="image">Image</string>
+    <string name="placeholder">Placeholder</string>
+    <string name="separator">Separator</string>
+
+    <!-- Launcher -->
+    <string name="search_apps">Search apps</string>
+</resources>
