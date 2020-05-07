@@ -9,18 +9,25 @@ import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.AppInfo
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
 
-class GridViewAdapter : BaseAdapter(), OnItemMovedListener {
+class GridViewAdapter : BaseAdapter(), OnItemMovedListener, AppViewHolder.OnClickListeners {
 
-    private val list: MutableList<AppInfo> = ArrayList()
+    private lateinit var onClickListeners: OnClickListeners
+    val list: MutableList<AppInfo> = ArrayList()
     private var inEditMode = false
 
 
     override fun getView(position: Int, convertview: View?, parent: ViewGroup): View {
         val appViewHolder: AppViewHolder
         val myView: View =
-            LayoutInflater.from(parent.context).inflate(R.layout.cell_app_info, parent, false)
-        appViewHolder = AppViewHolder(myView,false)
+            convertview
+                ?: LayoutInflater.from(parent.context).inflate(
+                    R.layout.cell_app_info,
+                    parent,
+                    false
+                )
+        appViewHolder = AppViewHolder(myView, false)
         appViewHolder.setAppInfo(getItem(position) as AppInfo)
+        appViewHolder.setOnClickListeners(this)
         return myView
     }
 
@@ -57,5 +64,22 @@ class GridViewAdapter : BaseAdapter(), OnItemMovedListener {
     fun setInEditMode(inEditMode: Boolean) {
         this.inEditMode = inEditMode
         notifyDataSetChanged()
+    }
+
+    interface OnClickListeners {
+        fun onItemClick(position: Int, parent: View, appInfo: AppInfo)
+    }
+
+    fun setOnClickListeners(onClickListeners: OnClickListeners) {
+        this.onClickListeners = onClickListeners
+    }
+
+    override fun onItemClick(position: Int, parent: View, appInfo: AppInfo) {
+        if (::onClickListeners.isInitialized)
+            onClickListeners.onItemClick(position, parent, appInfo)
+    }
+
+    override fun onItemLongClick(position: Int, parent: View, appInfo: AppInfo) {
+
     }
 }

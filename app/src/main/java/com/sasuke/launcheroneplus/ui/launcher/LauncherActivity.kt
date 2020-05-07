@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.MotionEvent
 import android.view.View
+import android.widget.AdapterView
 import android.widget.EdgeEffect
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -28,7 +29,8 @@ import kotlinx.android.synthetic.main.layout_non_sliding.*
 import kotlinx.android.synthetic.main.layout_sliding.*
 import javax.inject.Inject
 
-class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners {
+class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
+    GridViewAdapter.OnClickListeners {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -47,6 +49,10 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners {
     private lateinit var handler: Handler
 
     private val gridAdapter = GridViewAdapter()
+
+    init {
+        gridAdapter.setOnClickListeners(this)
+    }
 
     companion object {
         /** The magnitude of rotation while the list is scrolled. */
