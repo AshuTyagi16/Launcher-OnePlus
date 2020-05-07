@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.Gravity
 import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.EdgeEffect
 import androidx.core.widget.addTextChangedListener
@@ -13,12 +14,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.github.nisrulz.sensey.Sensey
-import com.github.nisrulz.sensey.TouchTypeDetector
+import com.github.nisrulz.sensey.*
 import com.huxq17.handygridview.HandyGridView
 import com.huxq17.handygridview.listener.OnItemCapturedListener
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.AppInfo
+import com.sasuke.launcheroneplus.ui.HiddenAppsActivity
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
 import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
@@ -47,17 +48,17 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     @Inject
     lateinit var itemDecoration: ItemDecorator
 
+    @Inject
+    lateinit var gridAdapter: GridViewAdapter
+
     private lateinit var launcherActivityViewModel: LauncherActivityViewModel
 
     private lateinit var handler: Handler
 
-    private val gridAdapter = GridViewAdapter()
-
     private lateinit var keyboardTriggerBehavior: KeyboardTriggerBehavior
 
-    init {
-        gridAdapter.setOnClickListeners(this)
-    }
+    private lateinit var pinchScaleListener: PinchScaleDetector.PinchScaleListener
+    private lateinit var touchTypeListener: TouchTypeDetector.TouchTypListener
 
     companion object {
         /** The magnitude of rotation while the list is scrolled. */
@@ -163,6 +164,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     private fun setupGridView() {
         gridApps.adapter = gridAdapter
+        gridAdapter.setOnClickListeners(this)
         setMode(HandyGridView.MODE.LONG_PRESS)
         gridApps.setAutoOptimize(true)
         gridApps.setScrollSpeed(750)
@@ -199,7 +201,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             })
         }
 
-        val touchTypeDetector = object : TouchTypeDetector.TouchTypListener {
+        touchTypeListener = object : TouchTypeDetector.TouchTypListener {
             override fun onDoubleTap() {
 
             }
@@ -242,7 +244,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
         }
 
-        Sensey.getInstance().startTouchTypeDetection(this, touchTypeDetector)
+        Sensey.getInstance().startTouchTypeDetection(this, touchTypeListener)
 
         clParent.addPanelSlideListener(object : SlidingUpPanelLayout.PanelSlideListener {
             override fun onPanelSlide(panel: View?, slideOffset: Float) {
@@ -259,6 +261,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                 when (newState) {
                     SlidingUpPanelLayout.PanelState.EXPANDED -> {
                         Sensey.getInstance().stopTouchTypeDetection()
+                        Sensey.getInstance().stopPinchScaleDetection()
                     }
                     SlidingUpPanelLayout.PanelState.DRAGGING -> {
 
@@ -266,8 +269,10 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                     SlidingUpPanelLayout.PanelState.COLLAPSED -> {
                         Sensey.getInstance().startTouchTypeDetection(
                             this@LauncherActivity,
-                            touchTypeDetector
+                            touchTypeListener
                         )
+                        Sensey.getInstance()
+                            .startPinchScaleDetection(this@LauncherActivity, pinchScaleListener)
                         hideKeyboard()
                     }
                 }
@@ -300,6 +305,26 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                 launcherActivityViewModel.getDefaultList()
             }
         }
+
+        pinchScaleListener = object : PinchScaleDetector.PinchScaleListener {
+            override fun onScaleEnd(p0: ScaleGestureDetector?) {
+                if (::touchTypeListener.isInitialized) {
+                    Sensey.getInstance()
+                        .startTouchTypeDetection(this@LauncherActivity, touchTypeListener)
+                }
+            }
+
+            override fun onScale(p0: ScaleGestureDetector?, isScalingOut: Boolean) {
+                if (!isScalingOut) {
+                    startActivity(HiddenAppsActivity.newIntent(this@LauncherActivity))
+                }
+            }
+
+            override fun onScaleStart(p0: ScaleGestureDetector?) {
+                Sensey.getInstance().stopTouchTypeDetection()
+            }
+
+        }
     }
 
     private fun getAppList() {
@@ -326,32 +351,9 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     }
 
     private fun keyboardOpen() {
-        etSearch.animate().x(0f).setListener(object : Animator.AnimatorListener {
-            override fun onAnimationRepeat(p0: Animator?) {
-
-            }
-
-            override fun onAnimationEnd(p0: Animator?) {
-                etSearch.apply {
-                    gravity = Gravity.START
-                    compoundDrawablePadding = 40
-                    setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_back_white, 0, 0, 0)
-                }
-            }
-
-            override fun onAnimationCancel(p0: Animator?) {
-
-            }
-
-            override fun onAnimationStart(p0: Animator?) {
-
-            }
-
-        })
-    }
-
-    private fun keyboardClosed() {
-        etSearch.animate().x(300f)
+        etSearch.animate()
+            .x(0f)
+            .setDuration(100)
             .setListener(object : Animator.AnimatorListener {
                 override fun onAnimationRepeat(p0: Animator?) {
 
@@ -360,7 +362,33 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                 override fun onAnimationEnd(p0: Animator?) {
                     etSearch.apply {
                         compoundDrawablePadding = 40
-                        gravity = Gravity.CENTER
+                        setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_back_white, 0, 0, 0)
+                    }
+                }
+
+                override fun onAnimationCancel(p0: Animator?) {
+
+                }
+
+                override fun onAnimationStart(p0: Animator?) {
+
+                }
+
+            })
+    }
+
+    private fun keyboardClosed() {
+        etSearch.animate()
+            .x(300f)
+            .setDuration(100)
+            .setListener(object : Animator.AnimatorListener {
+                override fun onAnimationRepeat(p0: Animator?) {
+
+                }
+
+                override fun onAnimationEnd(p0: Animator?) {
+                    etSearch.apply {
+                        compoundDrawablePadding = 40
                         setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_search_white, 0, 0, 0)
                     }
                     etSearch.clearFocus()

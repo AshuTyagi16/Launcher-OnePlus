@@ -7,6 +7,7 @@ import com.sasuke.launcheroneplus.di.mapkey.ViewModelKey
 import com.sasuke.launcheroneplus.di.scope.PerActivityScope
 import com.sasuke.launcheroneplus.ui.base.GridSpacingItemDecoration
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
+import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
 import com.sasuke.launcheroneplus.ui.launcher.LauncherActivityViewModel
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppAdapter
 import com.sasuke.launcheroneplus.util.Constants
@@ -39,6 +40,12 @@ abstract class LauncherActivityModule {
                 Constants.APP_LIST_HORIZONTAL_SPACING,
                 Constants.APP_LIST_VERTICAL_SPACING
             )
+        }
+
+        @Provides
+        @PerActivityScope
+        fun gridViewAdapter(): GridViewAdapter {
+            return GridViewAdapter()
         }
     }
 

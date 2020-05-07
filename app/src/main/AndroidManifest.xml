@@ -30,6 +30,10 @@
         <activity
             android:name=".ui.base.BaseActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".ui.HiddenAppsActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
