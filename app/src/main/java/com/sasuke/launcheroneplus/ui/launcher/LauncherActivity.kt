@@ -1,14 +1,13 @@
 package com.sasuke.launcheroneplus.ui.launcher
 
+import android.animation.Animator
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
-import android.widget.AdapterView
 import android.widget.EdgeEffect
-import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -69,11 +68,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         private const val OVERSCROLL_TRANSLATION_MAGNITUDE = 0.2f
         /** The magnitude of translation distance when the list reaches the edge on fling. */
         private const val FLING_TRANSLATION_MAGNITUDE = 0.5f
-
-        const val DRAWABLE_LEFT = 0
-        const val DRAWABLE_TOP = 1
-        const val DRAWABLE_RIGHT = 2
-        const val DRAWABLE_BOTTOM = 3
 
     }
 
@@ -331,21 +325,57 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     }
 
     private fun keyboardOpen() {
-        etSearch.apply {
-            gravity = Gravity.START
-            compoundDrawablePadding = 80
-            setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_back_white, 0, 0, 0)
-        }
+        etSearch.animate().x(0f).setListener(object : Animator.AnimatorListener {
+            override fun onAnimationRepeat(p0: Animator?) {
+
+            }
+
+            override fun onAnimationEnd(p0: Animator?) {
+                etSearch.apply {
+                    gravity = Gravity.START
+                    compoundDrawablePadding = 40
+                    setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_back_white, 0, 0, 0)
+                }
+            }
+
+            override fun onAnimationCancel(p0: Animator?) {
+
+            }
+
+            override fun onAnimationStart(p0: Animator?) {
+
+            }
+
+        })
     }
 
     private fun keyboardClosed() {
-        etSearch.apply {
-            compoundDrawablePadding = 0
-            gravity = Gravity.CENTER
-            setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_search_white, 0, 0, 0)
-        }
-        etSearch.clearFocus()
-        etSearch.setText("")
+        etSearch.animate().x(300f)
+            .setListener(object : Animator.AnimatorListener {
+                override fun onAnimationRepeat(p0: Animator?) {
+
+                }
+
+                override fun onAnimationEnd(p0: Animator?) {
+                    etSearch.apply {
+                        compoundDrawablePadding = 40
+                        gravity = Gravity.CENTER
+                        setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_search_white, 0, 0, 0)
+                    }
+                    etSearch.clearFocus()
+                    etSearch.setText("")
+                }
+
+                override fun onAnimationCancel(p0: Animator?) {
+
+                }
+
+                override fun onAnimationStart(p0: Animator?) {
+
+                }
+
+            })
+
     }
 
     private inline fun <reified T : RecyclerView.ViewHolder> RecyclerView.forEachVisibleHolder(

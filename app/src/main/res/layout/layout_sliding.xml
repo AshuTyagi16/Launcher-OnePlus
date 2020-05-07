@@ -24,32 +24,40 @@
         android:layout_marginBottom="5dp"
         android:alpha="0"
         android:paddingStart="20dp"
-        android:paddingEnd="20dp"
         android:paddingTop="20dp"
+        android:paddingEnd="20dp"
         app:layout_constraintBottom_toTopOf="@id/rvApps"
         app:layout_constraintTop_toBottomOf="@id/ivDragIcon"
         tools:alpha="1">
 
-        <EditText
-            android:id="@+id/etSearch"
+        <FrameLayout
+            android:id="@+id/etContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@null"
-            android:drawableStart="@drawable/ic_search_white"
-            android:drawableTint="@color/search_bar"
-            android:focusedByDefault="false"
-            android:gravity="center"
-            android:hint="@string/search_apps"
-            android:maxLength="20"
-            android:maxLines="1"
-            android:padding="10dp"
-            android:singleLine="true"
-            android:textColor="@color/search_bar"
-            android:textColorHint="@color/search_bar"
-            android:textSize="@dimen/font_large"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <EditText
+                android:id="@+id/etSearch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:drawableStart="@drawable/ic_search_white"
+                android:drawableTint="@color/search_bar"
+                android:focusedByDefault="false"
+                android:gravity="center"
+                android:hint="@string/search_apps"
+                android:maxLength="20"
+                android:maxLines="1"
+                android:padding="10dp"
+                android:singleLine="true"
+                android:textColor="@color/search_bar"
+                android:textColorHint="@color/search_bar"
+                android:textSize="@dimen/font_large" />
+        </FrameLayout>
+
 
         <ImageView
             android:id="@+id/ivSeparator"
@@ -58,7 +66,7 @@
             android:layout_marginTop="10dp"
             android:background="@color/search_bar"
             android:contentDescription="@string/image"
-            app:layout_constraintTop_toBottomOf="@id/etSearch"
+            app:layout_constraintTop_toBottomOf="@id/etContainer"
             tools:layout_marginBottom="20dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
