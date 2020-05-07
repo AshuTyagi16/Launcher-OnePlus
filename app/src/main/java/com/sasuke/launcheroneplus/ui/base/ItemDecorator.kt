@@ -9,7 +9,7 @@ class ItemDecorator(private val horizontalSpace: Int, private val verticalSpace:
     RecyclerView.ItemDecoration() {
 
     companion object {
-        private const val EDGE_SPACING_FACTOR = 2
+        private const val EDGE_SPACING_FACTOR = 1
     }
 
     override fun getItemOffsets(

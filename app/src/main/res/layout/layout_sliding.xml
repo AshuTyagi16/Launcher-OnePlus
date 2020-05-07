@@ -23,7 +23,9 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:alpha="0"
-        android:padding="20dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="20dp"
         app:layout_constraintBottom_toTopOf="@id/rvApps"
         app:layout_constraintTop_toBottomOf="@id/ivDragIcon"
         tools:alpha="1">
