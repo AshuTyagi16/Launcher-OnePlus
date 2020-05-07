@@ -3,10 +3,13 @@ package com.sasuke.launcheroneplus.ui.launcher
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.widget.AdapterView
 import android.widget.EdgeEffect
+import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
@@ -23,6 +26,7 @@ import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppAdapter
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
 import com.sasuke.launcheroneplus.util.Constants
+import com.sasuke.launcheroneplus.util.KeyboardTriggerBehavior
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import kotlinx.android.synthetic.main.activity_launcher.*
 import kotlinx.android.synthetic.main.layout_non_sliding.*
@@ -50,6 +54,8 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     private val gridAdapter = GridViewAdapter()
 
+    private lateinit var keyboardTriggerBehavior: KeyboardTriggerBehavior
+
     init {
         gridAdapter.setOnClickListeners(this)
     }
@@ -63,6 +69,12 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         private const val OVERSCROLL_TRANSLATION_MAGNITUDE = 0.2f
         /** The magnitude of translation distance when the list reaches the edge on fling. */
         private const val FLING_TRANSLATION_MAGNITUDE = 0.5f
+
+        const val DRAWABLE_LEFT = 0
+        const val DRAWABLE_TOP = 1
+        const val DRAWABLE_RIGHT = 2
+        const val DRAWABLE_BOTTOM = 3
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -184,6 +196,15 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     }
 
     private fun setupListeners() {
+        keyboardTriggerBehavior = KeyboardTriggerBehavior(this).apply {
+            observe(this@LauncherActivity, Observer {
+                when (it) {
+                    KeyboardTriggerBehavior.Status.OPEN -> keyboardOpen()
+                    KeyboardTriggerBehavior.Status.CLOSED -> keyboardClosed()
+                }
+            })
+        }
+
         val touchTypeDetector = object : TouchTypeDetector.TouchTypListener {
             override fun onDoubleTap() {
 
@@ -205,9 +226,10 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                         }, 50)
                     }
                     TouchTypeDetector.SCROLL_DIR_DOWN -> {
-                        handler.postDelayed({
-                            openStatusBar()
-                        }, 1)
+                        if (clParent.panelState == SlidingUpPanelLayout.PanelState.COLLAPSED)
+                            handler.postDelayed({
+                                openStatusBar()
+                            }, 1)
                     }
                 }
             }
@@ -245,7 +267,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                         Sensey.getInstance().stopTouchTypeDetection()
                     }
                     SlidingUpPanelLayout.PanelState.DRAGGING -> {
-                        Sensey.getInstance().stopTouchTypeDetection()
+
                     }
                     SlidingUpPanelLayout.PanelState.COLLAPSED -> {
                         Sensey.getInstance().startTouchTypeDetection(
@@ -255,7 +277,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                     }
                 }
             }
-
         })
 
         rvApps.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -276,6 +297,14 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                 }
             }
         })
+
+        etSearch.addTextChangedListener {
+            if (!it.isNullOrEmpty()) {
+                launcherActivityViewModel.filterApps(it.toString())
+            } else {
+                launcherActivityViewModel.getDefaultList()
+            }
+        }
     }
 
     private fun getAppList() {
@@ -299,6 +328,24 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         val intent = packageManager.getLaunchIntentForPackage(appInfo.packageName)
         startActivity(intent)
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+    }
+
+    private fun keyboardOpen() {
+        etSearch.apply {
+            gravity = Gravity.START
+            compoundDrawablePadding = 80
+            setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_back_white, 0, 0, 0)
+        }
+    }
+
+    private fun keyboardClosed() {
+        etSearch.apply {
+            compoundDrawablePadding = 0
+            gravity = Gravity.CENTER
+            setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_search_white, 0, 0, 0)
+        }
+        etSearch.clearFocus()
+        etSearch.setText("")
     }
 
     private inline fun <reified T : RecyclerView.ViewHolder> RecyclerView.forEachVisibleHolder(
@@ -331,9 +378,9 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     }
 
     override fun onBackPressed() {
-        if (clParent.panelState === SlidingUpPanelLayout.PanelState.EXPANDED)
+        if (clParent.panelState === SlidingUpPanelLayout.PanelState.EXPANDED) {
             clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
-        else
+        } else
             super.onBackPressed()
     }
 }

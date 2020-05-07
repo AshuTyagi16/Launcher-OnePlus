@@ -20,6 +20,8 @@ class LauncherActivityViewModel @Inject constructor(private val context: Context
     val appList: LiveData<MutableList<AppInfo>>
         get() = _appList
 
+    private lateinit var list: MutableList<AppInfo>
+    private lateinit var listFiltered: MutableList<AppInfo>
     private val packageManager = context.packageManager
 
     fun getAppsList() {
@@ -38,11 +40,62 @@ class LauncherActivityViewModel @Inject constructor(private val context: Context
                         appInoList.add(packageInfo)
                     }
                     appInoList.sortBy {
-                        it.label.toLowerCase()
+                        it.label.toLowerCase(Locale.getDefault())
                     }
+                    list = appInoList
                     _appList.postValue(appInoList)
                 }
             }
         }
     }
+
+    fun getDefaultList() {
+        if (::list.isInitialized) {
+            _appList.postValue(list)
+        }
+    }
+
+    fun filterApps(query: String) {
+        if (::list.isInitialized && query.isNotEmpty()) {
+            val filtered = ArrayList<AppInfo>()
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    list.forEach {
+                        if (matches(
+                                it.label.toLowerCase(Locale.getDefault()), query.toLowerCase(
+                                    Locale.getDefault()
+                                )
+                            )
+                        ) {
+                            filtered.add(it)
+                        }
+                    }
+                    listFiltered = filtered
+                    _appList.postValue(listFiltered)
+                }
+            }
+        }
+    }
+
+    private fun matches(
+        haystack: String,
+        needle: String
+    ): Boolean {
+        val queryLength = needle.length
+        val titleLength = haystack.length
+        if (titleLength < queryLength || queryLength <= 0) {
+            return false
+        }
+        var ni = 0
+        var hi = 0
+        while (hi < titleLength) {
+            if (haystack[hi] == needle[ni]) {
+                ni++
+                if (ni == queryLength) return true
+            }
+            hi++
+        }
+        return false
+    }
+
 }

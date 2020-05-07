@@ -8,6 +8,8 @@
     <color name="black">#ff000000</color>
     <color name="black_transparent">#cc000000</color>
     <color name="white">#ffffffff</color>
+    <color name="shadow_white">#33ffffff</color>
+    <color name="transparent">#00ffffff</color>
 
     <!-- Text Colors -->
     <color name="color_text_primary">@color/black</color>

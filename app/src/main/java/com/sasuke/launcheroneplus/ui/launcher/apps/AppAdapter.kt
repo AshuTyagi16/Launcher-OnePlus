@@ -3,6 +3,8 @@ package com.sasuke.launcheroneplus.ui.launcher.apps
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import androidx.core.view.doOnLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.l4digital.fastscroll.FastScroller
@@ -14,7 +16,6 @@ class AppAdapter : RecyclerView.Adapter<AppViewHolder>(), FastScroller.SectionIn
 
     private lateinit var appList: MutableList<AppInfo>
     private lateinit var onClickListeners: OnClickListeners
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
         val view =
@@ -43,7 +44,7 @@ class AppAdapter : RecyclerView.Adapter<AppViewHolder>(), FastScroller.SectionIn
     }
 
     override fun getSectionText(position: Int): CharSequence {
-        return appList[position].label[0].toString()
+        return appList[position].label[0].toUpperCase().toString()
     }
 
     interface OnClickListeners {
