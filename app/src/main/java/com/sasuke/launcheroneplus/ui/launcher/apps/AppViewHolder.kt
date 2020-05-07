@@ -9,7 +9,7 @@ import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.AppInfo
 import kotlinx.android.synthetic.main.cell_app_info.view.*
 
-class AppViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class AppViewHolder(itemView: View, private val consumeLongPress: Boolean = true) : RecyclerView.ViewHolder(itemView) {
 
     private lateinit var onClickListeners: OnClickListeners
 
@@ -57,7 +57,7 @@ class AppViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         itemView.setOnLongClickListener {
             if (::onClickListeners.isInitialized)
                 onClickListeners.onItemLongClick(adapterPosition, itemView, appInfo)
-            return@setOnLongClickListener true
+            return@setOnLongClickListener consumeLongPress
         }
 
         itemView.setOnClickListener {

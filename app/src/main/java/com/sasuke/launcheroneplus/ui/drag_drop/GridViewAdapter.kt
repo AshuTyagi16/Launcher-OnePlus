@@ -19,7 +19,7 @@ class GridViewAdapter : BaseAdapter(), OnItemMovedListener {
         val appViewHolder: AppViewHolder
         val myView: View =
             LayoutInflater.from(parent.context).inflate(R.layout.cell_app_info, parent, false)
-        appViewHolder = AppViewHolder(myView)
+        appViewHolder = AppViewHolder(myView,false)
         appViewHolder.setAppInfo(getItem(position) as AppInfo)
         return myView
     }
