@@ -9,4 +9,5 @@
 
     <!-- Launcher -->
     <string name="search_apps">Search apps</string>
+    <string name="shortcut_added_to_home_screen">Shortcut Added To Home Screen!!</string>
 </resources>

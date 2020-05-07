@@ -1,12 +1,17 @@
 package com.sasuke.launcheroneplus.ui.base
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import com.jaeger.library.StatusBarUtil
 import dagger.android.support.DaggerAppCompatActivity
 import io.github.inflationx.viewpump.ViewPumpContextWrapper
 
 open class BaseActivity : DaggerAppCompatActivity() {
+
+    private var toast: Toast? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,5 +22,20 @@ open class BaseActivity : DaggerAppCompatActivity() {
         newBase?.let {
             super.attachBaseContext(ViewPumpContextWrapper.wrap(it))
         }
+    }
+
+    fun showToast(message: String) {
+        toast?.cancel()
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).let {
+            it.show()
+            toast = it
+        }
+    }
+
+    @SuppressLint("WrongConstant")
+    fun openStatusBar() {
+        val sbservice = getSystemService("statusbar")
+        val statusbarManager = Class.forName("android.app.StatusBarManager")
+        statusbarManager.getMethod("expandNotificationsPanel").invoke(sbservice)
     }
 }

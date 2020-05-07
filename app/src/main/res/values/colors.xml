@@ -16,4 +16,6 @@
 
     <!-- App Search Bar -->
     <color name="search_bar">#ff0080ff</color>
+    <color name="app_highlight">#4d0080ff</color>
+    <color name="app_un_highlight">#00ffffff</color>
 </resources>

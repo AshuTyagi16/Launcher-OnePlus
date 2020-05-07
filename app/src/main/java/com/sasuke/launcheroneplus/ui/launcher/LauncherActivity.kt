@@ -12,18 +12,23 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.nisrulz.sensey.Sensey
 import com.github.nisrulz.sensey.TouchTypeDetector
+import com.huxq17.handygridview.HandyGridView
+import com.huxq17.handygridview.listener.OnItemCapturedListener
 import com.sasuke.launcheroneplus.R
+import com.sasuke.launcheroneplus.data.AppInfo
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
+import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppAdapter
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
 import com.sasuke.launcheroneplus.util.Constants
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import kotlinx.android.synthetic.main.activity_launcher.*
+import kotlinx.android.synthetic.main.layout_non_sliding.*
 import kotlinx.android.synthetic.main.layout_sliding.*
 import javax.inject.Inject
 
-class LauncherActivity : BaseActivity() {
+class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -40,6 +45,8 @@ class LauncherActivity : BaseActivity() {
     private lateinit var launcherActivityViewModel: LauncherActivityViewModel
 
     private lateinit var handler: Handler
+
+    private val gridAdapter = GridViewAdapter()
 
     companion object {
         /** The magnitude of rotation while the list is scrolled. */
@@ -58,6 +65,7 @@ class LauncherActivity : BaseActivity() {
         inject()
         setWindowInsets()
         setupRecyclerView()
+        setupGridView()
         setupListeners()
         getAppList()
         observeLiveData()
@@ -83,6 +91,7 @@ class LauncherActivity : BaseActivity() {
         rvApps.layoutManager = layoutManager
         rvApps.addItemDecoration(itemDecoration)
         rvApps.adapter = adapter
+        adapter.setOnClickListeners(this)
 
         rvApps.edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
             override fun createEdgeEffect(recyclerView: RecyclerView, direction: Int): EdgeEffect {
@@ -140,6 +149,34 @@ class LauncherActivity : BaseActivity() {
 
     }
 
+    private fun setupGridView() {
+        gridApps.adapter = gridAdapter
+        setMode(HandyGridView.MODE.LONG_PRESS)
+        gridApps.setAutoOptimize(true)
+        gridApps.setScrollSpeed(750)
+
+        gridApps.setOnItemLongClickListener { _, _, i, _ ->
+            if (!gridApps.isTouchMode && !gridApps.isNoneMode && !gridAdapter.isFixed(i)) {//long press enter edit mode.
+                setMode(HandyGridView.MODE.TOUCH)
+                return@setOnItemLongClickListener true
+            }
+            return@setOnItemLongClickListener false
+        }
+
+        gridApps.setOnItemCapturedListener(object : OnItemCapturedListener {
+            override fun onItemReleased(v: View?, position: Int) {
+                v?.scaleX = 1f
+                v?.scaleY = 1f
+                setMode(HandyGridView.MODE.LONG_PRESS)
+            }
+
+            override fun onItemCaptured(v: View?, position: Int) {
+                v?.scaleX = 1.2f
+                v?.scaleY = 1.2f
+            }
+        })
+    }
+
     private fun setupListeners() {
         val touchTypeDetector = object : TouchTypeDetector.TouchTypListener {
             override fun onDoubleTap() {
@@ -160,6 +197,11 @@ class LauncherActivity : BaseActivity() {
                         handler.postDelayed({
                             clParent.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
                         }, 50)
+                    }
+                    TouchTypeDetector.SCROLL_DIR_DOWN -> {
+                        handler.postDelayed({
+                            openStatusBar()
+                        }, 1)
                     }
                 }
             }
@@ -184,6 +226,7 @@ class LauncherActivity : BaseActivity() {
             override fun onPanelSlide(panel: View?, slideOffset: Float) {
                 ivDragIcon.alpha = 1 - slideOffset
                 clSearchBar.alpha = slideOffset
+                gridApps.alpha = 1 - slideOffset
             }
 
             override fun onPanelStateChanged(
@@ -193,6 +236,9 @@ class LauncherActivity : BaseActivity() {
             ) {
                 when (newState) {
                     SlidingUpPanelLayout.PanelState.EXPANDED -> {
+                        Sensey.getInstance().stopTouchTypeDetection()
+                    }
+                    SlidingUpPanelLayout.PanelState.DRAGGING -> {
                         Sensey.getInstance().stopTouchTypeDetection()
                     }
                     SlidingUpPanelLayout.PanelState.COLLAPSED -> {
@@ -238,6 +284,17 @@ class LauncherActivity : BaseActivity() {
         })
     }
 
+    private fun setMode(mode: HandyGridView.MODE) {
+        gridApps.mode = mode
+        gridAdapter.setInEditMode(mode == HandyGridView.MODE.TOUCH)
+    }
+
+    private fun openApp(appInfo: AppInfo) {
+        val intent = packageManager.getLaunchIntentForPackage(appInfo.packageName)
+        startActivity(intent)
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+    }
+
     private inline fun <reified T : RecyclerView.ViewHolder> RecyclerView.forEachVisibleHolder(
         action: (T) -> Unit
     ) {
@@ -254,5 +311,23 @@ class LauncherActivity : BaseActivity() {
     override fun onDestroy() {
         Sensey.getInstance().stop()
         super.onDestroy()
+    }
+
+    override fun onItemClick(position: Int, parent: View, appInfo: AppInfo) {
+        openApp(appInfo)
+    }
+
+    override fun onItemLongClick(position: Int, parent: View, appInfo: AppInfo) {
+        if (gridAdapter.addItem(appInfo)) {
+            clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+            showToast(getString(R.string.shortcut_added_to_home_screen))
+        }
+    }
+
+    override fun onBackPressed() {
+        if (clParent.panelState === SlidingUpPanelLayout.PanelState.EXPANDED)
+            clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+        else
+            super.onBackPressed()
     }
 }

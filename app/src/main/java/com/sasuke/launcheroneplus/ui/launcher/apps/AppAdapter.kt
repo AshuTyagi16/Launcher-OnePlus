@@ -1,6 +1,7 @@
 package com.sasuke.launcheroneplus.ui.launcher.apps
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.doOnLayout
 import androidx.recyclerview.widget.RecyclerView
@@ -8,9 +9,12 @@ import com.l4digital.fastscroll.FastScroller
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.AppInfo
 
-class AppAdapter : RecyclerView.Adapter<AppViewHolder>(), FastScroller.SectionIndexer {
+class AppAdapter : RecyclerView.Adapter<AppViewHolder>(), FastScroller.SectionIndexer,
+    AppViewHolder.OnClickListeners {
 
     private lateinit var appList: MutableList<AppInfo>
+    private lateinit var onClickListeners: OnClickListeners
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
         val view =
@@ -29,6 +33,7 @@ class AppAdapter : RecyclerView.Adapter<AppViewHolder>(), FastScroller.SectionIn
     override fun onBindViewHolder(holder: AppViewHolder, position: Int) {
         if (::appList.isInitialized) {
             holder.setAppInfo(appList[position])
+            holder.setOnClickListeners(this)
         }
     }
 
@@ -39,5 +44,24 @@ class AppAdapter : RecyclerView.Adapter<AppViewHolder>(), FastScroller.SectionIn
 
     override fun getSectionText(position: Int): CharSequence {
         return appList[position].label[0].toString()
+    }
+
+    interface OnClickListeners {
+        fun onItemClick(position: Int, parent: View, appInfo: AppInfo)
+        fun onItemLongClick(position: Int, parent: View, appInfo: AppInfo)
+    }
+
+    fun setOnClickListeners(onClickListeners: OnClickListeners) {
+        this.onClickListeners = onClickListeners
+    }
+
+    override fun onItemClick(position: Int, parent: View, appInfo: AppInfo) {
+        if (::onClickListeners.isInitialized)
+            onClickListeners.onItemClick(position, parent, appInfo)
+    }
+
+    override fun onItemLongClick(position: Int, parent: View, appInfo: AppInfo) {
+        if (::onClickListeners.isInitialized)
+            onClickListeners.onItemLongClick(position, parent, appInfo)
     }
 }

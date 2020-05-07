@@ -85,4 +85,7 @@ dependencies {
 
     //Bounce Effect Animation RecyclerView
     implementation 'androidx.dynamicanimation:dynamicanimation:1.1.0-alpha03'
+
+    //Draggable Grid View Layout
+    implementation 'com.huxq17.handygridview:handygridview:1.2.0'
 }

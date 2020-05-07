@@ -13,4 +13,22 @@
         android:scaleType="centerCrop"
         android:src="@drawable/lion" />
 
+    <com.huxq17.handygridview.HandyGridView
+        android:id="@+id/gridApps"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="30dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:gravity="center"
+        android:horizontalSpacing="10dp"
+        android:numColumns="5"
+        android:paddingLeft="10dp"
+        android:paddingTop="30dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="30dp"
+        android:scrollbars="vertical"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="10dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
