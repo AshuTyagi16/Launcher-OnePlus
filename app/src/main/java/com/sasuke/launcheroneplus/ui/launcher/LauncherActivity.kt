@@ -268,6 +268,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                             this@LauncherActivity,
                             touchTypeDetector
                         )
+                        hideKeyboard()
                     }
                 }
             }
