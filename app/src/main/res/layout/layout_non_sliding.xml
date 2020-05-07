@@ -13,12 +13,23 @@
         android:scaleType="centerCrop"
         android:src="@drawable/lion" />
 
+    <View
+        android:id="@+id/dragView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:translationZ="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.huxq17.handygridview.HandyGridView
         android:id="@+id/gridApps"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="30dp"
         android:clipChildren="false"
+        android:translationZ="1dp"
         android:clipToPadding="false"
         android:gravity="center"
         android:horizontalSpacing="10dp"

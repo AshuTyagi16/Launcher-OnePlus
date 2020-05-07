@@ -17,6 +17,10 @@ class AppAdapter : RecyclerView.Adapter<AppViewHolder>(), FastScroller.SectionIn
     private lateinit var appList: MutableList<AppInfo>
     private lateinit var onClickListeners: OnClickListeners
 
+    init {
+        setHasStableIds(true)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.cell_app_info, parent, false)
@@ -36,6 +40,10 @@ class AppAdapter : RecyclerView.Adapter<AppViewHolder>(), FastScroller.SectionIn
             holder.setAppInfo(appList[position])
             holder.setOnClickListeners(this)
         }
+    }
+
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
     }
 
     fun setApps(list: MutableList<AppInfo>) {

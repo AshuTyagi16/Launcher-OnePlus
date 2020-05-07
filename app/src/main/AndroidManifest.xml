@@ -32,7 +32,11 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
-            android:name=".ui.HiddenAppsActivity"
+            android:name=".ui.hidden_apps.HiddenAppsActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".ui.hidden_apps.app_selector.AppSelectionActivity"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
 

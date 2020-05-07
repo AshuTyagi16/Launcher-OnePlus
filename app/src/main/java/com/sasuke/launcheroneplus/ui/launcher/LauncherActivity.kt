@@ -1,10 +1,11 @@
 package com.sasuke.launcheroneplus.ui.launcher
 
 import android.animation.Animator
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.view.Gravity
+import android.view.DragEvent
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
@@ -14,15 +15,18 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.github.nisrulz.sensey.*
+import com.github.nisrulz.sensey.PinchScaleDetector
+import com.github.nisrulz.sensey.Sensey
+import com.github.nisrulz.sensey.TouchTypeDetector
 import com.huxq17.handygridview.HandyGridView
 import com.huxq17.handygridview.listener.OnItemCapturedListener
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.AppInfo
-import com.sasuke.launcheroneplus.ui.HiddenAppsActivity
+import com.sasuke.launcheroneplus.data.DragData
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
 import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
+import com.sasuke.launcheroneplus.ui.hidden_apps.HiddenAppsActivity
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppAdapter
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
 import com.sasuke.launcheroneplus.util.Constants
@@ -32,6 +36,7 @@ import kotlinx.android.synthetic.main.activity_launcher.*
 import kotlinx.android.synthetic.main.layout_non_sliding.*
 import kotlinx.android.synthetic.main.layout_sliding.*
 import javax.inject.Inject
+
 
 class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     GridViewAdapter.OnClickListeners {
@@ -325,6 +330,28 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             }
 
         }
+
+        dragView.setOnDragListener { view, dragEvent ->
+            when (dragEvent.action) {
+                DragEvent.ACTION_DRAG_ENTERED -> {
+//                    dragView.setBackgroundColor(Color.GREEN)
+                }
+                DragEvent.ACTION_DRAG_EXITED -> {
+//                    dragView.setBackgroundColor(Color.RED)
+                }
+                DragEvent.ACTION_DRAG_ENDED -> {
+//                    dragView.setBackgroundColor(Color.WHITE)
+                }
+                DragEvent.ACTION_DROP -> {
+                    val item = dragEvent.localState as DragData
+                    gridAdapter.addItem(item.item)
+                    showToast(getString(R.string.shortcut_added_to_home_screen))
+                }
+                else -> {
+                }
+            }
+            true
+        }
     }
 
     private fun getAppList() {
@@ -430,10 +457,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     }
 
     override fun onItemLongClick(position: Int, parent: View, appInfo: AppInfo) {
-        if (gridAdapter.addItem(appInfo)) {
-            clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
-            showToast(getString(R.string.shortcut_added_to_home_screen))
-        }
+        clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
     }
 
     override fun onBackPressed() {

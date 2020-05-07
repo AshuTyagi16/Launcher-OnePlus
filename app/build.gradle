@@ -88,4 +88,8 @@ dependencies {
 
     //Draggable Grid View Layout
     implementation 'com.huxq17.handygridview:handygridview:1.2.0'
+
+    //MultiSelect RecyclerView
+    implementation 'androidx.recyclerview:recyclerview-selection:1.0.0'
+
 }

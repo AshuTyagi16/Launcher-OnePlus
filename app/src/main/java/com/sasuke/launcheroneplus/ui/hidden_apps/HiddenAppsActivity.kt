@@ -1,4 +1,4 @@
-package com.sasuke.launcheroneplus.ui
+package com.sasuke.launcheroneplus.ui.hidden_apps
 
 import android.content.Context
 import android.content.Intent

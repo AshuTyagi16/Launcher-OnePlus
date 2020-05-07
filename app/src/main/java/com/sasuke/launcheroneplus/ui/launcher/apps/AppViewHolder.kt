@@ -2,24 +2,21 @@ package com.sasuke.launcheroneplus.ui.launcher.apps
 
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.dynamicanimation.animation.SpringForce
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.AppInfo
+import com.sasuke.launcheroneplus.data.DragData
 import kotlinx.android.synthetic.main.cell_app_info.view.*
 
-class AppViewHolder(itemView: View, private val consumeLongPress: Boolean = true) : RecyclerView.ViewHolder(itemView) {
+class AppViewHolder(itemView: View, private val consumeLongPress: Boolean = true) :
+    RecyclerView.ViewHolder(itemView) {
 
     private lateinit var onClickListeners: OnClickListeners
 
     var currentVelocity = 0f
-
-    var highlight = false
-
-    private val highlightColor = ContextCompat.getColor(itemView.context, R.color.app_highlight)
-    private val unhighlightColor =
-        ContextCompat.getColor(itemView.context, R.color.app_un_highlight)
 
     /**
      * A [SpringAnimation] for this RecyclerView item. This animation rotates the view with a bouncy
@@ -54,21 +51,21 @@ class AppViewHolder(itemView: View, private val consumeLongPress: Boolean = true
         itemView.ivAppIcon.setImageDrawable(appInfo.icon)
         itemView.tvAppLabel.text = appInfo.label
 
-        itemView.setOnLongClickListener {
-            if (::onClickListeners.isInitialized)
-                onClickListeners.onItemLongClick(adapterPosition, itemView, appInfo)
-            return@setOnLongClickListener consumeLongPress
-        }
-
         itemView.setOnClickListener {
             if (::onClickListeners.isInitialized)
                 onClickListeners.onItemClick(adapterPosition, itemView, appInfo)
         }
 
-        if (highlight)
-            itemView.clApp.setBackgroundColor(highlightColor)
-        else
-            itemView.clApp.setBackgroundColor(unhighlightColor)
+        itemView.setOnLongClickListener {
+            if (::onClickListeners.isInitialized)
+                onClickListeners.onItemLongClick(adapterPosition, itemView, appInfo)
+            val icon = itemView.ivAppIcon
+            val state =
+                DragData(appInfo, icon.width, icon.height)
+            val shadow = View.DragShadowBuilder(icon)
+            ViewCompat.startDragAndDrop(icon, null, shadow, state, 0)
+            return@setOnLongClickListener true
+        }
     }
 
     interface OnClickListeners {

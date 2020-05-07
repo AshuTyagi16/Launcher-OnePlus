@@ -52,13 +52,9 @@ class GridViewAdapter : BaseAdapter(), OnItemMovedListener, AppViewHolder.OnClic
         return false
     }
 
-    fun addItem(appInfo: AppInfo): Boolean {
-        if (!list.contains(appInfo)) {
-            list.add(appInfo)
-            notifyDataSetChanged()
-            return true
-        }
-        return false
+    fun addItem(appInfo: AppInfo) {
+        list.add(appInfo)
+        notifyDataSetChanged()
     }
 
     fun setInEditMode(inEditMode: Boolean) {

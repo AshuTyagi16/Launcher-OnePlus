@@ -5,6 +5,7 @@
     android:id="@+id/clApp"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:background="@drawable/highlight"
     android:paddingTop="10dp"
     android:paddingBottom="10dp">
 
