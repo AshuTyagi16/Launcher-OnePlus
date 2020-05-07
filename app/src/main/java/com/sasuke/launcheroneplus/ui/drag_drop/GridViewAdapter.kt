@@ -12,9 +12,8 @@ import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
 class GridViewAdapter : BaseAdapter(), OnItemMovedListener, AppViewHolder.OnClickListeners {
 
     private lateinit var onClickListeners: OnClickListeners
-    val list: MutableList<AppInfo> = ArrayList()
+    private val list: MutableList<AppInfo> = ArrayList()
     private var inEditMode = false
-
 
     override fun getView(position: Int, convertview: View?, parent: ViewGroup): View {
         val appViewHolder: AppViewHolder
