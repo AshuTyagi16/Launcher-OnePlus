@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.sasuke.launcheroneplus.data.AppInfo
 import com.sasuke.launcheroneplus.util.PackageResolverUtils
 import com.sasuke.launcheroneplus.util.SearchUtils
+import com.sasuke.launcheroneplus.util.StorageUtils
+import com.sasuke.launcheroneplus.util.toLowerCased
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -16,7 +18,7 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-class LauncherActivityViewModel @Inject constructor(private val context: Context) : ViewModel() {
+class LauncherActivityViewModel @Inject constructor(context: Context) : ViewModel() {
 
     private val _appList = MutableLiveData<MutableList<AppInfo>>()
     val appList: LiveData<MutableList<AppInfo>>
@@ -24,17 +26,13 @@ class LauncherActivityViewModel @Inject constructor(private val context: Context
 
     private lateinit var list: MutableList<AppInfo>
     private lateinit var listFiltered: MutableList<AppInfo>
+
     private val packageManager = context.packageManager
 
     fun getAppsList() {
-        val mainIntent = Intent(Intent.ACTION_MAIN, null)
-        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                list = PackageResolverUtils.getSortedAppList(
-                    packageManager,
-                    context.packageManager.queryIntentActivities(mainIntent, 0)
-                )
+                list = PackageResolverUtils.getSortedAppList(packageManager)
                 _appList.postValue(list)
             }
         }
@@ -52,14 +50,8 @@ class LauncherActivityViewModel @Inject constructor(private val context: Context
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     list.forEach {
-                        if (SearchUtils.matches(
-                                it.label.toLowerCase(Locale.getDefault()), query.toLowerCase(
-                                    Locale.getDefault()
-                                )
-                            )
-                        ) {
+                        if (SearchUtils.matches(it.label.toLowerCased(), query.toLowerCased()))
                             filtered.add(it)
-                        }
                     }
                     listFiltered = filtered
                     _appList.postValue(listFiltered)

@@ -1,7 +1,7 @@
 package com.sasuke.launcheroneplus.util
 
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
 import androidx.annotation.WorkerThread
 import com.sasuke.launcheroneplus.data.AppInfo
 import java.util.*
@@ -11,10 +11,15 @@ object PackageResolverUtils {
 
     @WorkerThread
     suspend fun getSortedAppList(
-        packageManager: PackageManager,
-        list: List<ResolveInfo>
+        packageManager: PackageManager
     ): MutableList<AppInfo> {
+
+        val mainIntent = Intent(Intent.ACTION_MAIN, null)
+        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
+
+        val list = packageManager.queryIntentActivities(mainIntent, 0)
         val appInoList: MutableList<AppInfo> = ArrayList(list.size)
+
         list.forEach { resolveInfo ->
             val packageInfo = AppInfo(
                 resolveInfo.loadIcon(packageManager),
@@ -23,9 +28,11 @@ object PackageResolverUtils {
             )
             appInoList.add(packageInfo)
         }
+
         appInoList.sortBy {
-            it.label.toLowerCase(Locale.getDefault())
+            it.label.toLowerCased()
         }
+
         return appInoList
     }
 }
