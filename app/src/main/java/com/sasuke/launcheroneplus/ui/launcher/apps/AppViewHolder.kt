@@ -9,6 +9,7 @@ import androidx.dynamicanimation.animation.SpringForce
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.AppInfo
 import com.sasuke.launcheroneplus.data.DragData
+import com.sasuke.launcheroneplus.ui.base.MyDragShadowBuilder
 import kotlinx.android.synthetic.main.cell_app_info.view.*
 
 class AppViewHolder(itemView: View, private val consumeLongPress: Boolean = true) :
@@ -63,7 +64,7 @@ class AppViewHolder(itemView: View, private val consumeLongPress: Boolean = true
                 val icon = itemView.ivAppIcon
                 val state =
                     DragData(appInfo, icon.width, icon.height)
-                val shadow = View.DragShadowBuilder(icon)
+                val shadow = MyDragShadowBuilder(icon)
                 ViewCompat.startDragAndDrop(icon, null, shadow, state, 0)
             }
             return@setOnLongClickListener consumeLongPress

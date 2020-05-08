@@ -10,6 +10,7 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.EdgeEffect
+import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -340,6 +341,8 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         dragView.setOnDragListener { _, dragEvent ->
             when (dragEvent.action) {
                 DragEvent.ACTION_DRAG_STARTED -> {
+                    clInnerParent.animate().scaleX(0.8f).scaleY(0.8f).start()
+                    clInnerParent.background = ContextCompat.getDrawable(this, R.drawable.shadow)
                     clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
                 }
                 DragEvent.ACTION_DRAG_ENTERED -> {
@@ -349,7 +352,8 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
                 }
                 DragEvent.ACTION_DRAG_ENDED -> {
-
+                    clInnerParent.background = null
+                    clInnerParent.animate().scaleX(1f).scaleY(1f).start()
                 }
                 DragEvent.ACTION_DROP -> {
                     val item = dragEvent.localState as DragData
