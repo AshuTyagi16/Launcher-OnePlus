@@ -11,7 +11,8 @@ import com.l4digital.fastscroll.FastScroller
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.AppInfo
 
-class AppAdapter : RecyclerView.Adapter<AppViewHolder>(), FastScroller.SectionIndexer,
+class AppAdapter : RecyclerView.Adapter<AppViewHolder>(),
+    FastScroller.SectionIndexer,
     AppViewHolder.OnClickListeners {
 
     private lateinit var appList: MutableList<AppInfo>

@@ -84,5 +84,5 @@
         tools:itemCount="25"
         tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         tools:listitem="@layout/cell_app_info"
-        tools:spanCount="4" />
+        tools:spanCount="5" />
 </androidx.constraintlayout.widget.ConstraintLayout>

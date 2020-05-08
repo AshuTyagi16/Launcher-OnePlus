@@ -92,4 +92,7 @@ dependencies {
     //MultiSelect RecyclerView
     implementation 'androidx.recyclerview:recyclerview-selection:1.0.0'
 
+    //Lottie Animation
+    implementation 'com.airbnb.android:lottie:3.4.0'
+
 }

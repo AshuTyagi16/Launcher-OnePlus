@@ -6,6 +6,7 @@
     <string name="image">Image</string>
     <string name="placeholder">Placeholder</string>
     <string name="separator">Separator</string>
+    <string name="button">Button</string>
 
     <!-- Launcher -->
     <string name="search_apps">Search apps</string>
@@ -13,4 +14,12 @@
 
     <!-- Drag n Drop -->
     <string name="removeItem">Remove</string>
+
+    <!-- App Selection -->
+    <string name="n_app_selected">%d selected</string>
+    <string name="select_application_to_hide">Select application to hide</string>
+
+    <!-- Hidden Space -->
+    <string name="hidden_space">Hidden Space</string>
+    <string name="no_hidden_applications">No hidden applications</string>
 </resources>

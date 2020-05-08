@@ -13,6 +13,12 @@
         <item name="android:windowActionBarOverlay">true</item>
     </style>
 
+    <style name="CheckBox" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="colorAccent">@color/search_bar</item>
+        <item name="android:textColorSecondary">@color/white</item>
+
+    </style>
+
     <!-- Text -->
     <style name="Text">
         <item name="android:layout_width">wrap_content</item>

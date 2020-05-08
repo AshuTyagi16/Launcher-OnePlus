@@ -254,7 +254,28 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
         }
 
+        pinchScaleListener = object : PinchScaleDetector.PinchScaleListener {
+            override fun onScaleEnd(p0: ScaleGestureDetector?) {
+                if (::touchTypeListener.isInitialized) {
+                    Sensey.getInstance()
+                        .startTouchTypeDetection(this@LauncherActivity, touchTypeListener)
+                }
+            }
+
+            override fun onScale(p0: ScaleGestureDetector?, isScalingOut: Boolean) {
+                if (!isScalingOut) {
+                    startActivity(HiddenAppsActivity.newIntent(this@LauncherActivity))
+                }
+            }
+
+            override fun onScaleStart(p0: ScaleGestureDetector?) {
+                Sensey.getInstance().stopTouchTypeDetection()
+            }
+
+        }
+
         Sensey.getInstance().startTouchTypeDetection(this, touchTypeListener)
+        Sensey.getInstance().startPinchScaleDetection(this@LauncherActivity, pinchScaleListener)
 
         clParent.addPanelSlideListener(object : SlidingUpPanelLayout.PanelSlideListener {
             override fun onPanelSlide(panel: View?, slideOffset: Float) {
@@ -316,28 +337,11 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             }
         }
 
-        pinchScaleListener = object : PinchScaleDetector.PinchScaleListener {
-            override fun onScaleEnd(p0: ScaleGestureDetector?) {
-                if (::touchTypeListener.isInitialized) {
-                    Sensey.getInstance()
-                        .startTouchTypeDetection(this@LauncherActivity, touchTypeListener)
-                }
-            }
-
-            override fun onScale(p0: ScaleGestureDetector?, isScalingOut: Boolean) {
-                if (!isScalingOut) {
-                    startActivity(HiddenAppsActivity.newIntent(this@LauncherActivity))
-                }
-            }
-
-            override fun onScaleStart(p0: ScaleGestureDetector?) {
-                Sensey.getInstance().stopTouchTypeDetection()
-            }
-
-        }
-
         dragView.setOnDragListener { _, dragEvent ->
             when (dragEvent.action) {
+                DragEvent.ACTION_DRAG_STARTED -> {
+                    clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+                }
                 DragEvent.ACTION_DRAG_ENTERED -> {
                     clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
                 }

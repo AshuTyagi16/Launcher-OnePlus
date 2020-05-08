@@ -6,16 +6,34 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:paddingTop="10dp"
-    android:paddingBottom="10dp">
+    android:paddingBottom="10dp"
+    tools:background="@color/black">
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:button="@drawable/cb_selector"
+        android:clickable="false"
+        android:focusable="false"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:theme="@style/CheckBox"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/ivAppIcon"
         android:layout_width="45dp"
         android:layout_height="45dp"
+        android:adjustViewBounds="true"
+        android:clickable="false"
         android:contentDescription="@string/icon"
+        android:focusable="false"
         app:layout_constraintEnd_toEndOf="@id/tvAppLabel"
+        app:layout_constraintStart_toEndOf="@id/checkbox"
         app:layout_constraintStart_toStartOf="@id/tvAppLabel"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/checkbox"
         tools:src="@tools:sample/avatars" />
 
     <TextView
@@ -24,7 +42,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:clickable="false"
         android:ellipsize="end"
+        android:focusable="false"
         android:gravity="center"
         android:maxWidth="100dp"
         android:maxLines="1"

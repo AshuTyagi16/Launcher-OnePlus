@@ -19,6 +19,6 @@ abstract class ActivityBindingModule {
     internal abstract fun hiddenAppsActivity(): HiddenAppsActivity
 
     @PerActivityScope
-    @ContributesAndroidInjector(modules = [])
+    @ContributesAndroidInjector(modules = [AppSelectionActivityModule::class])
     internal abstract fun appSelectionActivity(): AppSelectionActivity
 }
