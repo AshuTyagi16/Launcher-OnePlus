@@ -59,12 +59,14 @@ class AppViewHolder(itemView: View, private val consumeLongPress: Boolean = true
         itemView.setOnLongClickListener {
             if (::onClickListeners.isInitialized)
                 onClickListeners.onItemLongClick(adapterPosition, itemView, appInfo)
-            val icon = itemView.ivAppIcon
-            val state =
-                DragData(appInfo, icon.width, icon.height)
-            val shadow = View.DragShadowBuilder(icon)
-            ViewCompat.startDragAndDrop(icon, null, shadow, state, 0)
-            return@setOnLongClickListener true
+            if (consumeLongPress) {
+                val icon = itemView.ivAppIcon
+                val state =
+                    DragData(appInfo, icon.width, icon.height)
+                val shadow = View.DragShadowBuilder(icon)
+                ViewCompat.startDragAndDrop(icon, null, shadow, state, 0)
+            }
+            return@setOnLongClickListener consumeLongPress
         }
     }
 

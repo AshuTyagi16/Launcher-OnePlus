@@ -68,12 +68,17 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     companion object {
         /** The magnitude of rotation while the list is scrolled. */
         private const val SCROLL_ROTATION_MAGNITUDE = 0.25f
+
         /** The magnitude of rotation while the list is over-scrolled. */
         private const val OVERSCROLL_ROTATION_MAGNITUDE = -10
+
         /** The magnitude of translation distance while the list is over-scrolled. */
         private const val OVERSCROLL_TRANSLATION_MAGNITUDE = 0.2f
+
         /** The magnitude of translation distance when the list reaches the edge on fling. */
         private const val FLING_TRANSLATION_MAGNITUDE = 0.5f
+
+        private const val CURRENT_PAGE_KEY = "CURRENT_PAGE_KEY"
 
     }
 
@@ -331,26 +336,28 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
         }
 
-        dragView.setOnDragListener { view, dragEvent ->
+        dragView.setOnDragListener { _, dragEvent ->
             when (dragEvent.action) {
                 DragEvent.ACTION_DRAG_ENTERED -> {
-//                    dragView.setBackgroundColor(Color.GREEN)
+                    clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
                 }
                 DragEvent.ACTION_DRAG_EXITED -> {
-//                    dragView.setBackgroundColor(Color.RED)
+
                 }
                 DragEvent.ACTION_DRAG_ENDED -> {
-//                    dragView.setBackgroundColor(Color.WHITE)
+
                 }
                 DragEvent.ACTION_DROP -> {
                     val item = dragEvent.localState as DragData
                     gridAdapter.addItem(item.item)
                     showToast(getString(R.string.shortcut_added_to_home_screen))
+                    dragView.visibility = View.GONE
                 }
                 else -> {
+
                 }
             }
-            true
+            return@setOnDragListener true
         }
     }
 
@@ -457,6 +464,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     }
 
     override fun onItemLongClick(position: Int, parent: View, appInfo: AppInfo) {
+        dragView.visibility = View.VISIBLE
         clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
     }
 
