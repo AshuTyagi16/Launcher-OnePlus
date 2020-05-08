@@ -7,7 +7,13 @@ import android.widget.ImageView
 
 class MyDragShadowBuilder(v: View) : View.DragShadowBuilder(v) {
 
-    private val shadow = (v as ImageView).drawable
+    private var drawable = (v as ImageView).drawable
+
+    init {
+        drawable = drawable.constantState?.newDrawable()?.mutate()
+    }
+
+    private val shadow = drawable
 
     // Defines a callback that sends the drag shadow dimensions and touch point back to the
     // system.
