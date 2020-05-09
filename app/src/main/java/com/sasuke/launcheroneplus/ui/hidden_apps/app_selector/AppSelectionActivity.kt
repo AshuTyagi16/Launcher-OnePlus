@@ -3,27 +3,38 @@ package com.sasuke.launcheroneplus.ui.hidden_apps.app_selector
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
-import com.sasuke.launcheroneplus.data.model.AppInfo
+import com.sasuke.launcheroneplus.di.qualifiers.HiddenAppLayoutManager
+import com.sasuke.launcheroneplus.di.qualifiers.VisibleAppLayoutManager
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
 import kotlinx.android.synthetic.main.activity_app_selection.*
 import javax.inject.Inject
 
-class AppSelectionActivity : BaseActivity(), AppSelectionAdapter.OnClickListeners {
+class AppSelectionActivity : BaseActivity(), VisibleAppSelectionAdapter.OnClickListeners,
+    HiddenAppSelectionAdapter.OnClickListeners {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     @Inject
-    lateinit var adapter: AppSelectionAdapter
+    lateinit var adapterHiddenApps: HiddenAppSelectionAdapter
 
     @Inject
-    lateinit var layoutManager: GridLayoutManager
+    lateinit var adapterVisibleApps: VisibleAppSelectionAdapter
+
+    @Inject
+    @VisibleAppLayoutManager
+    lateinit var visibleAppsLayoutManager: GridLayoutManager
+
+    @Inject
+    @HiddenAppLayoutManager
+    lateinit var hiddenAppsLayoutManager: GridLayoutManager
 
     @Inject
     lateinit var itemDecoration: ItemDecorator
@@ -52,15 +63,36 @@ class AppSelectionActivity : BaseActivity(), AppSelectionAdapter.OnClickListener
     }
 
     private fun setupRecyclerView() {
-        rvApps.layoutManager = layoutManager
-        rvApps.addItemDecoration(itemDecoration)
-        rvApps.adapter = adapter
-        adapter.setOnClickListeners(this)
+        rvHideApps.layoutManager = visibleAppsLayoutManager
+        rvHideApps.addItemDecoration(itemDecoration)
+        rvHideApps.adapter = adapterVisibleApps
+        adapterVisibleApps.setOnClickListeners(this)
+
+        rvUnHideApps.layoutManager = hiddenAppsLayoutManager
+        rvUnHideApps.addItemDecoration(itemDecoration)
+        rvUnHideApps.adapter = adapterHiddenApps
+        adapterHiddenApps.setOnClickListeners(this)
     }
 
     private fun getApps() {
-        appSelectionActivityViewModel.appListLiveData.observe(this, Observer {
-            appSelectionActivityViewModel.setApps()
+        appSelectionActivityViewModel.visibleAppListLiveData.observe(this, Observer {
+            if (it.isEmpty()) {
+                rvHideApps.visibility = View.GONE
+                ivSeparatorRvs.visibility = View.GONE
+            } else {
+                rvHideApps.visibility = View.VISIBLE
+            }
+            appSelectionActivityViewModel.setVisibleApps()
+        })
+
+        appSelectionActivityViewModel.hiddenAppListLiveData.observe(this, Observer {
+            if (it.isEmpty()) {
+                rvUnHideApps.visibility = View.GONE
+                ivSeparatorRvs.visibility = View.GONE
+            } else {
+                rvUnHideApps.visibility = View.VISIBLE
+            }
+            appSelectionActivityViewModel.setHiddenApps()
         })
     }
 
@@ -79,6 +111,7 @@ class AppSelectionActivity : BaseActivity(), AppSelectionAdapter.OnClickListener
         btnCheck.setOnClickListener {
             if (appCount > 0) {
                 appSelectionActivityViewModel.hideSelectedApps()
+                appSelectionActivityViewModel.unhideSelectedApps()
                 finish()
             } else
                 finish()
@@ -88,7 +121,11 @@ class AppSelectionActivity : BaseActivity(), AppSelectionAdapter.OnClickListener
         }
     }
 
-    override fun onItemClick(position: Int, appInfo: App) {
-        appSelectionActivityViewModel.toggleSelection(position)
+    override fun onHiddenItemClick(position: Int, appInfo: App) {
+        appSelectionActivityViewModel.toggleHiddenSelection(position)
+    }
+
+    override fun onVisibleItemClick(position: Int, appInfo: App) {
+        appSelectionActivityViewModel.toggleVisibleSelection(position)
     }
 }

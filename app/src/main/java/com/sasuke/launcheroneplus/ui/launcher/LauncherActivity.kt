@@ -22,7 +22,6 @@ import com.huxq17.handygridview.HandyGridView
 import com.huxq17.handygridview.listener.OnItemCapturedListener
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
-import com.sasuke.launcheroneplus.data.model.AppInfo
 import com.sasuke.launcheroneplus.data.model.DragData
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
@@ -110,12 +109,12 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     }
 
     private fun setupRecyclerView() {
-        rvApps.layoutManager = layoutManager
-        rvApps.addItemDecoration(itemDecoration)
-        rvApps.adapter = adapter
+        rvHideApps.layoutManager = layoutManager
+        rvHideApps.addItemDecoration(itemDecoration)
+        rvHideApps.adapter = adapter
         adapter.setOnClickListeners(this)
 
-        rvApps.edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
+        rvHideApps.edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
             override fun createEdgeEffect(recyclerView: RecyclerView, direction: Int): EdgeEffect {
                 return object : EdgeEffect(recyclerView.context) {
 
@@ -309,7 +308,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             }
         })
 
-        rvApps.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        rvHideApps.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
 
                 if (layoutManager.findFirstCompletelyVisibleItemPosition() >= Constants.APP_LIST_SPAN_COUNT)

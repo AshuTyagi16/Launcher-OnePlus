@@ -65,21 +65,67 @@
             android:contentDescription="@string/separator"
             app:layout_constraintTop_toBottomOf="@id/btnBack" />
 
-        <com.l4digital.fastscroll.FastScrollRecyclerView
-            android:id="@+id/rvApps"
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:bubbleColor="@color/search_bar"
-            app:bubbleTextColor="@color/white"
-            app:handleColor="@color/search_bar"
-            app:hideScrollbar="true"
+            android:fillViewport="true"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ivSeparator"
-            app:showTrack="false"
-            tools:itemCount="25"
-            tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            tools:listitem="@layout/cell_app_selector"
-            tools:spanCount="4" />
+            app:layout_constraintTop_toBottomOf="@id/ivSeparator">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <com.l4digital.fastscroll.FastScrollRecyclerView
+                    android:id="@+id/rvUnHideApps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    app:bubbleColor="@color/search_bar"
+                    app:bubbleTextColor="@color/white"
+                    app:handleColor="@color/search_bar"
+                    app:hideScrollbar="true"
+                    app:layout_constraintBottom_toTopOf="@id/ivSeparatorRvs"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:showTrack="false"
+                    tools:itemCount="25"
+                    tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    tools:listitem="@layout/cell_app_selector"
+                    tools:spanCount="4" />
+
+                <ImageView
+                    android:id="@+id/ivSeparatorRvs"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:visibility="gone"
+                    android:layout_marginBottom="5dp"
+                    android:background="@color/shadow_white"
+                    android:contentDescription="@string/separator"
+                    app:layout_constraintBottom_toTopOf="@id/rvHideApps"
+                    app:layout_constraintTop_toBottomOf="@id/rvUnHideApps" />
+
+                <com.l4digital.fastscroll.FastScrollRecyclerView
+                    android:id="@+id/rvHideApps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    app:bubbleColor="@color/search_bar"
+                    app:bubbleTextColor="@color/white"
+                    app:handleColor="@color/search_bar"
+                    app:hideScrollbar="true"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/ivSeparatorRvs"
+                    app:showTrack="false"
+                    tools:itemCount="25"
+                    tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    tools:listitem="@layout/cell_app_selector"
+                    tools:spanCount="4" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

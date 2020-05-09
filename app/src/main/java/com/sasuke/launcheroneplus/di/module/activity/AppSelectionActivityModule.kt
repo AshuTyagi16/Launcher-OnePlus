@@ -3,13 +3,15 @@ package com.sasuke.launcheroneplus.di.module.activity
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.GridLayoutManager
-import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.di.mapkey.ViewModelKey
+import com.sasuke.launcheroneplus.di.qualifiers.HiddenAppLayoutManager
+import com.sasuke.launcheroneplus.di.qualifiers.VisibleAppLayoutManager
 import com.sasuke.launcheroneplus.di.scope.PerActivityScope
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
 import com.sasuke.launcheroneplus.ui.hidden_apps.app_selector.AppSelectionActivityViewModel
-import com.sasuke.launcheroneplus.ui.hidden_apps.app_selector.AppSelectionAdapter
+import com.sasuke.launcheroneplus.ui.hidden_apps.app_selector.HiddenAppSelectionAdapter
+import com.sasuke.launcheroneplus.ui.hidden_apps.app_selector.VisibleAppSelectionAdapter
 import com.sasuke.launcheroneplus.util.Constants
 import dagger.Binds
 import dagger.Module
@@ -23,13 +25,27 @@ abstract class AppSelectionActivityModule {
 
         @Provides
         @PerActivityScope
-        fun adapter(glide: RequestManager): AppSelectionAdapter {
-            return AppSelectionAdapter(glide)
+        fun hiddenAppSelectionAdapter(glide: RequestManager): HiddenAppSelectionAdapter {
+            return HiddenAppSelectionAdapter(glide)
         }
 
         @Provides
         @PerActivityScope
-        fun gridLayoutManager(context: Context): GridLayoutManager {
+        fun visibleAppSelectionAdapter(glide: RequestManager): VisibleAppSelectionAdapter {
+            return VisibleAppSelectionAdapter(glide)
+        }
+
+        @Provides
+        @PerActivityScope
+        @HiddenAppLayoutManager
+        fun gridLayoutManager1(context: Context): GridLayoutManager {
+            return GridLayoutManager(context, Constants.APP_LIST_SPAN_COUNT)
+        }
+
+        @Provides
+        @PerActivityScope
+        @VisibleAppLayoutManager
+        fun gridLayoutManager2(context: Context): GridLayoutManager {
             return GridLayoutManager(context, Constants.APP_LIST_SPAN_COUNT)
         }
 

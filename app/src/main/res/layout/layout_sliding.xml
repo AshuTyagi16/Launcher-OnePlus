@@ -26,7 +26,7 @@
         android:paddingStart="20dp"
         android:paddingTop="20dp"
         android:paddingEnd="20dp"
-        app:layout_constraintBottom_toTopOf="@id/rvApps"
+        app:layout_constraintBottom_toTopOf="@id/rvHideApps"
         app:layout_constraintTop_toBottomOf="@id/ivDragIcon"
         tools:alpha="1">
 
@@ -71,7 +71,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.l4digital.fastscroll.FastScrollRecyclerView
-        android:id="@+id/rvApps"
+        android:id="@+id/rvHideApps"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:bubbleColor="@color/search_bar"

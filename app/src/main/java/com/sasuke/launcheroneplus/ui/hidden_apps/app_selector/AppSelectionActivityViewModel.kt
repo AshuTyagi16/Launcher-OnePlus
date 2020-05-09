@@ -11,43 +11,76 @@ import javax.inject.Inject
 
 class AppSelectionActivityViewModel @Inject constructor(
     private val roomRepository: RoomRepository,
-    private val appSelectionAdapter: AppSelectionAdapter
+    private val visibleAppSelectionAdapter: VisibleAppSelectionAdapter,
+    private val hiddenAppSelectionAdapter: HiddenAppSelectionAdapter
 ) : ViewModel() {
 
-    private lateinit var appList: MutableList<App>
-    private val selectedAppList: MutableList<App> = ArrayList()
+    private lateinit var visibleAppList: MutableList<App>
+    private val selectedVisibleAppList: MutableList<App> = ArrayList()
 
-    private val _appListLiveData = MediatorLiveData<MutableList<App>>()
-    val appListLiveData: LiveData<MutableList<App>>
-        get() = _appListLiveData
+    private lateinit var hiddenAppList: MutableList<App>
+    private val selectedHiddenAppList: MutableList<App> = ArrayList()
+
+    private val _hiddenAppListLiveData = MediatorLiveData<MutableList<App>>()
+    val hiddenAppListLiveData: LiveData<MutableList<App>>
+        get() = _hiddenAppListLiveData
+
+    private val _visibleAppListLiveData = MediatorLiveData<MutableList<App>>()
+    val visibleAppListLiveData: LiveData<MutableList<App>>
+        get() = _visibleAppListLiveData
 
     private val _selectedAppCountLiveData = MutableLiveData<Int>()
     val selectedAppCountLiveData: LiveData<Int>
         get() = _selectedAppCountLiveData
 
     init {
-        _appListLiveData.addSource(roomRepository.getApps(true)) {
-            appList = it
-            _appListLiveData.postValue(it)
+        _visibleAppListLiveData.addSource(roomRepository.getApps()) {
+            visibleAppList = it
+            _visibleAppListLiveData.postValue(it)
+        }
+        _hiddenAppListLiveData.addSource(roomRepository.getOnlyHiddenApps()) {
+            hiddenAppList = it
+            _hiddenAppListLiveData.postValue(it)
         }
     }
 
-    fun setApps() {
-        appSelectionAdapter.setApps(appList)
+    fun setVisibleApps() {
+        visibleAppSelectionAdapter.setApps(visibleAppList)
     }
 
-    fun toggleSelection(position: Int) {
-        if (::appList.isInitialized) {
-            appSelectionAdapter.toggle(position)
+    fun setHiddenApps() {
+        hiddenAppSelectionAdapter.setApps(hiddenAppList)
+    }
+
+    fun toggleVisibleSelection(position: Int) {
+        if (::visibleAppList.isInitialized) {
+            visibleAppSelectionAdapter.toggle(position)
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
-                    val item = appList[position]
-                    if (selectedAppList.contains(item)) {
-                        selectedAppList.remove(item)
+                    val item = visibleAppList[position]
+                    if (selectedVisibleAppList.contains(item)) {
+                        selectedVisibleAppList.remove(item)
                     } else {
-                        selectedAppList.add(item)
+                        selectedVisibleAppList.add(item)
                     }
-                    _selectedAppCountLiveData.postValue(selectedAppList.size)
+                    _selectedAppCountLiveData.postValue(selectedVisibleAppList.size + selectedHiddenAppList.size)
+                }
+            }
+        }
+    }
+
+    fun toggleHiddenSelection(position: Int) {
+        if (::hiddenAppList.isInitialized) {
+            hiddenAppSelectionAdapter.toggle(position)
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    val item = hiddenAppList[position]
+                    if (selectedHiddenAppList.contains(item)) {
+                        selectedHiddenAppList.remove(item)
+                    } else {
+                        selectedHiddenAppList.add(item)
+                    }
+                    _selectedAppCountLiveData.postValue(selectedHiddenAppList.size + selectedVisibleAppList.size)
                 }
             }
         }
@@ -56,11 +89,23 @@ class AppSelectionActivityViewModel @Inject constructor(
     fun hideSelectedApps() {
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
-                val arr = IntArray(selectedAppList.size)
-                selectedAppList.forEachIndexed { index, app ->
+                val arr = IntArray(selectedVisibleAppList.size)
+                selectedVisibleAppList.forEachIndexed { index, app ->
                     arr[index] = app._id
                 }
                 roomRepository.hideApps(arr)
+            }
+        }
+    }
+
+    fun unhideSelectedApps() {
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                val arr = IntArray(selectedHiddenAppList.size)
+                selectedHiddenAppList.forEachIndexed { index, app ->
+                    arr[index] = app._id
+                }
+                roomRepository.unhideApps(arr)
             }
         }
     }

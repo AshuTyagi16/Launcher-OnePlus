@@ -11,7 +11,7 @@
     app:umanoFadeColor="@color/black_transparent"
     app:umanoOverlay="true"
     app:umanoPanelHeight="68dp"
-    app:umanoScrollableView="@id/rvApps"
+    app:umanoScrollableView="@id/rvHideApps"
     app:umanoShadowHeight="0dp"
     tools:context=".ui.launcher.LauncherActivity">
 

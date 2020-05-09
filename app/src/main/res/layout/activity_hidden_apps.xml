@@ -39,6 +39,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:lottie_autoPlay="true"
+            app:lottie_repeatCount="1"
+            app:lottie_repeatMode="reverse"
             app:lottie_fileName="glasses.json"
             app:lottie_loop="true" />
 
