@@ -345,7 +345,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         dragView.setOnDragListener { _, dragEvent ->
             when (dragEvent.action) {
                 DragEvent.ACTION_DRAG_STARTED -> {
-                    clInnerParent.animate().scaleX(0.8f).scaleY(0.8f).start()
+                    clInnerParent.animate().scaleX(0.7f).scaleY(0.7f).start()
                     clInnerParent.background = ContextCompat.getDrawable(this, R.drawable.shadow)
                     clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
                 }

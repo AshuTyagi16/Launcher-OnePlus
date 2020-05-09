@@ -76,7 +76,7 @@ dependencies {
     implementation 'com.jaeger.statusbarutil:library:1.5.1'
 
     //Sliding Up Panel
-    implementation 'com.sothree.slidinguppanel:library:3.4.0'
+    implementation 'com.github.hannesa2:AndroidSlidingUpPanel:4.2.0'
 
     //Sensor & Gesture Detection
     implementation 'com.github.nisrulz:sensey:1.8.0'

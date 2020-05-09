@@ -54,7 +54,6 @@ class AppSelectionActivity : BaseActivity(), VisibleAppSelectionAdapter.OnClickL
         setupRecyclerView()
         getApps()
         observeLiveData()
-        setListeners()
     }
 
     private fun inject() {
@@ -106,6 +105,8 @@ class AppSelectionActivity : BaseActivity(), VisibleAppSelectionAdapter.OnClickL
         appSelectionActivityViewModel.showSeparatorLiveData.observe(this, Observer {
             progressBar.hide()
             scrollView.show()
+            setListeners()
+
             if (it)
                 ivSeparatorRvs.show()
             else
