@@ -9,6 +9,7 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.EdgeEffect
+import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
@@ -37,6 +38,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import kotlinx.android.synthetic.main.activity_launcher.*
 import kotlinx.android.synthetic.main.layout_non_sliding.*
 import kotlinx.android.synthetic.main.layout_sliding.*
+import java.util.concurrent.Executor
 import javax.inject.Inject
 
 class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
@@ -66,6 +68,12 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     private lateinit var pinchScaleListener: PinchScaleDetector.PinchScaleListener
     private lateinit var touchTypeListener: TouchTypeDetector.TouchTypListener
 
+    private lateinit var executor: Executor
+
+    private lateinit var biometricPrompt: BiometricPrompt
+
+    private lateinit var promptInfo: BiometricPrompt.PromptInfo
+
     companion object {
         /** The magnitude of rotation while the list is scrolled. */
         private const val SCROLL_ROTATION_MAGNITUDE = 0.25f
@@ -90,6 +98,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         setupGridView()
         setupListeners()
         observeLiveData()
+        initBiometric()
     }
 
     private fun inject() {
@@ -262,7 +271,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
             override fun onScale(p0: ScaleGestureDetector?, isScalingOut: Boolean) {
                 if (!isScalingOut) {
-                    startActivity(HiddenAppsActivity.newIntent(this@LauncherActivity))
+                    biometricPrompt.authenticate(promptInfo)
                 }
             }
 
@@ -437,6 +446,38 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                 }
 
             })
+
+    }
+
+    private fun initBiometric() {
+        executor = ContextCompat.getMainExecutor(this)
+
+        biometricPrompt = BiometricPrompt(this, executor,
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationError(
+                    errorCode: Int,
+                    errString: CharSequence
+                ) {
+                    super.onAuthenticationError(errorCode, errString)
+                }
+
+                override fun onAuthenticationSucceeded(
+                    result: BiometricPrompt.AuthenticationResult
+                ) {
+                    super.onAuthenticationSucceeded(result)
+                    startActivity(HiddenAppsActivity.newIntent(this@LauncherActivity))
+                }
+
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
+                }
+            })
+
+        promptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle(getString(R.string.confirm_your_password))
+            .setConfirmationRequired(false)
+            .setDeviceCredentialAllowed(true)
+            .build()
 
     }
 

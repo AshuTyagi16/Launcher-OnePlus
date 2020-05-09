@@ -56,8 +56,8 @@ class HiddenAppsActivity : BaseActivity(), AppAdapter.OnClickListeners {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_hidden_apps)
         inject()
-        setupRecyclerView()
         observeLiveData()
+        setupRecyclerView()
         setupListeners()
     }
 
