@@ -7,7 +7,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import androidx.annotation.WorkerThread
 
-object BitmapUtils {
+class BitmapUtils {
 
     @WorkerThread
     suspend fun drawableToBitmap(drawable: Drawable): Bitmap? {

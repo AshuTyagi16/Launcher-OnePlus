@@ -9,6 +9,10 @@ import dagger.android.HasAndroidInjector
 import io.github.inflationx.calligraphy3.CalligraphyConfig
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor
 import io.github.inflationx.viewpump.ViewPump
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class LauncherApp : Application(), HasAndroidInjector {
@@ -22,6 +26,7 @@ class LauncherApp : Application(), HasAndroidInjector {
         super.onCreate()
         initComponent()
         initFont()
+        initApps()
     }
 
     private fun initFont() {
@@ -42,6 +47,14 @@ class LauncherApp : Application(), HasAndroidInjector {
     private fun initComponent() {
         component = DaggerLauncherAppComponent.factory().create(applicationContext)
         component.inject(this)
+    }
+
+    private fun initApps() {
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                component.getAllListUtils().saveAppsInDB()
+            }
+        }
     }
 
     override fun androidInjector(): AndroidInjector<Any> {

@@ -3,6 +3,7 @@ package com.sasuke.launcheroneplus.di.module.activity
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.GridLayoutManager
+import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.di.mapkey.ViewModelKey
 import com.sasuke.launcheroneplus.di.scope.PerActivityScope
 import com.sasuke.launcheroneplus.ui.base.GridSpacingItemDecoration
@@ -23,8 +24,8 @@ abstract class LauncherActivityModule {
 
         @Provides
         @PerActivityScope
-        fun adapter(): AppAdapter {
-            return AppAdapter()
+        fun adapter(glide: RequestManager): AppAdapter {
+            return AppAdapter(glide)
         }
 
         @Provides
@@ -44,8 +45,8 @@ abstract class LauncherActivityModule {
 
         @Provides
         @PerActivityScope
-        fun gridViewAdapter(): GridViewAdapter {
-            return GridViewAdapter()
+        fun gridViewAdapter(glide: RequestManager): GridViewAdapter {
+            return GridViewAdapter(glide)
         }
     }
 

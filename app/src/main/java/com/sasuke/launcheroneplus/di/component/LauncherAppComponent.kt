@@ -1,11 +1,16 @@
 package com.sasuke.launcheroneplus.di.component
 
 import android.content.Context
+import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.LauncherApp
+import com.sasuke.launcheroneplus.data.db.RoomRepository
 import com.sasuke.launcheroneplus.di.scope.LauncherAppScope
 import com.sasuke.launcheroneplus.di.module.util.ViewModelFactoryModule
 import com.sasuke.launcheroneplus.di.module.activity.ActivityBindingModule
+import com.sasuke.launcheroneplus.di.module.library.GlideModule
 import com.sasuke.launcheroneplus.di.module.util.UtilsModule
+import com.sasuke.launcheroneplus.util.AppListUtil
+import com.sasuke.launcheroneplus.util.BitmapUtils
 import com.sasuke.launcheroneplus.util.StorageUtils
 import dagger.BindsInstance
 import dagger.Component
@@ -15,6 +20,7 @@ import dagger.android.support.AndroidSupportInjectionModule
 @LauncherAppScope
 @Component(
     modules = [
+        GlideModule::class,
         UtilsModule::class,
         AndroidSupportInjectionModule::class,
         ViewModelFactoryModule::class,
@@ -29,5 +35,13 @@ interface LauncherAppComponent : AndroidInjector<LauncherApp> {
 
     fun context(): Context
 
+    fun glide(): RequestManager
+
     fun getStorageUtil(): StorageUtils
+
+    fun getBitmapUtils(): BitmapUtils
+
+    fun getRoomRepository(): RoomRepository
+
+    fun getAllListUtils(): AppListUtil
 }

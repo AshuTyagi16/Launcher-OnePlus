@@ -3,6 +3,8 @@ package com.sasuke.launcheroneplus.di.module.activity
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.GridLayoutManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.di.mapkey.ViewModelKey
 import com.sasuke.launcheroneplus.di.scope.PerActivityScope
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
@@ -21,8 +23,8 @@ abstract class AppSelectionActivityModule {
 
         @Provides
         @PerActivityScope
-        fun adapter(): AppSelectionAdapter {
-            return AppSelectionAdapter()
+        fun adapter(glide: RequestManager): AppSelectionAdapter {
+            return AppSelectionAdapter(glide)
         }
 
         @Provides

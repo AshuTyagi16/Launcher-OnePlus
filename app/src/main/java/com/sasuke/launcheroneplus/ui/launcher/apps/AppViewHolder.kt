@@ -1,21 +1,29 @@
 package com.sasuke.launcheroneplus.ui.launcher.apps
 
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.dynamicanimation.animation.SpringForce
-import com.sasuke.launcheroneplus.R
-import com.sasuke.launcheroneplus.data.AppInfo
-import com.sasuke.launcheroneplus.data.DragData
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
+import com.sasuke.launcheroneplus.data.model.App
+import com.sasuke.launcheroneplus.data.model.AppInfo
+import com.sasuke.launcheroneplus.data.model.DragData
 import com.sasuke.launcheroneplus.ui.base.MyDragShadowBuilder
 import kotlinx.android.synthetic.main.cell_app_info.view.*
+import java.io.File
 
-class AppViewHolder(itemView: View, private val consumeLongPress: Boolean = true) :
+class AppViewHolder(
+    itemView: View,
+    private val glide: RequestManager,
+    private val consumeLongPress: Boolean = true
+) :
     RecyclerView.ViewHolder(itemView) {
 
     private lateinit var onClickListeners: OnClickListeners
+
+    private val dir = itemView.context.getExternalFilesDir("app_icon")
 
     var currentVelocity = 0f
 
@@ -48,8 +56,9 @@ class AppViewHolder(itemView: View, private val consumeLongPress: Boolean = true
                 .setStiffness(SpringForce.STIFFNESS_LOW)
         )
 
-    fun setAppInfo(appInfo: AppInfo) {
-        itemView.ivAppIcon.setImageDrawable(appInfo.icon)
+    fun setAppInfo(appInfo: App) {
+        glide.load(File("$dir${File.separator}${appInfo.label}"))
+            .into(itemView.ivAppIcon)
         itemView.tvAppLabel.text = appInfo.label
 
         itemView.setOnClickListener {
@@ -63,7 +72,11 @@ class AppViewHolder(itemView: View, private val consumeLongPress: Boolean = true
             if (consumeLongPress) {
                 val icon = itemView.ivAppIcon
                 val state =
-                    DragData(appInfo, icon.width, icon.height)
+                    DragData(
+                        appInfo,
+                        icon.width,
+                        icon.height
+                    )
                 val shadow = MyDragShadowBuilder(icon)
                 ViewCompat.startDragAndDrop(icon, null, shadow, state, 0)
             }
@@ -72,8 +85,8 @@ class AppViewHolder(itemView: View, private val consumeLongPress: Boolean = true
     }
 
     interface OnClickListeners {
-        fun onItemClick(position: Int, parent: View, appInfo: AppInfo)
-        fun onItemLongClick(position: Int, parent: View, appInfo: AppInfo)
+        fun onItemClick(position: Int, parent: View, appInfo: App)
+        fun onItemLongClick(position: Int, parent: View, appInfo: App)
     }
 
     fun setOnClickListeners(onClickListeners: OnClickListeners) {

@@ -4,15 +4,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import com.bumptech.glide.RequestManager
 import com.huxq17.handygridview.scrollrunner.OnItemMovedListener
 import com.sasuke.launcheroneplus.R
-import com.sasuke.launcheroneplus.data.AppInfo
+import com.sasuke.launcheroneplus.data.model.App
+import com.sasuke.launcheroneplus.data.model.AppInfo
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
 
-class GridViewAdapter : BaseAdapter(), OnItemMovedListener, AppViewHolder.OnClickListeners {
+class GridViewAdapter(private val glide: RequestManager) : BaseAdapter(), OnItemMovedListener,
+    AppViewHolder.OnClickListeners {
 
     private lateinit var onClickListeners: OnClickListeners
-    private val list: MutableList<AppInfo> = ArrayList()
+    private val list: MutableList<App> = ArrayList()
     private var inEditMode = false
 
     override fun getView(position: Int, convertview: View?, parent: ViewGroup): View {
@@ -24,8 +27,8 @@ class GridViewAdapter : BaseAdapter(), OnItemMovedListener, AppViewHolder.OnClic
                     parent,
                     false
                 )
-        appViewHolder = AppViewHolder(myView, false)
-        appViewHolder.setAppInfo(getItem(position) as AppInfo)
+        appViewHolder = AppViewHolder(myView, glide, false)
+        appViewHolder.setAppInfo(getItem(position) as App)
         appViewHolder.setOnClickListeners(this)
         return myView
     }
@@ -51,7 +54,7 @@ class GridViewAdapter : BaseAdapter(), OnItemMovedListener, AppViewHolder.OnClic
         return false
     }
 
-    fun addItem(appInfo: AppInfo) {
+    fun addItem(appInfo: App) {
         list.add(appInfo)
         notifyDataSetChanged()
     }
@@ -62,19 +65,19 @@ class GridViewAdapter : BaseAdapter(), OnItemMovedListener, AppViewHolder.OnClic
     }
 
     interface OnClickListeners {
-        fun onItemClick(position: Int, parent: View, appInfo: AppInfo)
+        fun onItemClick(position: Int, parent: View, appInfo: App)
     }
 
     fun setOnClickListeners(onClickListeners: OnClickListeners) {
         this.onClickListeners = onClickListeners
     }
 
-    override fun onItemClick(position: Int, parent: View, appInfo: AppInfo) {
+    override fun onItemClick(position: Int, parent: View, appInfo: App) {
         if (::onClickListeners.isInitialized)
             onClickListeners.onItemClick(position, parent, appInfo)
     }
 
-    override fun onItemLongClick(position: Int, parent: View, appInfo: AppInfo) {
+    override fun onItemLongClick(position: Int, parent: View, appInfo: App) {
 
     }
 }

@@ -3,8 +3,7 @@ package com.sasuke.launcheroneplus.util
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.annotation.WorkerThread
-import com.sasuke.launcheroneplus.data.AppInfo
-import java.util.*
+import com.sasuke.launcheroneplus.data.model.AppInfo
 import kotlin.collections.ArrayList
 
 object PackageResolverUtils {
@@ -22,9 +21,9 @@ object PackageResolverUtils {
 
         list.forEach { resolveInfo ->
             val packageInfo = AppInfo(
-                resolveInfo.loadIcon(packageManager),
-                resolveInfo.activityInfo.packageName,
-                resolveInfo.loadLabel(packageManager).toString()
+                icon = resolveInfo.loadIcon(packageManager),
+                packageName = resolveInfo.activityInfo.packageName,
+                label = resolveInfo.loadLabel(packageManager).toString()
             )
             appInoList.add(packageInfo)
         }

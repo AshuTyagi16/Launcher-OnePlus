@@ -7,7 +7,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.sasuke.launcheroneplus.R
-import com.sasuke.launcheroneplus.data.AppInfo
+import com.sasuke.launcheroneplus.data.model.App
+import com.sasuke.launcheroneplus.data.model.AppInfo
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
 import kotlinx.android.synthetic.main.activity_app_selection.*
@@ -58,7 +59,9 @@ class AppSelectionActivity : BaseActivity(), AppSelectionAdapter.OnClickListener
     }
 
     private fun getApps() {
-        appSelectionActivityViewModel.getAppList()
+        appSelectionActivityViewModel.appListLiveData.observe(this, Observer {
+            appSelectionActivityViewModel.setApps()
+        })
     }
 
     private fun observeLiveData() {
@@ -74,7 +77,10 @@ class AppSelectionActivity : BaseActivity(), AppSelectionAdapter.OnClickListener
 
     private fun setListeners() {
         btnCheck.setOnClickListener {
-            if (appCount > 0)
+            if (appCount > 0) {
+                appSelectionActivityViewModel.hideSelectedApps()
+                finish()
+            } else
                 finish()
         }
         btnBack.setOnClickListener {
@@ -82,7 +88,7 @@ class AppSelectionActivity : BaseActivity(), AppSelectionAdapter.OnClickListener
         }
     }
 
-    override fun onItemClick(position: Int, appInfo: AppInfo) {
+    override fun onItemClick(position: Int, appInfo: App) {
         appSelectionActivityViewModel.toggleSelection(position)
     }
 }

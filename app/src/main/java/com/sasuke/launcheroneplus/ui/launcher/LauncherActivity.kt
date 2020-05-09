@@ -1,7 +1,6 @@
 package com.sasuke.launcheroneplus.ui.launcher
 
 import android.animation.Animator
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -22,8 +21,9 @@ import com.github.nisrulz.sensey.TouchTypeDetector
 import com.huxq17.handygridview.HandyGridView
 import com.huxq17.handygridview.listener.OnItemCapturedListener
 import com.sasuke.launcheroneplus.R
-import com.sasuke.launcheroneplus.data.AppInfo
-import com.sasuke.launcheroneplus.data.DragData
+import com.sasuke.launcheroneplus.data.model.App
+import com.sasuke.launcheroneplus.data.model.AppInfo
+import com.sasuke.launcheroneplus.data.model.DragData
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
 import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
@@ -37,7 +37,6 @@ import kotlinx.android.synthetic.main.activity_launcher.*
 import kotlinx.android.synthetic.main.layout_non_sliding.*
 import kotlinx.android.synthetic.main.layout_sliding.*
 import javax.inject.Inject
-
 
 class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     GridViewAdapter.OnClickListeners {
@@ -91,7 +90,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         setupRecyclerView()
         setupGridView()
         setupListeners()
-        getAppList()
         observeLiveData()
     }
 
@@ -331,10 +329,8 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         })
 
         etSearch.addTextChangedListener {
-            if (!it.isNullOrEmpty()) {
+            it?.let {
                 launcherActivityViewModel.filterApps(it.toString())
-            } else {
-                launcherActivityViewModel.getDefaultList()
             }
         }
 
@@ -369,12 +365,14 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         }
     }
 
-    private fun getAppList() {
-        launcherActivityViewModel.getAppsList()
-    }
-
     private fun observeLiveData() {
         launcherActivityViewModel.appList.observe(this, Observer {
+            it?.let {
+                adapter.setApps(it)
+            }
+        })
+
+        launcherActivityViewModel.filterAppsLiveData.observe(this, Observer {
             it?.let {
                 adapter.setApps(it)
             }
@@ -386,7 +384,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         gridAdapter.setInEditMode(mode == HandyGridView.MODE.TOUCH)
     }
 
-    private fun openApp(appInfo: AppInfo) {
+    private fun openApp(appInfo: App) {
         val intent = packageManager.getLaunchIntentForPackage(appInfo.packageName)
         startActivity(intent)
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
@@ -467,11 +465,11 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         super.onDestroy()
     }
 
-    override fun onItemClick(position: Int, parent: View, appInfo: AppInfo) {
+    override fun onItemClick(position: Int, parent: View, appInfo: App) {
         openApp(appInfo)
     }
 
-    override fun onItemLongClick(position: Int, parent: View, appInfo: AppInfo) {
+    override fun onItemLongClick(position: Int, parent: View, appInfo: App) {
         dragView.visibility = View.VISIBLE
         clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
     }
