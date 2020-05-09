@@ -8,7 +8,6 @@ import com.bumptech.glide.RequestManager
 import com.huxq17.handygridview.scrollrunner.OnItemMovedListener
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
-import com.sasuke.launcheroneplus.data.model.AppInfo
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
 
 class GridViewAdapter(private val glide: RequestManager) : BaseAdapter(), OnItemMovedListener,

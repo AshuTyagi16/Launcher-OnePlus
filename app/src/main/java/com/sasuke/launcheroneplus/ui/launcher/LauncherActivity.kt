@@ -31,6 +31,8 @@ import com.sasuke.launcheroneplus.ui.launcher.apps.AppAdapter
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
 import com.sasuke.launcheroneplus.util.Constants
 import com.sasuke.launcheroneplus.util.KeyboardTriggerBehavior
+import com.sasuke.launcheroneplus.util.forEachVisibleHolder
+import com.sasuke.launcheroneplus.util.openApp
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import kotlinx.android.synthetic.main.activity_launcher.*
 import kotlinx.android.synthetic.main.layout_non_sliding.*
@@ -76,8 +78,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
         /** The magnitude of translation distance when the list reaches the edge on fling. */
         private const val FLING_TRANSLATION_MAGNITUDE = 0.5f
-
-        private const val CURRENT_PAGE_KEY = "CURRENT_PAGE_KEY"
 
     }
 
@@ -383,12 +383,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         gridAdapter.setInEditMode(mode == HandyGridView.MODE.TOUCH)
     }
 
-    private fun openApp(appInfo: App) {
-        val intent = packageManager.getLaunchIntentForPackage(appInfo.packageName)
-        startActivity(intent)
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-    }
-
     private fun keyboardOpen() {
         etSearch.animate()
             .x(0f)
@@ -444,14 +438,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
             })
 
-    }
-
-    private inline fun <reified T : RecyclerView.ViewHolder> RecyclerView.forEachVisibleHolder(
-        action: (T) -> Unit
-    ) {
-        for (i in 0 until childCount) {
-            action(getChildViewHolder(getChildAt(i)) as T)
-        }
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {

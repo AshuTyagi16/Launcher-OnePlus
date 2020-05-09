@@ -5,10 +5,8 @@ import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.dynamicanimation.animation.SpringForce
-import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.data.model.App
-import com.sasuke.launcheroneplus.data.model.AppInfo
 import com.sasuke.launcheroneplus.data.model.DragData
 import com.sasuke.launcheroneplus.ui.base.MyDragShadowBuilder
 import kotlinx.android.synthetic.main.cell_app_info.view.*

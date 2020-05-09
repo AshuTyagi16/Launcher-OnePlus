@@ -25,7 +25,7 @@
             android:id="@+id/btnBack"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="25dp"
             android:contentDescription="@string/button"
             android:src="@drawable/ic_back_white"
             app:layout_constraintBottom_toTopOf="@id/ivSeparator"
@@ -60,15 +60,30 @@
             android:id="@+id/ivSeparator"
             android:layout_width="match_parent"
             android:layout_height="1dp"
+            android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
+            android:layout_marginEnd="5dp"
             android:background="@color/shadow_white"
             android:contentDescription="@string/separator"
             app:layout_constraintTop_toBottomOf="@id/btnBack" />
 
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/ProgressBar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ivSeparator" />
+
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:fillViewport="true"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ivSeparator">
 
@@ -98,10 +113,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="5dp"
-                    android:visibility="gone"
                     android:layout_marginBottom="5dp"
                     android:background="@color/shadow_white"
                     android:contentDescription="@string/separator"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toTopOf="@id/rvHideApps"
                     app:layout_constraintTop_toBottomOf="@id/rvUnHideApps" />
 
@@ -124,7 +139,6 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

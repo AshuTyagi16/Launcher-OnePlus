@@ -33,6 +33,13 @@ class AppSelectionActivityViewModel @Inject constructor(
     val selectedAppCountLiveData: LiveData<Int>
         get() = _selectedAppCountLiveData
 
+    private val _showSeparatorLiveData = MediatorLiveData<Boolean>()
+    val showSeparatorLiveData: LiveData<Boolean>
+        get() = _showSeparatorLiveData
+
+    private var defaultSelectedCount = 0
+
+
     init {
         _visibleAppListLiveData.addSource(roomRepository.getApps()) {
             visibleAppList = it
@@ -40,7 +47,16 @@ class AppSelectionActivityViewModel @Inject constructor(
         }
         _hiddenAppListLiveData.addSource(roomRepository.getOnlyHiddenApps()) {
             hiddenAppList = it
+            defaultSelectedCount = it.size
             _hiddenAppListLiveData.postValue(it)
+        }
+        _showSeparatorLiveData.addSource(
+            zipLiveData(
+                _visibleAppListLiveData,
+                _hiddenAppListLiveData
+            )
+        ) {
+            _showSeparatorLiveData.postValue(it.first.isNotEmpty() && it.second.isNotEmpty())
         }
     }
 
@@ -63,7 +79,7 @@ class AppSelectionActivityViewModel @Inject constructor(
                     } else {
                         selectedVisibleAppList.add(item)
                     }
-                    _selectedAppCountLiveData.postValue(selectedVisibleAppList.size + selectedHiddenAppList.size)
+                    _selectedAppCountLiveData.postValue(selectedVisibleAppList.size + defaultSelectedCount)
                 }
             }
         }
@@ -77,10 +93,12 @@ class AppSelectionActivityViewModel @Inject constructor(
                     val item = hiddenAppList[position]
                     if (selectedHiddenAppList.contains(item)) {
                         selectedHiddenAppList.remove(item)
+                        defaultSelectedCount++
                     } else {
                         selectedHiddenAppList.add(item)
+                        defaultSelectedCount--
                     }
-                    _selectedAppCountLiveData.postValue(selectedHiddenAppList.size + selectedVisibleAppList.size)
+                    _selectedAppCountLiveData.postValue(selectedVisibleAppList.size + defaultSelectedCount)
                 }
             }
         }
@@ -106,6 +124,29 @@ class AppSelectionActivityViewModel @Inject constructor(
                     arr[index] = app._id
                 }
                 roomRepository.unhideApps(arr)
+            }
+        }
+    }
+
+    private fun <A, B> zipLiveData(a: LiveData<A>, b: LiveData<B>): LiveData<Pair<A, B>> {
+        return MediatorLiveData<Pair<A, B>>().apply {
+            var lastA: A? = null
+            var lastB: B? = null
+
+            fun update() {
+                val localLastA = lastA
+                val localLastB = lastB
+                if (localLastA != null && localLastB != null)
+                    this.value = Pair(localLastA, localLastB)
+            }
+
+            addSource(a) {
+                lastA = it
+                update()
+            }
+            addSource(b) {
+                lastB = it
+                update()
             }
         }
     }

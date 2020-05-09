@@ -1,5 +1,6 @@
 package com.sasuke.launcheroneplus.data.model
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -10,5 +11,6 @@ data class App(
     val packageName: String,
     val label: String,
     var isSelected: Boolean = false,
+    @ColumnInfo(name = "isHidden", index = true)
     var isHidden: Boolean = false
 )

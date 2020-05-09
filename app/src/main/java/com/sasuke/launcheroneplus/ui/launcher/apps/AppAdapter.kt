@@ -9,7 +9,6 @@ import com.bumptech.glide.RequestManager
 import com.l4digital.fastscroll.FastScroller
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
-import com.sasuke.launcheroneplus.data.model.AppInfo
 
 class AppAdapter(private val glide: RequestManager) : RecyclerView.Adapter<AppViewHolder>(),
     FastScroller.SectionIndexer,

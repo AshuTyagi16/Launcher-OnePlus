@@ -3,7 +3,6 @@ package com.sasuke.launcheroneplus.ui.launcher
 import androidx.lifecycle.*
 import com.sasuke.launcheroneplus.data.db.RoomRepository
 import com.sasuke.launcheroneplus.data.model.App
-import com.sasuke.launcheroneplus.data.model.AppInfo
 import com.sasuke.launcheroneplus.util.SearchUtils
 import com.sasuke.launcheroneplus.util.toLowerCased
 import kotlinx.coroutines.Dispatchers

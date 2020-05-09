@@ -16,9 +16,11 @@
     <style name="CheckBox" parent="Widget.AppCompat.CompoundButton.CheckBox">
         <item name="colorAccent">@color/search_bar</item>
         <item name="android:textColorSecondary">@color/white</item>
-
     </style>
 
+    <style name="ProgressBar" parent="Widget.AppCompat.ProgressBar">
+        <item name="colorAccent">@color/search_bar</item> <!-- Whatever color you want-->
+    </style>
     <!-- Text -->
     <style name="Text">
         <item name="android:layout_width">wrap_content</item>

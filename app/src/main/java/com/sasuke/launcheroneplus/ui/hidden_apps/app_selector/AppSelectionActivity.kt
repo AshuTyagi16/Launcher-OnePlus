@@ -13,6 +13,8 @@ import com.sasuke.launcheroneplus.di.qualifiers.HiddenAppLayoutManager
 import com.sasuke.launcheroneplus.di.qualifiers.VisibleAppLayoutManager
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
+import com.sasuke.launcheroneplus.util.hide
+import com.sasuke.launcheroneplus.util.show
 import kotlinx.android.synthetic.main.activity_app_selection.*
 import javax.inject.Inject
 
@@ -40,8 +42,6 @@ class AppSelectionActivity : BaseActivity(), VisibleAppSelectionAdapter.OnClickL
     lateinit var itemDecoration: ItemDecorator
 
     private lateinit var appSelectionActivityViewModel: AppSelectionActivityViewModel
-
-    private var appCount = 0
 
     companion object {
         fun newIntent(context: Context) = Intent(context, AppSelectionActivity::class.java)
@@ -77,20 +77,18 @@ class AppSelectionActivity : BaseActivity(), VisibleAppSelectionAdapter.OnClickL
     private fun getApps() {
         appSelectionActivityViewModel.visibleAppListLiveData.observe(this, Observer {
             if (it.isEmpty()) {
-                rvHideApps.visibility = View.GONE
-                ivSeparatorRvs.visibility = View.GONE
+                rvHideApps.hide()
             } else {
-                rvHideApps.visibility = View.VISIBLE
+                rvHideApps.show()
             }
             appSelectionActivityViewModel.setVisibleApps()
         })
 
         appSelectionActivityViewModel.hiddenAppListLiveData.observe(this, Observer {
             if (it.isEmpty()) {
-                rvUnHideApps.visibility = View.GONE
-                ivSeparatorRvs.visibility = View.GONE
+                rvUnHideApps.hide()
             } else {
-                rvUnHideApps.visibility = View.VISIBLE
+                rvUnHideApps.show()
             }
             appSelectionActivityViewModel.setHiddenApps()
         })
@@ -98,23 +96,28 @@ class AppSelectionActivity : BaseActivity(), VisibleAppSelectionAdapter.OnClickL
 
     private fun observeLiveData() {
         appSelectionActivityViewModel.selectedAppCountLiveData.observe(this, Observer {
-            appCount = it
             tvStatus.text = getString(R.string.n_app_selected, it)
             if (it > 0)
                 btnCheck.setImageResource(R.drawable.ic_check_white)
             else
                 btnCheck.setImageResource(R.drawable.ic_check_white_disabled)
         })
+
+        appSelectionActivityViewModel.showSeparatorLiveData.observe(this, Observer {
+            progressBar.hide()
+            scrollView.show()
+            if (it)
+                ivSeparatorRvs.show()
+            else
+                ivSeparatorRvs.hide()
+        })
     }
 
     private fun setListeners() {
         btnCheck.setOnClickListener {
-            if (appCount > 0) {
-                appSelectionActivityViewModel.hideSelectedApps()
-                appSelectionActivityViewModel.unhideSelectedApps()
-                finish()
-            } else
-                finish()
+            appSelectionActivityViewModel.hideSelectedApps()
+            appSelectionActivityViewModel.unhideSelectedApps()
+            finish()
         }
         btnBack.setOnClickListener {
             finish()

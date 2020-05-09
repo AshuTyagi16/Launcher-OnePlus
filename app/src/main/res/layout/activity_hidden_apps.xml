@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -12,7 +13,8 @@
         android:scaleType="centerCrop"
         android:src="@drawable/lion" />
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clInnerParent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/black_transparent"
@@ -24,42 +26,100 @@
             android:id="@+id/btnAddAppToHide"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="20dp"
             android:contentDescription="@string/button"
             android:src="@drawable/ic_add_white"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/btnBack"
+            app:layout_constraintEnd_toEndOf="@id/ivSeparator"
+            app:layout_constraintTop_toTopOf="@id/btnBack" />
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="20dp"
+            android:contentDescription="@string/button"
+            android:src="@drawable/ic_close_white"
+            app:layout_constraintBottom_toTopOf="@id/ivSeparator"
+            app:layout_constraintStart_toStartOf="@id/ivSeparator"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvStatus"
+            style="@style/Text.Primary.Bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:gravity="center"
+            android:text="@string/hidden_space"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_normal"
+            app:layout_constraintBottom_toBottomOf="@id/btnBack"
+            app:layout_constraintStart_toEndOf="@id/btnBack"
+            app:layout_constraintTop_toTopOf="@id/btnBack" />
+
+        <ImageView
+            android:id="@+id/ivSeparator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@color/shadow_white"
+            android:contentDescription="@string/separator"
+            app:layout_constraintTop_toBottomOf="@id/btnAddAppToHide" />
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/lottieView"
             android:layout_width="match_parent"
             android:layout_height="300dp"
-            android:layout_centerInParent="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:lottie_autoPlay="true"
-            app:lottie_repeatCount="1"
-            app:lottie_repeatMode="reverse"
             app:lottie_fileName="glasses.json"
-            app:lottie_loop="true" />
+            app:lottie_loop="true"
+            app:lottie_repeatCount="1"
+            app:lottie_repeatMode="reverse" />
+
+        <Space
+            android:id="@+id/spacer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="100dp"
+            app:layout_constraintBottom_toBottomOf="@id/lottieView"
+            app:layout_constraintEnd_toEndOf="@id/lottieView"
+            app:layout_constraintStart_toStartOf="@id/lottieView" />
 
         <TextView
+            android:id="@+id/tvNoHiddenApplications"
             style="@style/Text.Primary.Bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@id/lottieView"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="75dp"
             android:text="@string/no_hidden_applications"
             android:textColor="@color/white"
             android:textSize="@dimen/font_larger"
             android:translationZ="2dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/lottieView" />
+            app:layout_constraintTop_toBottomOf="@id/spacer" />
 
-    </RelativeLayout>
+        <com.l4digital.fastscroll.FastScrollRecyclerView
+            android:id="@+id/rvApps"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:bubbleColor="@color/search_bar"
+            app:bubbleTextColor="@color/white"
+            app:handleColor="@color/search_bar"
+            app:hideScrollbar="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ivSeparator"
+            app:showTrack="false"
+            tools:itemCount="25"
+            tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            tools:listitem="@layout/cell_app_info"
+            tools:spanCount="5" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
