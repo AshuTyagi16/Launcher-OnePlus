@@ -55,7 +55,7 @@ class AppViewHolder(
         )
 
     fun setAppInfo(appInfo: App) {
-        glide.load(File("$dir${File.separator}${appInfo.label}"))
+        glide.load(File("$dir${File.separator}${appInfo.label.replace("[\\W]|_".toRegex(),"")}"))
             .into(itemView.ivAppIcon)
         itemView.tvAppLabel.text = appInfo.label
 

@@ -129,9 +129,19 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                 super.onDragged(offset, postion)
                 rvHideApps.forEachVisibleHolder { holder: AppViewHolder ->
                     if (adapter.appList[postion].label[0].toUpperCase() == adapter.appList[holder.adapterPosition].label[0].toUpperCase())
-                        holder.itemView.setBackgroundColor(ContextCompat.getColor(this@LauncherActivity,R.color.app_highlight))
+                        holder.itemView.setBackgroundColor(
+                            ContextCompat.getColor(
+                                this@LauncherActivity,
+                                R.color.app_highlight
+                            )
+                        )
                     else
-                        holder.itemView.setBackgroundColor(ContextCompat.getColor(this@LauncherActivity,R.color.app_un_highlight))
+                        holder.itemView.setBackgroundColor(
+                            ContextCompat.getColor(
+                                this@LauncherActivity,
+                                R.color.app_un_highlight
+                            )
+                        )
                 }
 
             }
@@ -144,9 +154,14 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                 super.onReleased()
                 handler.postDelayed({
                     rvHideApps.forEachVisibleHolder { holder: AppViewHolder ->
-                        holder.itemView.setBackgroundColor(ContextCompat.getColor(this@LauncherActivity,R.color.app_un_highlight))
+                        holder.itemView.setBackgroundColor(
+                            ContextCompat.getColor(
+                                this@LauncherActivity,
+                                R.color.app_un_highlight
+                            )
+                        )
                     }
-                },500)
+                }, 500)
             }
         })
 
@@ -267,9 +282,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                     }
                     TouchTypeDetector.SCROLL_DIR_DOWN -> {
                         if (clParent.panelState == SlidingUpPanelLayout.PanelState.COLLAPSED)
-                            handler.postDelayed({
-                                openStatusBar()
-                            }, 1)
+                            openStatusBar()
                     }
                 }
             }

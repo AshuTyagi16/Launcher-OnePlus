@@ -14,7 +14,7 @@ class HiddenAppSelectionViewHolder(itemView: View, private val glide: RequestMan
     private val dir = itemView.context.getExternalFilesDir("app_icon")
 
     fun setApp(appInfo: App) {
-        glide.load(File("$dir${File.separator}${appInfo.label}"))
+        glide.load(File("$dir${File.separator}${appInfo.label.replace("[\\W]|_".toRegex(),"")}"))
             .into(itemView.ivAppIcon)
         itemView.tvAppLabel.text = appInfo.label
 

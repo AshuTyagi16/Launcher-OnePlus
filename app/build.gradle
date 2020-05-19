@@ -111,5 +111,8 @@ dependencies {
     //Fingerprint Authentication
     implementation "androidx.biometric:biometric:1.0.1"
 
+    //Image Compression
+    implementation 'top.zibin:Luban:1.1.8'
+
 
 }
