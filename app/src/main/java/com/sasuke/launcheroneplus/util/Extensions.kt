@@ -19,8 +19,7 @@ inline fun <reified T : RecyclerView.ViewHolder> RecyclerView.forEachVisibleHold
 
 fun Activity.openApp(appInfo: App) {
     packageManager.getLaunchIntentForPackage(appInfo.packageName)?.let {
-        startActivity(intent)
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        startActivity(it)
     }
 }
 

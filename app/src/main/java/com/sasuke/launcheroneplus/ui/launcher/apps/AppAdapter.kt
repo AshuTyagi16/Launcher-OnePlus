@@ -1,6 +1,5 @@
 package com.sasuke.launcheroneplus.ui.launcher.apps
 
-import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.view.LayoutInflater
@@ -17,7 +16,6 @@ import com.sasuke.launcheroneplus.data.model.App
 
 class AppAdapter(private val glide: RequestManager, private val consumeLongPress: Boolean) :
     RecyclerView.Adapter<AppViewHolder>(),
-//    RecyclerViewFastScroller.OnPopupTextUpdate,
     RecyclerViewFastScroller.OnPopupViewUpdate,
     AppViewHolder.OnClickListeners {
 
@@ -76,10 +74,6 @@ class AppAdapter(private val glide: RequestManager, private val consumeLongPress
         if (::onClickListeners.isInitialized)
             onClickListeners.onItemLongClick(position, parent, appInfo)
     }
-
-//    override fun onChange(position: Int): CharSequence {
-//        return appList[position].label[0].toUpperCase().toString()
-//    }
 
     override fun onUpdate(position: Int, popupTextView: TextView) {
         popupTextView.background.colorFilter = PorterDuffColorFilter(

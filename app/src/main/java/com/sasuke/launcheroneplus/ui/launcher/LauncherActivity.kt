@@ -2,13 +2,8 @@ package com.sasuke.launcheroneplus.ui.launcher
 
 import android.animation.Animator
 import android.app.WallpaperManager
-import android.app.admin.DevicePolicyManager
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.view.DragEvent
@@ -16,6 +11,7 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.EdgeEffect
+import android.widget.Toast
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
@@ -37,13 +33,13 @@ import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.data.model.DragData
 import com.sasuke.launcheroneplus.data.model.Result
 import com.sasuke.launcheroneplus.data.model.Status
-import com.sasuke.launcheroneplus.receiver.AdminReceiver
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
 import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
 import com.sasuke.launcheroneplus.ui.hidden_apps.HiddenAppsActivity
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppAdapter
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
+import com.sasuke.launcheroneplus.ui.screen_off.ScreenOffActivity
 import com.sasuke.launcheroneplus.util.Constants
 import com.sasuke.launcheroneplus.util.KeyboardTriggerBehavior
 import com.sasuke.launcheroneplus.util.forEachVisibleHolder
@@ -91,10 +87,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
-    private lateinit var devicePolicyManager: DevicePolicyManager
-
-    private lateinit var mComponentName: ComponentName
-
     private lateinit var wallpaperManager: WallpaperManager
 
     private lateinit var list: List<Result>
@@ -129,7 +121,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         setupListeners()
         observeLiveData()
         initBiometric()
-        initAdminRights()
     }
 
     private fun inject() {
@@ -291,12 +282,8 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
         touchTypeListener = object : TouchTypeDetector.TouchTypListener {
             override fun onDoubleTap() {
-                val isAdmin = devicePolicyManager.isAdminActive(mComponentName)
-                if (isAdmin) {
-                    devicePolicyManager.lockNow()
-                } else {
-                    showToast(getString(R.string.not_registered_as_admin))
-                }
+                startActivity(ScreenOffActivity.newIntent(this@LauncherActivity))
+                overridePendingTransition(0, 0)
             }
 
             override fun onSwipe(p0: Int) {
@@ -322,7 +309,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             }
 
             override fun onLongPress() {
-                showToast("Setting Wallpaper")
+                showToast("Setting Wallpaper", Toast.LENGTH_LONG)
                 setCustomWallpaper()
             }
 
@@ -556,18 +543,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     }
 
-    private fun initAdminRights() {
-        devicePolicyManager = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-        mComponentName = ComponentName(this, AdminReceiver::class.java)
-        val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
-        intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, mComponentName)
-        intent.putExtra(
-            DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-            getString(R.string.admin_permission_description)
-        )
-        startActivityForResult(intent, REQUEST_CODE_ADMIN_RIGHTS)
-    }
-
     private fun setCustomWallpaper() {
         if (::list.isInitialized) {
             glide
@@ -587,7 +562,8 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                             count++
                         else
                             count = 0
-                        Sensey.getInstance().startTouchTypeDetection(this@LauncherActivity,touchTypeListener)
+                        Sensey.getInstance()
+                            .startTouchTypeDetection(this@LauncherActivity, touchTypeListener)
                     }
 
                     override fun onLoadStarted(placeholder: Drawable?) {
@@ -597,7 +573,8 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
                     override fun onLoadFailed(errorDrawable: Drawable?) {
                         super.onLoadFailed(errorDrawable)
-                        Sensey.getInstance().startTouchTypeDetection(this@LauncherActivity,touchTypeListener)
+                        Sensey.getInstance()
+                            .startTouchTypeDetection(this@LauncherActivity, touchTypeListener)
                     }
                 })
         }

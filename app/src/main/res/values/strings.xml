@@ -25,6 +25,6 @@
     <string name="confirm_your_password">Confirm your password</string>
 
     <!-- Admin Rights -->
-    <string name="not_registered_as_admin">Not registered as admin</string>
-    <string name="admin_permission_description">Admin permission is required to enable double tap to lock functionality</string>
+    <string name="accessibility_service_description">An accessibility service to lock the screen.</string>
+
 </resources>

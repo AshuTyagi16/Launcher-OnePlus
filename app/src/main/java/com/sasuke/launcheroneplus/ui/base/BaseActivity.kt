@@ -25,9 +25,9 @@ open class BaseActivity : DaggerAppCompatActivity() {
         }
     }
 
-    fun showToast(message: String) {
+    fun showToast(message: String, length: Int = Toast.LENGTH_SHORT) {
         toast?.cancel()
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).let {
+        Toast.makeText(this, message, length).let {
             it.show()
             toast = it
         }

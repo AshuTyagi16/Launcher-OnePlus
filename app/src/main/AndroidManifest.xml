@@ -5,7 +5,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name=".LauncherApp"
@@ -44,24 +45,16 @@
             android:name=".ui.hidden_apps.app_selector.AppSelectionActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
+        <activity
+            android:name=".ui.screen_off.ScreenOffActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+
         <receiver android:name=".receiver.AppChangeReceiver">
             <intent-filter android:priority="100">
                 <action android:name="android.intent.action.PACKAGE_ADDED" />
                 <action android:name="android.intent.action.PACKAGE_REMOVED" />
 
                 <data android:scheme="package" />
-            </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name=".receiver.AdminReceiver"
-            android:permission="android.permission.BIND_DEVICE_ADMIN">
-            <meta-data
-                android:name="android.app.device_admin"
-                android:resource="@xml/admin" />
-
-            <intent-filter>
-                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
         </receiver>
     </application>

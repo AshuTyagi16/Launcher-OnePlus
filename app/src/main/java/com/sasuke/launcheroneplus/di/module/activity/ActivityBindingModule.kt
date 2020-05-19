@@ -4,6 +4,7 @@ import com.sasuke.launcheroneplus.ui.launcher.LauncherActivity
 import com.sasuke.launcheroneplus.di.scope.PerActivityScope
 import com.sasuke.launcheroneplus.ui.hidden_apps.HiddenAppsActivity
 import com.sasuke.launcheroneplus.ui.hidden_apps.app_selector.AppSelectionActivity
+import com.sasuke.launcheroneplus.ui.screen_off.ScreenOffActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -21,4 +22,8 @@ abstract class ActivityBindingModule {
     @PerActivityScope
     @ContributesAndroidInjector(modules = [AppSelectionActivityModule::class])
     internal abstract fun appSelectionActivity(): AppSelectionActivity
+
+    @PerActivityScope
+    @ContributesAndroidInjector(modules = [])
+    internal abstract fun screenOffActivity(): ScreenOffActivity
 }
