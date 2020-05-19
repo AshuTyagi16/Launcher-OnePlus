@@ -25,7 +25,7 @@ abstract class LauncherActivityModule {
         @Provides
         @PerActivityScope
         fun adapter(glide: RequestManager): AppAdapter {
-            return AppAdapter(glide)
+            return AppAdapter(glide, true)
         }
 
         @Provides

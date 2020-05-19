@@ -26,7 +26,7 @@ abstract class HiddenAppsActivityModule {
         @Provides
         @PerActivityScope
         fun adapter(glide: RequestManager): AppAdapter {
-            return AppAdapter(glide)
+            return AppAdapter(glide, false)
         }
 
         @Provides

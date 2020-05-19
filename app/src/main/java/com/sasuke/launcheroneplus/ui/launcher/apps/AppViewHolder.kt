@@ -29,7 +29,7 @@ class AppViewHolder(
      * A [SpringAnimation] for this RecyclerView item. This animation rotates the view with a bouncy
      * spring configuration, resulting in the oscillation effect.
      *
-     * The animation is started in [CheeseAdapter.onScrollListener].
+     * The animation is started in [Recyclerview.onScrollListener].
      */
     val rotation: SpringAnimation = SpringAnimation(itemView, SpringAnimation.ROTATION)
         .setSpring(

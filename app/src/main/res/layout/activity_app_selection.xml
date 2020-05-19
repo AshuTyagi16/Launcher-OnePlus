@@ -91,18 +91,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <com.l4digital.fastscroll.FastScrollRecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvUnHideApps"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false"
-                    app:bubbleColor="@color/search_bar"
-                    app:bubbleTextColor="@color/white"
-                    app:handleColor="@color/search_bar"
-                    app:hideScrollbar="true"
                     app:layout_constraintBottom_toTopOf="@id/ivSeparatorRvs"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:showTrack="false"
                     tools:itemCount="25"
                     tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                     tools:listitem="@layout/cell_app_selector"
@@ -120,18 +115,13 @@
                     app:layout_constraintBottom_toTopOf="@id/rvHideApps"
                     app:layout_constraintTop_toBottomOf="@id/rvUnHideApps" />
 
-                <com.l4digital.fastscroll.FastScrollRecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvHideApps"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false"
-                    app:bubbleColor="@color/search_bar"
-                    app:bubbleTextColor="@color/white"
-                    app:handleColor="@color/search_bar"
-                    app:hideScrollbar="true"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/ivSeparatorRvs"
-                    app:showTrack="false"
                     tools:itemCount="25"
                     tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                     tools:listitem="@layout/cell_app_selector"

@@ -38,6 +38,14 @@
         <activity
             android:name=".ui.hidden_apps.app_selector.AppSelectionActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <receiver android:name=".receiver.AppChangeReceiver">
+            <intent-filter android:priority="100">
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -4,13 +4,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
-import com.l4digital.fastscroll.FastScroller
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
 
 class HiddenAppSelectionAdapter(private val glide: RequestManager) :
     RecyclerView.Adapter<HiddenAppSelectionViewHolder>(),
-    FastScroller.SectionIndexer,
     HiddenAppSelectionViewHolder.OnClickListeners {
 
     private lateinit var onClickListeners: OnClickListeners
@@ -20,33 +18,37 @@ class HiddenAppSelectionAdapter(private val glide: RequestManager) :
         setHasStableIds(true)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HiddenAppSelectionViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): HiddenAppSelectionViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.cell_app_selector, parent, false)
-        return HiddenAppSelectionViewHolder(view, glide)
+        val holderHidden = HiddenAppSelectionViewHolder(view, glide)
+        holderHidden.setOnClickListeners(this)
+        return holderHidden
     }
 
     override fun getItemCount(): Int {
         return if (::appList.isInitialized) appList.size else 0
     }
 
-    override fun onBindViewHolder(holderVisible: HiddenAppSelectionViewHolder, position: Int) {
+    override fun onBindViewHolder(holderHidden: HiddenAppSelectionViewHolder, position: Int) {
         if (::appList.isInitialized) {
-            holderVisible.setApp(appList[position])
-            holderVisible.setOnClickListeners(this)
+            holderHidden.setApp(appList[position])
         }
     }
 
     override fun onBindViewHolder(
-        holderVisible: HiddenAppSelectionViewHolder,
+        holderHidden: HiddenAppSelectionViewHolder,
         position: Int,
         payloads: MutableList<Any>
     ) {
-        super.onBindViewHolder(holderVisible, position, payloads)
+        super.onBindViewHolder(holderHidden, position, payloads)
         if (payloads.isNotEmpty()) {
             val flag = payloads[0]
             if (flag is Boolean) {
-                holderVisible.toggle(flag)
+                holderHidden.toggle(flag)
             }
         }
     }
@@ -80,7 +82,7 @@ class HiddenAppSelectionAdapter(private val glide: RequestManager) :
             onClickListeners.onHiddenItemClick(position, appInfo)
     }
 
-    override fun getSectionText(position: Int): CharSequence {
-        return appList[position].label[0].toUpperCase().toString()
-    }
+//    override fun getSectionText(position: Int): CharSequence {
+//        return appList[position].label[0].toUpperCase().toString()
+//    }
 }

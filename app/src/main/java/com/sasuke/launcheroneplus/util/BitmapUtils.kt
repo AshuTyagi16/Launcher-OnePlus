@@ -25,8 +25,8 @@ class BitmapUtils {
             ) // Single color bitmap will be created of 1x1 pixel
         } else {
             Bitmap.createBitmap(
-                drawable.intrinsicWidth,
-                drawable.intrinsicHeight,
+                drawable.intrinsicWidth / 5,
+                drawable.intrinsicHeight / 5,
                 Bitmap.Config.ARGB_8888
             )
         }

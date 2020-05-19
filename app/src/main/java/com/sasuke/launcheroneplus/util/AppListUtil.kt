@@ -1,6 +1,7 @@
 package com.sasuke.launcheroneplus.util
 
 import android.content.pm.PackageManager
+import android.database.DatabaseUtils
 import androidx.annotation.WorkerThread
 import com.sasuke.launcheroneplus.data.db.RoomRepository
 import com.sasuke.launcheroneplus.data.model.App
@@ -28,6 +29,27 @@ class AppListUtil(
                         )
                     }
                 }
+            }
+        }
+    }
+
+    @WorkerThread
+    suspend fun removeAppFromDB(packageName: String) {
+        roomRepository.deleteApp(packageName)
+    }
+
+    @WorkerThread
+    suspend fun addAppToDB(packageName: String) {
+        val appInfo = PackageResolverUtils.getAppInfoFromPackageName(packageManager, packageName)
+        bitmapUtils.drawableToBitmap(appInfo.icon)?.let {
+            storageUtils.saveBitmapToFile(it, appInfo.label)?.let {
+                roomRepository.insert(
+                    App(
+                        icon = it,
+                        packageName = appInfo.packageName,
+                        label = appInfo.label
+                    )
+                )
             }
         }
     }

@@ -30,4 +30,10 @@ interface AppsDao {
 
     @Query("UPDATE apps SET isHidden = :isHidden where _id IN(:ids)")
     suspend fun unhideApps(ids: IntArray, isHidden: Boolean)
+
+    @Query("DELETE FROM apps")
+    suspend fun deleteAllApps()
+
+    @Query("DELETE FROM apps where packageName = :packageName")
+    suspend fun deleteApp(packageName: String)
 }

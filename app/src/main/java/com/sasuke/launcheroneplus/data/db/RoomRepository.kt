@@ -1,5 +1,7 @@
 package com.sasuke.launcheroneplus.data.db
 
+import android.database.DatabaseUtils
+import android.util.Log
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import com.sasuke.launcheroneplus.data.db.dao.AppsDao
@@ -20,6 +22,16 @@ class RoomRepository(private val appsDao: AppsDao) {
 
     fun isAppsInDB(): Int {
         return appsDao.isAppsInDB()
+    }
+
+    @WorkerThread
+    suspend fun deleteAllApps() {
+        return appsDao.deleteAllApps()
+    }
+
+    @WorkerThread
+    suspend fun deleteApp(packageName: String) {
+        return appsDao.deleteApp(packageName)
     }
 
     @WorkerThread

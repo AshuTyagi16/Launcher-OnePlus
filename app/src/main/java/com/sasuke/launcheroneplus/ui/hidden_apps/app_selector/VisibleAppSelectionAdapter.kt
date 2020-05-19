@@ -4,13 +4,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
-import com.l4digital.fastscroll.FastScroller
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
 
 class VisibleAppSelectionAdapter(private val glide: RequestManager) :
     RecyclerView.Adapter<VisibleAppSelectionViewHolder>(),
-    FastScroller.SectionIndexer,
     VisibleAppSelectionViewHolder.OnClickListeners {
 
     private lateinit var onClickListeners: OnClickListeners
@@ -20,10 +18,15 @@ class VisibleAppSelectionAdapter(private val glide: RequestManager) :
         setHasStableIds(true)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VisibleAppSelectionViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): VisibleAppSelectionViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.cell_app_selector, parent, false)
-        return VisibleAppSelectionViewHolder(view, glide)
+        val holderVisible = VisibleAppSelectionViewHolder(view, glide)
+        holderVisible.setOnClickListeners(this)
+        return holderVisible
     }
 
     override fun getItemCount(): Int {
@@ -33,7 +36,6 @@ class VisibleAppSelectionAdapter(private val glide: RequestManager) :
     override fun onBindViewHolder(holderVisible: VisibleAppSelectionViewHolder, position: Int) {
         if (::appList.isInitialized) {
             holderVisible.setApp(appList[position])
-            holderVisible.setOnClickListeners(this)
         }
     }
 
@@ -80,7 +82,7 @@ class VisibleAppSelectionAdapter(private val glide: RequestManager) :
             onClickListeners.onVisibleItemClick(position, appInfo)
     }
 
-    override fun getSectionText(position: Int): CharSequence {
-        return appList[position].label[0].toUpperCase().toString()
-    }
+//    override fun getSectionText(position: Int): CharSequence {
+//        return appList[position].label[0].toUpperCase().toString()
+//    }
 }

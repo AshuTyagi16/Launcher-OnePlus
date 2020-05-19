@@ -21,6 +21,7 @@ import com.github.nisrulz.sensey.Sensey
 import com.github.nisrulz.sensey.TouchTypeDetector
 import com.huxq17.handygridview.HandyGridView
 import com.huxq17.handygridview.listener.OnItemCapturedListener
+import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.data.model.DragData
@@ -122,6 +123,32 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         rvHideApps.addItemDecoration(itemDecoration)
         rvHideApps.adapter = adapter
         adapter.setOnClickListeners(this)
+
+        fastscroller.setHandleStateListener(object : RecyclerViewFastScroller.HandleStateListener {
+            override fun onDragged(offset: Float, postion: Int) {
+                super.onDragged(offset, postion)
+                rvHideApps.forEachVisibleHolder { holder: AppViewHolder ->
+                    if (adapter.appList[postion].label[0].toUpperCase() == adapter.appList[holder.adapterPosition].label[0].toUpperCase())
+                        holder.itemView.setBackgroundColor(ContextCompat.getColor(this@LauncherActivity,R.color.app_highlight))
+                    else
+                        holder.itemView.setBackgroundColor(ContextCompat.getColor(this@LauncherActivity,R.color.app_un_highlight))
+                }
+
+            }
+
+            override fun onEngaged() {
+                super.onEngaged()
+            }
+
+            override fun onReleased() {
+                super.onReleased()
+                handler.postDelayed({
+                    rvHideApps.forEachVisibleHolder { holder: AppViewHolder ->
+                        holder.itemView.setBackgroundColor(ContextCompat.getColor(this@LauncherActivity,R.color.app_un_highlight))
+                    }
+                },500)
+            }
+        })
 
         rvHideApps.edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
             override fun createEdgeEffect(recyclerView: RecyclerView, direction: Int): EdgeEffect {
@@ -336,7 +363,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             }
         })
 
-        etSearch.addTextChangedListener {
+        etSearch.addTextChangedListener() {
             it?.let {
                 launcherActivityViewModel.filterApps(it.toString())
             }

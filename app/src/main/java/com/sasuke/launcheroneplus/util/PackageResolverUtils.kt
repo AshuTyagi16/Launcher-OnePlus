@@ -1,5 +1,6 @@
 package com.sasuke.launcheroneplus.util
 
+import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.annotation.WorkerThread
@@ -33,5 +34,17 @@ object PackageResolverUtils {
         }
 
         return appInoList
+    }
+
+    @WorkerThread
+    fun getAppInfoFromPackageName(packageManager: PackageManager, packageName: String): AppInfo {
+        val intent = Intent()
+        intent.`package` = packageName
+        val resolveInfo = packageManager.resolveActivity(intent, 0)
+        return AppInfo(
+            icon = resolveInfo.loadIcon(packageManager),
+            packageName = resolveInfo.activityInfo.packageName,
+            label = resolveInfo.loadLabel(packageManager).toString()
+        )
     }
 }

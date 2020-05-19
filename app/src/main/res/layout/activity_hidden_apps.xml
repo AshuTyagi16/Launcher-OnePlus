@@ -103,17 +103,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/spacer" />
 
-        <com.l4digital.fastscroll.FastScrollRecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvApps"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:bubbleColor="@color/search_bar"
-            app:bubbleTextColor="@color/white"
-            app:handleColor="@color/search_bar"
-            app:hideScrollbar="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ivSeparator"
-            app:showTrack="false"
             tools:itemCount="25"
             tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             tools:listitem="@layout/cell_app_info"
