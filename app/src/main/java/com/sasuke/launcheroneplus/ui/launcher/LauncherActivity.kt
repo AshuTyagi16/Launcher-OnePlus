@@ -1,6 +1,10 @@
 package com.sasuke.launcheroneplus.ui.launcher
 
 import android.animation.Animator
+import android.app.admin.DevicePolicyManager
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -25,6 +29,7 @@ import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.data.model.DragData
+import com.sasuke.launcheroneplus.receiver.AdminReceiver
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
 import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
@@ -75,6 +80,10 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
+    private lateinit var devicePolicyManager: DevicePolicyManager
+
+    private lateinit var mComponentName: ComponentName
+
     companion object {
         /** The magnitude of rotation while the list is scrolled. */
         private const val SCROLL_ROTATION_MAGNITUDE = 0.25f
@@ -88,6 +97,8 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         /** The magnitude of translation distance when the list reaches the edge on fling. */
         private const val FLING_TRANSLATION_MAGNITUDE = 0.5f
 
+        private const val REQUEST_CODE_ADMIN_RIGHTS = 567
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,6 +111,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         setupListeners()
         observeLiveData()
         initBiometric()
+        initAdminRights()
     }
 
     private fun inject() {
@@ -144,10 +156,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                         )
                 }
 
-            }
-
-            override fun onEngaged() {
-                super.onEngaged()
             }
 
             override fun onReleased() {
@@ -262,7 +270,12 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
         touchTypeListener = object : TouchTypeDetector.TouchTypListener {
             override fun onDoubleTap() {
-
+                val isAdmin = devicePolicyManager.isAdminActive(mComponentName)
+                if (isAdmin) {
+                    devicePolicyManager.lockNow()
+                } else {
+                    showToast(getString(R.string.not_registered_as_admin))
+                }
             }
 
             override fun onSwipe(p0: Int) {
@@ -376,7 +389,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             }
         })
 
-        etSearch.addTextChangedListener() {
+        etSearch.addTextChangedListener {
             it?.let {
                 launcherActivityViewModel.filterApps(it.toString())
             }
@@ -494,12 +507,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
         biometricPrompt = BiometricPrompt(this, executor,
             object : BiometricPrompt.AuthenticationCallback() {
-                override fun onAuthenticationError(
-                    errorCode: Int,
-                    errString: CharSequence
-                ) {
-                    super.onAuthenticationError(errorCode, errString)
-                }
 
                 override fun onAuthenticationSucceeded(
                     result: BiometricPrompt.AuthenticationResult
@@ -508,9 +515,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                     startActivity(HiddenAppsActivity.newIntent(this@LauncherActivity))
                 }
 
-                override fun onAuthenticationFailed() {
-                    super.onAuthenticationFailed()
-                }
             })
 
         promptInfo = BiometricPrompt.PromptInfo.Builder()
@@ -519,6 +523,18 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             .setDeviceCredentialAllowed(true)
             .build()
 
+    }
+
+    private fun initAdminRights() {
+        devicePolicyManager = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        mComponentName = ComponentName(this, AdminReceiver::class.java)
+        val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
+        intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, mComponentName)
+        intent.putExtra(
+            DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+            getString(R.string.admin_permission_description)
+        )
+        startActivityForResult(intent, REQUEST_CODE_ADMIN_RIGHTS)
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
