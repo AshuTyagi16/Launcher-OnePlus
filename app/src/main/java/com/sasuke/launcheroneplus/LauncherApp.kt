@@ -1,6 +1,7 @@
 package com.sasuke.launcheroneplus
 
 import android.app.Application
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import com.sasuke.launcheroneplus.di.component.DaggerLauncherAppComponent
@@ -31,6 +32,16 @@ class LauncherApp : Application(), HasAndroidInjector {
         initFont()
         initApps()
         register()
+    }
+
+    companion object {
+        fun get(context: Context): LauncherApp{
+            return context as LauncherApp
+        }
+    }
+
+    fun getComponent(): LauncherAppComponent {
+        return component
     }
 
     private fun initFont() {
@@ -66,7 +77,7 @@ class LauncherApp : Application(), HasAndroidInjector {
         intentFilter.addAction(Intent.ACTION_PACKAGE_ADDED)
         intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED)
         intentFilter.addDataScheme("package")
-        registerReceiver(AppChangeReceiver(component.getAllListUtils()), intentFilter)
+        registerReceiver(AppChangeReceiver(), intentFilter)
     }
 
     override fun androidInjector(): AndroidInjector<Any> {
