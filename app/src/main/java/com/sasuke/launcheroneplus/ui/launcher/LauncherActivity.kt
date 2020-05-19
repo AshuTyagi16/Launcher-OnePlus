@@ -1,10 +1,13 @@
 package com.sasuke.launcheroneplus.ui.launcher
 
 import android.animation.Animator
+import android.app.WallpaperManager
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -20,6 +23,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.RequestManager
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.github.nisrulz.sensey.PinchScaleDetector
 import com.github.nisrulz.sensey.Sensey
 import com.github.nisrulz.sensey.TouchTypeDetector
@@ -29,6 +35,8 @@ import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.data.model.DragData
+import com.sasuke.launcheroneplus.data.model.Result
+import com.sasuke.launcheroneplus.data.model.Status
 import com.sasuke.launcheroneplus.receiver.AdminReceiver
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
@@ -65,6 +73,9 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     @Inject
     lateinit var gridAdapter: GridViewAdapter
 
+    @Inject
+    lateinit var glide: RequestManager
+
     private lateinit var launcherActivityViewModel: LauncherActivityViewModel
 
     private lateinit var handler: Handler
@@ -83,6 +94,12 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     private lateinit var devicePolicyManager: DevicePolicyManager
 
     private lateinit var mComponentName: ComponentName
+
+    private lateinit var wallpaperManager: WallpaperManager
+
+    private lateinit var list: List<Result>
+
+    private var count = 0
 
     companion object {
         /** The magnitude of rotation while the list is scrolled. */
@@ -105,6 +122,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launcher)
         inject()
+        initWallpaperManager()
         setWindowInsets()
         setupRecyclerView()
         setupGridView()
@@ -119,14 +137,17 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             ViewModelProvider(this, viewModelFactory).get(LauncherActivityViewModel::class.java)
         Sensey.getInstance().init(this)
         handler = Handler()
+        launcherActivityViewModel.getWallpaper()
+    }
+
+    private fun initWallpaperManager() {
+        wallpaperManager = WallpaperManager.getInstance(this)
     }
 
     private fun setWindowInsets() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
-            clParent.setOnApplyWindowInsetsListener { v, insets ->
-                v.setPadding(0, 0, 0, insets.systemWindowInsetBottom)
-                insets
-            }
+        clParent.setOnApplyWindowInsetsListener { v, insets ->
+            v.setPadding(0, 0, 0, insets.systemWindowInsetBottom)
+            insets
         }
     }
 
@@ -301,7 +322,8 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             }
 
             override fun onLongPress() {
-
+                showToast("Setting Wallpaper")
+                setCustomWallpaper()
             }
 
             override fun onThreeFingerSingleTap() {
@@ -427,6 +449,15 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     }
 
     private fun observeLiveData() {
+
+        launcherActivityViewModel.wallpaperLiveData.observe(this, Observer {
+            if (it.status == Status.SUCCESS) {
+                it.data?.let {
+                    list = it.results
+                }
+            }
+        })
+
         launcherActivityViewModel.appList.observe(this, Observer {
             it?.let {
                 adapter.setApps(it)
@@ -535,6 +566,41 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             getString(R.string.admin_permission_description)
         )
         startActivityForResult(intent, REQUEST_CODE_ADMIN_RIGHTS)
+    }
+
+    private fun setCustomWallpaper() {
+        if (::list.isInitialized) {
+            glide
+                .asBitmap()
+                .load(list[count].urls.regular)
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onLoadCleared(placeholder: Drawable?) {
+
+                    }
+
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: Transition<in Bitmap>?
+                    ) {
+                        wallpaperManager.setBitmap(resource)
+                        if (count < list.size - 1)
+                            count++
+                        else
+                            count = 0
+                        Sensey.getInstance().startTouchTypeDetection(this@LauncherActivity,touchTypeListener)
+                    }
+
+                    override fun onLoadStarted(placeholder: Drawable?) {
+                        super.onLoadStarted(placeholder)
+                        Sensey.getInstance().stopTouchTypeDetection()
+                    }
+
+                    override fun onLoadFailed(errorDrawable: Drawable?) {
+                        super.onLoadFailed(errorDrawable)
+                        Sensey.getInstance().startTouchTypeDetection(this@LauncherActivity,touchTypeListener)
+                    }
+                })
+        }
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {

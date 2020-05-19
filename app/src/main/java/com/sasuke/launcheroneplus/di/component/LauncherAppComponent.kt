@@ -4,10 +4,12 @@ import android.content.Context
 import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.LauncherApp
 import com.sasuke.launcheroneplus.data.db.RoomRepository
+import com.sasuke.launcheroneplus.data.network.UnsplashRepository
 import com.sasuke.launcheroneplus.di.scope.LauncherAppScope
 import com.sasuke.launcheroneplus.di.module.util.ViewModelFactoryModule
 import com.sasuke.launcheroneplus.di.module.activity.ActivityBindingModule
 import com.sasuke.launcheroneplus.di.module.library.GlideModule
+import com.sasuke.launcheroneplus.di.module.network.UnsplashRepositoryModule
 import com.sasuke.launcheroneplus.di.module.util.UtilsModule
 import com.sasuke.launcheroneplus.util.AppListUtil
 import com.sasuke.launcheroneplus.util.BitmapUtils
@@ -20,6 +22,7 @@ import dagger.android.support.AndroidSupportInjectionModule
 @LauncherAppScope
 @Component(
     modules = [
+        UnsplashRepositoryModule::class,
         GlideModule::class,
         UtilsModule::class,
         AndroidSupportInjectionModule::class,
@@ -44,4 +47,6 @@ interface LauncherAppComponent : AndroidInjector<LauncherApp> {
     fun getRoomRepository(): RoomRepository
 
     fun getAllListUtils(): AppListUtil
+
+    fun getUnsplashRepository(): UnsplashRepository
 }

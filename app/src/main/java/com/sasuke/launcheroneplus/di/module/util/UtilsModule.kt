@@ -6,6 +6,7 @@ import com.sasuke.launcheroneplus.di.module.local.RoomRepositoryModule
 import com.sasuke.launcheroneplus.di.scope.LauncherAppScope
 import com.sasuke.launcheroneplus.util.AppListUtil
 import com.sasuke.launcheroneplus.util.BitmapUtils
+import com.sasuke.launcheroneplus.util.NetworkUtil
 import com.sasuke.launcheroneplus.util.StorageUtils
 import dagger.Module
 import dagger.Provides
@@ -34,5 +35,11 @@ class UtilsModule {
         context: Context
     ): AppListUtil {
         return AppListUtil(roomRepository, bitmapUtils, storageUtils, context.packageManager)
+    }
+
+    @Provides
+    @LauncherAppScope
+    fun networkUtil(context: Context): NetworkUtil {
+        return NetworkUtil(context)
     }
 }
