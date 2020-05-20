@@ -49,6 +49,14 @@
             android:name=".ui.screen_off.ScreenOffActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
+        <activity
+            android:name=".ui.wallpaper.list.grid.WallpaperSettingsActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".ui.wallpaper.list.pager.WallpaperPagerActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+
         <receiver android:name=".receiver.AppChangeReceiver">
             <intent-filter android:priority="100">
                 <action android:name="android.intent.action.PACKAGE_ADDED" />

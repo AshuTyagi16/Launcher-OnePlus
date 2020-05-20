@@ -27,4 +27,7 @@
     <!-- Admin Rights -->
     <string name="accessibility_service_description">An accessibility service to lock the screen.</string>
 
+    <!-- Wallpaper -->
+    <string name="wallpaper">Wallpapers</string>
+
 </resources>

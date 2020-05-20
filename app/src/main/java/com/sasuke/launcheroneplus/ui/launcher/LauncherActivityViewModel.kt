@@ -63,7 +63,7 @@ class LauncherActivityViewModel @Inject constructor(
 
     fun getWallpaper() {
         _wallpaperLiveData.postValue(Resource.loading())
-        unsplashRepository.getWallpapers(this)
+        unsplashRepository.getWallpapers(onGetWallpaperListener = this)
     }
 
     override fun onGetWallpaperSuccess(wallpaper: Wallpaper) {

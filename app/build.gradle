@@ -125,5 +125,15 @@ dependencies {
     //EventBus
     implementation 'org.greenrobot:eventbus:3.2.0'
 
+    //SearchBar
+    implementation 'com.miguelcatalan:materialsearchview:1.4.0'
+
+    //Palette
+    implementation 'androidx.palette:palette:1.0.0'
+
+    //Gradient
+    implementation 'com.mikhaellopez:gradientview:1.1.0'
+
+
 
 }

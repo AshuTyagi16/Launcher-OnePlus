@@ -11,7 +11,6 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.EdgeEffect
-import android.widget.Toast
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
@@ -40,6 +39,7 @@ import com.sasuke.launcheroneplus.ui.hidden_apps.HiddenAppsActivity
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppAdapter
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
 import com.sasuke.launcheroneplus.ui.screen_off.ScreenOffActivity
+import com.sasuke.launcheroneplus.ui.wallpaper.list.grid.WallpaperSettingsActivity
 import com.sasuke.launcheroneplus.util.Constants
 import com.sasuke.launcheroneplus.util.KeyboardTriggerBehavior
 import com.sasuke.launcheroneplus.util.forEachVisibleHolder
@@ -309,8 +309,8 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             }
 
             override fun onLongPress() {
-                showToast("Setting Wallpaper", Toast.LENGTH_LONG)
-                setCustomWallpaper()
+                showToast("Setting Wallpaper")
+                startActivity(WallpaperSettingsActivity.newIntent(this@LauncherActivity))
             }
 
             override fun onThreeFingerSingleTap() {
@@ -581,7 +581,9 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        Sensey.getInstance().setupDispatchTouchEvent(ev)
+        ev?.let {
+            Sensey.getInstance().setupDispatchTouchEvent(it)
+        }
         return super.dispatchTouchEvent(ev)
     }
 

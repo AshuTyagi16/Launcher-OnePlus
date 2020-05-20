@@ -1,6 +1,7 @@
 package com.sasuke.launcheroneplus.util
 
 import android.app.Activity
+import android.content.res.Resources
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.sasuke.launcheroneplus.data.model.App
@@ -29,5 +30,9 @@ fun View.hide() {
 
 fun View.show() {
     this.visibility = View.VISIBLE
+}
+
+fun Int.dpToPx(): Int {
+    return (this * Resources.getSystem().displayMetrics.density).toInt()
 }
 

@@ -7,9 +7,10 @@ import com.sasuke.launcheroneplus.util.ApiCallback
 class UnsplashRepository(private val unsplashService: UnsplashService) {
 
     fun getWallpapers(
+        query: String = "Switzerland",
         onGetWallpaperListener: OnGetWallpaperListener
     ) {
-        unsplashService.getWallpapersForQuery().enqueue(object : ApiCallback<Wallpaper>() {
+        unsplashService.getWallpapersForQuery(query).enqueue(object : ApiCallback<Wallpaper>() {
             override fun success(response: Wallpaper) {
                 onGetWallpaperListener.onGetWallpaperSuccess(response)
             }
