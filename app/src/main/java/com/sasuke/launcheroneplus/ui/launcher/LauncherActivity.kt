@@ -87,12 +87,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
-    private lateinit var wallpaperManager: WallpaperManager
-
-    private lateinit var list: List<Result>
-
-    private var count = 0
-
     companion object {
         /** The magnitude of rotation while the list is scrolled. */
         private const val SCROLL_ROTATION_MAGNITUDE = 0.25f
@@ -114,7 +108,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launcher)
         inject()
-        initWallpaperManager()
         setWindowInsets()
         setupRecyclerView()
         setupGridView()
@@ -129,10 +122,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         Sensey.getInstance().init(this)
         handler = Handler()
         launcherActivityViewModel.getWallpaper()
-    }
-
-    private fun initWallpaperManager() {
-        wallpaperManager = WallpaperManager.getInstance(this)
     }
 
     private fun setWindowInsets() {
@@ -309,7 +298,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             }
 
             override fun onLongPress() {
-                showToast("Setting Wallpaper")
                 startActivity(WallpaperSettingsActivity.newIntent(this@LauncherActivity))
             }
 
@@ -437,14 +425,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     private fun observeLiveData() {
 
-        launcherActivityViewModel.wallpaperLiveData.observe(this, Observer {
-            if (it.status == Status.SUCCESS) {
-                it.data?.let {
-                    list = it.results
-                }
-            }
-        })
-
         launcherActivityViewModel.appList.observe(this, Observer {
             it?.let {
                 adapter.setApps(it)
@@ -541,43 +521,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             .setDeviceCredentialAllowed(true)
             .build()
 
-    }
-
-    private fun setCustomWallpaper() {
-        if (::list.isInitialized) {
-            glide
-                .asBitmap()
-                .load(list[count].urls.regular)
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onLoadCleared(placeholder: Drawable?) {
-
-                    }
-
-                    override fun onResourceReady(
-                        resource: Bitmap,
-                        transition: Transition<in Bitmap>?
-                    ) {
-                        wallpaperManager.setBitmap(resource)
-                        if (count < list.size - 1)
-                            count++
-                        else
-                            count = 0
-                        Sensey.getInstance()
-                            .startTouchTypeDetection(this@LauncherActivity, touchTypeListener)
-                    }
-
-                    override fun onLoadStarted(placeholder: Drawable?) {
-                        super.onLoadStarted(placeholder)
-                        Sensey.getInstance().stopTouchTypeDetection()
-                    }
-
-                    override fun onLoadFailed(errorDrawable: Drawable?) {
-                        super.onLoadFailed(errorDrawable)
-                        Sensey.getInstance()
-                            .startTouchTypeDetection(this@LauncherActivity, touchTypeListener)
-                    }
-                })
-        }
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {

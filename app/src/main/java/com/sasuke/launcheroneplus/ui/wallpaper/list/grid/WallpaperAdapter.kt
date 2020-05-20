@@ -2,6 +2,7 @@ package com.sasuke.launcheroneplus.ui.wallpaper.list.grid
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.R
@@ -29,7 +30,7 @@ class WallpaperAdapter(private val glide: RequestManager) :
     }
 
     override fun onBindViewHolder(holder: WallpaperViewHolder, position: Int) {
-        if (wallpapers.isNotEmpty() && position < wallpapers.size - 1) {
+        if (wallpapers.isNotEmpty() && position < wallpapers.size) {
             holder.setWallpaper(wallpapers[position])
         }
     }
@@ -39,13 +40,13 @@ class WallpaperAdapter(private val glide: RequestManager) :
         wallpapers.addAll(list)
     }
 
-    override fun onItemClick(position: Int) {
+    override fun onItemClick(position: Int, imageView: ImageView) {
         if (::onItemClickListener.isInitialized)
-            onItemClickListener.onItemClick(position)
+            onItemClickListener.onItemClick(position, imageView)
     }
 
     interface OnItemClickListener {
-        fun onItemClick(position: Int)
+        fun onItemClick(position: Int, imageView: ImageView)
     }
 
     fun setOnItemClickListener(onItemClickListener: OnItemClickListener) {

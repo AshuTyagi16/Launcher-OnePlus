@@ -4,8 +4,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.Handler
+import android.view.View
+import android.widget.ImageView
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.util.Pair
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.palette.graphics.Palette
@@ -13,21 +19,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.mikhaellopez.gradientview.GradientView
 import com.sasuke.launcheroneplus.R
+import com.sasuke.launcheroneplus.data.model.Result
 import com.sasuke.launcheroneplus.data.model.Status
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
+import com.sasuke.launcheroneplus.ui.wallpaper.WallpaperPreviewActivity
+import com.sasuke.launcheroneplus.util.hide
+import com.sasuke.launcheroneplus.util.show
 import kotlinx.android.synthetic.main.activity_wallpaper_pager.*
 import javax.inject.Inject
 
-class WallpaperPagerActivity : BaseActivity() {
+class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListener {
 
     @Inject
     lateinit var adapter: WallpaperPagerAdapter
@@ -47,17 +53,19 @@ class WallpaperPagerActivity : BaseActivity() {
     @Inject
     lateinit var glide: RequestManager
 
-    private lateinit var query: String
+    private var query: String? = null
 
     private var position: Int = 0
 
     private lateinit var wallpaperPagerActivityViewModel: WallpaperPagerActivityViewModel
 
+    private lateinit var handler: Handler
+
     companion object {
         private const val EXTRA_QUERY = "EXTRA_QUERY"
         private const val EXTRA_POSITION = "EXTRA_POSITION"
 
-        fun newIntent(context: Context, query: String, position: Int): Intent {
+        fun newIntent(context: Context, query: String?, position: Int): Intent {
             return Intent(context, WallpaperPagerActivity::class.java).apply {
                 putExtra(EXTRA_QUERY, query)
                 putExtra(EXTRA_POSITION, position)
@@ -72,7 +80,9 @@ class WallpaperPagerActivity : BaseActivity() {
         getArguments()
         getWallpapers()
         setupRecyclerView()
+        initGridView()
         observeLiveData()
+        handler = Handler()
     }
 
     private fun inject() {
@@ -83,17 +93,21 @@ class WallpaperPagerActivity : BaseActivity() {
     }
 
     private fun getArguments() {
-        query = intent.getStringExtra(EXTRA_QUERY)!!
+        query = intent.getStringExtra(EXTRA_QUERY)
         position = intent.getIntExtra(EXTRA_POSITION, 0)
     }
 
     private fun getWallpapers() {
-        wallpaperPagerActivityViewModel.getWallpapersForQuery(query)
+        if (!query.isNullOrEmpty())
+            wallpaperPagerActivityViewModel.getWallpapersForQuery(query!!)
+        else
+            wallpaperPagerActivityViewModel.getPopularWalls()
     }
 
     private fun setupRecyclerView() {
         rvWallpaperPager.layoutManager = layoutManager
         rvWallpaperPager.adapter = adapter
+        adapter.setOnItemListener(this)
         rvWallpaperPager.addItemDecoration(itemDecoration)
         pagerSnapHelper.attachToRecyclerView(rvWallpaperPager)
 
@@ -143,26 +157,67 @@ class WallpaperPagerActivity : BaseActivity() {
                             }
 
                         })
+
                 }
             }
         })
+    }
+
+    private fun initGridView() {
+        gradientView.apply {
+            // Set Color Start
+            start = Color.BLACK
+            alphaStart = 1f
+
+            // Set Color End
+            end = Color.BLACK
+            alphaEnd = 1f
+
+            // Set Gradient Direction
+            direction =
+                GradientView.GradientDirection.LEFT_TO_RIGHT
+        }
+        gradientView.animate()
     }
 
     private fun observeLiveData() {
         wallpaperPagerActivityViewModel.wallpaperLiveData.observe(this, Observer {
             when (it.status) {
                 Status.LOADING -> {
+                    rvWallpaperPager.hide()
+                    progressBar.show()
                 }
                 Status.SUCCESS -> {
+                    progressBar.hide()
+                    rvWallpaperPager.show()
                     it.data?.let {
-                        adapter.addWallpapers(it.results)
+                        adapter.addWallpapers(it)
                         adapter.notifyDataSetChanged()
-                        rvWallpaperPager.smoothScrollToPosition(position)
+                        handler.postDelayed({
+                            rvWallpaperPager.smoothScrollToPosition(position)
+                        }, 200)
                     }
                 }
                 Status.ERROR -> {
+                    progressBar.hide()
+                    rvWallpaperPager.hide()
                 }
             }
         })
+    }
+
+    override fun onItemClick(position: Int, result: Result, imageView: ImageView) {
+        val imagePair =
+            Pair.create<View, String>(imageView, getString(R.string.wallpaper))
+
+        val activityOptions =
+            ActivityOptionsCompat.makeSceneTransitionAnimation(
+                this,
+                imagePair
+            )
+        startActivity(
+            WallpaperPreviewActivity.newIntent(this, result.urls.regular),
+            activityOptions.toBundle()
+        )
     }
 }

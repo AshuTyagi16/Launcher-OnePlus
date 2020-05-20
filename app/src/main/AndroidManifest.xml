@@ -57,6 +57,10 @@
             android:name=".ui.wallpaper.list.pager.WallpaperPagerActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
+        <activity
+            android:name=".ui.wallpaper.WallpaperPreviewActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+
         <receiver android:name=".receiver.AppChangeReceiver">
             <intent-filter android:priority="100">
                 <action android:name="android.intent.action.PACKAGE_ADDED" />

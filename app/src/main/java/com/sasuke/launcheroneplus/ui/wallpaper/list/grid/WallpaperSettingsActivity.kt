@@ -4,6 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.View
+import android.widget.ImageView
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.util.Pair
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
@@ -13,6 +17,8 @@ import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
 import com.sasuke.launcheroneplus.ui.wallpaper.list.pager.WallpaperPagerActivity
 import com.sasuke.launcheroneplus.util.DebouncingQueryTextListener
+import com.sasuke.launcheroneplus.util.hide
+import com.sasuke.launcheroneplus.util.show
 import kotlinx.android.synthetic.main.activity_wallpaper_settings.*
 import javax.inject.Inject
 
@@ -32,7 +38,7 @@ class WallpaperSettingsActivity : BaseActivity(), WallpaperAdapter.OnItemClickLi
 
     private lateinit var wallpaperActivityViewModel: WallpaperActivityViewModel
 
-    private lateinit var query: String
+    private var query: String? = null
 
     companion object {
         fun newIntent(context: Context) = Intent(context, WallpaperSettingsActivity::class.java)
@@ -45,6 +51,7 @@ class WallpaperSettingsActivity : BaseActivity(), WallpaperAdapter.OnItemClickLi
         setupToolbar()
         setupRecyclerView()
         setupListeners()
+        getPopularWalls()
         observeLiveData()
     }
 
@@ -84,18 +91,28 @@ class WallpaperSettingsActivity : BaseActivity(), WallpaperAdapter.OnItemClickLi
         })
     }
 
+    private fun getPopularWalls() {
+        wallpaperActivityViewModel.getPopularWalls()
+    }
+
     private fun observeLiveData() {
         wallpaperActivityViewModel.wallpaperLiveData.observe(this, Observer {
             when (it.status) {
                 Status.LOADING -> {
+                    rvWallpaper.hide()
+                    progressBar.show()
                 }
                 Status.SUCCESS -> {
+                    progressBar.hide()
+                    rvWallpaper.show()
                     it.data?.let {
-                        adapter.addWallpapers(it.results)
+                        adapter.addWallpapers(it)
                         adapter.notifyDataSetChanged()
                     }
                 }
                 Status.ERROR -> {
+                    progressBar.hide()
+                    rvWallpaper.hide()
                 }
             }
         })
@@ -109,7 +126,18 @@ class WallpaperSettingsActivity : BaseActivity(), WallpaperAdapter.OnItemClickLi
         }
     }
 
-    override fun onItemClick(position: Int) {
-        startActivity(WallpaperPagerActivity.newIntent(this, query, position))
+    override fun onItemClick(position: Int, imageView: ImageView) {
+        val imagePair =
+            Pair.create<View, String>(imageView, position.toString())
+
+        val activityOptions =
+            ActivityOptionsCompat.makeSceneTransitionAnimation(
+                this,
+                imagePair
+            )
+        startActivity(
+            WallpaperPagerActivity.newIntent(this, query, position),
+            activityOptions.toBundle()
+        )
     }
 }

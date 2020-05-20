@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 class LauncherApp : Application(), HasAndroidInjector {
@@ -29,13 +30,14 @@ class LauncherApp : Application(), HasAndroidInjector {
     override fun onCreate() {
         super.onCreate()
         initComponent()
+        initTimber()
         initFont()
         initApps()
         register()
     }
 
     companion object {
-        fun get(context: Context): LauncherApp{
+        fun get(context: Context): LauncherApp {
             return context as LauncherApp
         }
     }
@@ -47,14 +49,7 @@ class LauncherApp : Application(), HasAndroidInjector {
     private fun initFont() {
         ViewPump.init(
             ViewPump.builder()
-                .addInterceptor(
-                    CalligraphyInterceptor(
-                        CalligraphyConfig.Builder()
-                            .setDefaultFontPath("fonts/Lato.ttf")
-                            .setFontAttrId(R.attr.fontPath)
-                            .build()
-                    )
-                )
+                .addInterceptor(component.calligraphyInterceptor())
                 .build()
         )
     }
@@ -70,6 +65,10 @@ class LauncherApp : Application(), HasAndroidInjector {
                 component.getAllListUtils().saveAppsInDB()
             }
         }
+    }
+
+    private fun initTimber() {
+        Timber.plant(component.timberTree())
     }
 
     private fun register() {

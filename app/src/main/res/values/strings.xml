@@ -29,5 +29,7 @@
 
     <!-- Wallpaper -->
     <string name="wallpaper">Wallpapers</string>
+    <string name="setting_wallpaper">Setting Wallpaper</string>
+    <string name="wallpaper_updated_successfully">Wallpaper Updated Successfully</string>
 
 </resources>

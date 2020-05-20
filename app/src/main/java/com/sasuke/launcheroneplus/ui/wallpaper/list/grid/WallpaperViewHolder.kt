@@ -1,6 +1,7 @@
 package com.sasuke.launcheroneplus.ui.wallpaper.list.grid
 
 import android.view.View
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -27,12 +28,12 @@ class WallpaperViewHolder(itemView: View, private val glide: RequestManager) :
 
         itemView.setOnClickListener {
             if (::onItemClickListener.isInitialized)
-                onItemClickListener.onItemClick(adapterPosition)
+                onItemClickListener.onItemClick(adapterPosition, itemView.ivWallpaper)
         }
     }
 
     interface OnItemClickListener {
-        fun onItemClick(position: Int)
+        fun onItemClick(position: Int, imageView: ImageView)
     }
 
     fun setOnItemClickListener(onItemClickListener: OnItemClickListener) {
