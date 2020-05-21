@@ -36,10 +36,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.sasuke.launcheroneplus.ui.widget.GridRecyclerView
         android:id="@+id/rvWallpaper"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layoutAnimation="@anim/grid_layout_animation_from_bottom"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
