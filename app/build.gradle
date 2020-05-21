@@ -135,7 +135,7 @@ dependencies {
     implementation 'com.mikhaellopez:gradientview:1.1.0'
 
     //Paginate
-    implementation 'com.github.markomilos:paginate:0.5.1'
+    implementation 'ru.alexbykov:nopaginate:0.9.9'
 
 
 

@@ -4,14 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
-import android.view.View
 import android.widget.ImageView
-import androidx.core.app.ActivityOptionsCompat
-import androidx.core.util.Pair
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import com.paginate.Paginate
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.Status
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
@@ -21,11 +17,12 @@ import com.sasuke.launcheroneplus.util.DebouncingQueryTextListener
 import com.sasuke.launcheroneplus.util.hide
 import com.sasuke.launcheroneplus.util.show
 import kotlinx.android.synthetic.main.activity_wallpaper_settings.*
+import ru.alexbykov.nopaginate.callback.OnLoadMoreListener
+import ru.alexbykov.nopaginate.paginate.NoPaginate
 import javax.inject.Inject
 
 class WallpaperSettingsActivity : BaseActivity(),
-    WallpaperAdapter.OnItemClickListener,
-    Paginate.Callbacks {
+    WallpaperAdapter.OnItemClickListener, OnLoadMoreListener {
 
     @Inject
     lateinit var adapter: WallpaperAdapter
@@ -43,11 +40,9 @@ class WallpaperSettingsActivity : BaseActivity(),
 
     private var query: String? = null
 
-    private var loading = true
-    private var loadedAllItems = false
     private var isFirstLoad = false
 
-    private lateinit var paginate: Paginate
+    private lateinit var paginate: NoPaginate
 
     companion object {
         fun newIntent(context: Context) = Intent(context, WallpaperSettingsActivity::class.java)
@@ -97,11 +92,10 @@ class WallpaperSettingsActivity : BaseActivity(),
                     if (query == null) {
                         query = it
                         wallpaperActivityViewModel.getWallpapersForQuery(it)
-//                        paginate = Paginate.with(rvWallpaper, this)
-//                            .setLoadingTriggerThreshold(0)
-//                            .setLoadingListItemCreator()
-//                            .addLoadingListItem(true)
-//                            .build()
+                        paginate = NoPaginate.with(rvWallpaper)
+                            .setLoadingTriggerThreshold(0)
+                            .setOnLoadMoreListener(this)
+                            .build()
                     } else {
                         if (query != it) {
                             query = it
@@ -109,7 +103,7 @@ class WallpaperSettingsActivity : BaseActivity(),
                             adapter.notifyDataSetChanged()
                             wallpaperActivityViewModel.refresh()
                             isFirstLoad = true
-                            loadedAllItems = false
+                            setNoMoreItems(false)
                             wallpaperActivityViewModel.getWallpapersForQuery(it)
                         }
                     }
@@ -153,12 +147,12 @@ class WallpaperSettingsActivity : BaseActivity(),
                         rvWallpaper.hide()
                         progressBar.show()
                     }
-                    loading = true
+                    showLoading(true)
                 }
                 Status.SUCCESS -> {
                     progressBar.hide()
                     rvWallpaper.show()
-                    loading = false
+                    showLoading(false)
                     if (isFirstLoad) {
                         isFirstLoad = false
                         adapter.wallpapers.clear()
@@ -176,16 +170,35 @@ class WallpaperSettingsActivity : BaseActivity(),
                                     adapter.wallpapers.size - previousSize
                                 )
                         } else
-                            loadedAllItems = true
+                            setNoMoreItems(true)
                     }
                 }
                 Status.ERROR -> {
-                    progressBar.hide()
-                    rvWallpaper.hide()
-                    loading = false
+                    if (isFirstLoad) {
+                        progressBar.hide()
+                        rvWallpaper.hide()
+                    } else {
+                        showLoading(false)
+                        showError(true)
+                    }
                 }
             }
         })
+    }
+
+    private fun showLoading(loading: Boolean) {
+        if (::paginate.isInitialized)
+            paginate.showLoading(loading)
+    }
+
+    private fun showError(error: Boolean) {
+        if (::paginate.isInitialized)
+            paginate.showError(error)
+    }
+
+    private fun setNoMoreItems(noMoreItems: Boolean) {
+        if (::paginate.isInitialized)
+            paginate.setNoMoreItems(noMoreItems)
     }
 
     override fun onBackPressed() {
@@ -205,13 +218,5 @@ class WallpaperSettingsActivity : BaseActivity(),
             if (!isFirstLoad)
                 wallpaperActivityViewModel.getWallpapersForQuery(it)
         }
-    }
-
-    override fun isLoading(): Boolean {
-        return loading
-    }
-
-    override fun hasLoadedAllItems(): Boolean {
-        return loadedAllItems
     }
 }
