@@ -9,6 +9,7 @@
         android:id="@+id/ivWallpaper"
         android:layout_width="350dp"
         android:layout_height="match_parent"
+        android:adjustViewBounds="true"
         android:contentDescription="@string/image"
         android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"

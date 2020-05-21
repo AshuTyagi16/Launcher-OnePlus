@@ -12,6 +12,11 @@
         <item name="android:windowDisablePreview">true</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowIsTranslucent">true</item>
+
+        <item name="android:windowSharedElementEnterTransition">@transition/change_image_transform</item>
+        <item name="android:windowSharedElementExitTransition">@transition/change_image_transform</item>
+
+
     </style>
 
     <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
@@ -21,6 +26,10 @@
         <item name="android:windowDisablePreview">true</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowIsTranslucent">true</item>
+
+        <item name="android:windowSharedElementEnterTransition">@transition/change_image_transform</item>
+        <item name="android:windowSharedElementExitTransition">@transition/change_image_transform</item>
+
     </style>
 
     <style name="CheckBox" parent="Widget.AppCompat.CompoundButton.CheckBox">

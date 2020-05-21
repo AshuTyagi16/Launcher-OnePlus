@@ -84,8 +84,14 @@ class WallpaperSettingsActivity : BaseActivity(), WallpaperAdapter.OnItemClickLi
         searchView.setOnQueryTextListener(DebouncingQueryTextListener(this.lifecycle) {
             it?.let {
                 if (it.isNotBlank()) {
-                    query = it
-                    wallpaperActivityViewModel.getWallpapersForQuery(it)
+                    if (query == null) {
+                        query = it
+                    } else {
+                        if (query != it) {
+                            query = it
+                            wallpaperActivityViewModel.getWallpapersForQuery(it)
+                        }
+                    }
                 }
             }
         })
@@ -127,17 +133,6 @@ class WallpaperSettingsActivity : BaseActivity(), WallpaperAdapter.OnItemClickLi
     }
 
     override fun onItemClick(position: Int, imageView: ImageView) {
-        val imagePair =
-            Pair.create<View, String>(imageView, position.toString())
-
-        val activityOptions =
-            ActivityOptionsCompat.makeSceneTransitionAnimation(
-                this,
-                imagePair
-            )
-        startActivity(
-            WallpaperPagerActivity.newIntent(this, query, position),
-            activityOptions.toBundle()
-        )
+        startActivity(WallpaperPagerActivity.newIntent(this, query, position))
     }
 }

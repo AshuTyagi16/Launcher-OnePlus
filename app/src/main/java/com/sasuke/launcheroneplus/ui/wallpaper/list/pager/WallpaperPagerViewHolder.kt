@@ -19,16 +19,15 @@ class WallpaperPagerViewHolder(itemView: View, private val glide: RequestManager
 
     init {
         requestOptions = requestOptions.transform(CenterCrop(), RoundedCorners(8.dpToPx()))
-        ViewCompat.setTransitionName(itemView.ivWallpaper, adapterPosition.toString())
     }
 
     private lateinit var onItemListener: OnItemListener
 
     fun setWallpaper(result: Result) {
         glide
-            .asBitmap()
             .load(result.urls.regular)
             .apply(requestOptions)
+            .dontAnimate()
             .into(itemView.ivWallpaper)
 
         itemView.setOnClickListener {

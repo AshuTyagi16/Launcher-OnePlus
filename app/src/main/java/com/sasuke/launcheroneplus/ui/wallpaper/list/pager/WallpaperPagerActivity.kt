@@ -121,42 +121,44 @@ class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListe
                 super.onScrollStateChanged(recyclerView, newState)
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     val pos = layoutManager.findFirstCompletelyVisibleItemPosition()
-                    val item = adapter.wallpapers[pos]
-                    glide
-                        .asBitmap()
-                        .load(item.urls.regular)
-                        .into(object : CustomTarget<Bitmap>() {
-                            override fun onLoadCleared(placeholder: Drawable?) {
+                    if (pos >= 0 && pos < adapter.wallpapers.size) {
+                        val item = adapter.wallpapers[pos]
+                        glide
+                            .asBitmap()
+                            .load(item.urls.regular)
+                            .into(object : CustomTarget<Bitmap>() {
+                                override fun onLoadCleared(placeholder: Drawable?) {
 
-                            }
+                                }
 
-                            override fun onResourceReady(
-                                resource: Bitmap,
-                                transition: Transition<in Bitmap>?
-                            ) {
-                                resource.let {
-                                    Palette.Builder(it).generate {
-                                        it?.let { palette ->
-                                            gradientView.apply {
-                                                // Set Color Start
-                                                start = palette.getDarkVibrantColor(0)
-                                                alphaStart = 1f
+                                override fun onResourceReady(
+                                    resource: Bitmap,
+                                    transition: Transition<in Bitmap>?
+                                ) {
+                                    resource.let {
+                                        Palette.Builder(it).generate {
+                                            it?.let { palette ->
+                                                gradientView.apply {
+                                                    // Set Color Start
+                                                    start = palette.getDarkVibrantColor(0)
+                                                    alphaStart = 1f
 
-                                                // Set Color End
-                                                end = palette.getDominantColor(0)
-                                                alphaEnd = 1f
+                                                    // Set Color End
+                                                    end = palette.getDominantColor(0)
+                                                    alphaEnd = 1f
 
-                                                // Set Gradient Direction
-                                                direction =
-                                                    GradientView.GradientDirection.LEFT_TO_RIGHT
+                                                    // Set Gradient Direction
+                                                    direction =
+                                                        GradientView.GradientDirection.LEFT_TO_RIGHT
+                                                }
+                                                gradientView.animate()
                                             }
-                                            gradientView.animate()
                                         }
                                     }
                                 }
-                            }
 
-                        })
+                            })
+                    }
 
                 }
             }
@@ -193,9 +195,7 @@ class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListe
                     it.data?.let {
                         adapter.addWallpapers(it)
                         adapter.notifyDataSetChanged()
-                        handler.postDelayed({
-                            rvWallpaperPager.smoothScrollToPosition(position)
-                        }, 200)
+                        rvWallpaperPager.scrollToPosition(position)
                     }
                 }
                 Status.ERROR -> {
@@ -208,7 +208,7 @@ class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListe
 
     override fun onItemClick(position: Int, result: Result, imageView: ImageView) {
         val imagePair =
-            Pair.create<View, String>(imageView, getString(R.string.wallpaper))
+            Pair.create<View, String>(imageView, position.toString())
 
         val activityOptions =
             ActivityOptionsCompat.makeSceneTransitionAnimation(
@@ -216,7 +216,7 @@ class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListe
                 imagePair
             )
         startActivity(
-            WallpaperPreviewActivity.newIntent(this, result.urls.regular),
+            WallpaperPreviewActivity.newIntent(this, result.urls.regular, position),
             activityOptions.toBundle()
         )
     }
