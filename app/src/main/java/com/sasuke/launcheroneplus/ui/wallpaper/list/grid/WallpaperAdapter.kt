@@ -11,7 +11,7 @@ import com.sasuke.launcheroneplus.data.model.Result
 class WallpaperAdapter(private val glide: RequestManager) :
     RecyclerView.Adapter<WallpaperViewHolder>(), WallpaperViewHolder.OnItemClickListener {
 
-    private val wallpapers = ArrayList<Result>()
+    val wallpapers = ArrayList<Result>()
     private lateinit var onItemClickListener: OnItemClickListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WallpaperViewHolder {
@@ -36,7 +36,6 @@ class WallpaperAdapter(private val glide: RequestManager) :
     }
 
     fun addWallpapers(list: List<Result>) {
-        wallpapers.clear()
         wallpapers.addAll(list)
     }
 

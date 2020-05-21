@@ -14,21 +14,32 @@ class WallpaperActivityViewModel @Inject constructor(private val unsplashReposit
     ViewModel(), UnsplashRepository.OnGetWallpaperListener,
     UnsplashRepository.OnGetPopularListener {
 
+    private var page = 1
+
+    private val _popularWallpaperLiveData = MutableLiveData<Resource<List<Result>>>()
+    val popularWallpaperLiveData: LiveData<Resource<List<Result>>>
+        get() = _popularWallpaperLiveData
+
     private val _wallpaperLiveData = MutableLiveData<Resource<List<Result>>>()
     val wallpaperLiveData: LiveData<Resource<List<Result>>>
         get() = _wallpaperLiveData
 
     fun getWallpapersForQuery(query: String) {
         _wallpaperLiveData.postValue(Resource.loading())
-        unsplashRepository.getWallpapers(query, this)
+        unsplashRepository.getWallpapers(query, page, this)
     }
 
     fun getPopularWalls() {
-        _wallpaperLiveData.postValue(Resource.loading())
+        _popularWallpaperLiveData.postValue(Resource.loading())
         unsplashRepository.getPopular(this)
     }
 
+    fun refresh() {
+        page = 1
+    }
+
     override fun onGetWallpaperSuccess(wallpaper: Wallpaper) {
+        page++
         _wallpaperLiveData.postValue(Resource.success(wallpaper.results))
     }
 
@@ -37,10 +48,10 @@ class WallpaperActivityViewModel @Inject constructor(private val unsplashReposit
     }
 
     override fun onGetPopularSuccess(list: List<Result>) {
-        _wallpaperLiveData.postValue(Resource.success(list))
+        _popularWallpaperLiveData.postValue(Resource.success(list))
     }
 
     override fun onGetPopularFailure(error: Error) {
-        _wallpaperLiveData.postValue(Resource.error(error))
+        _popularWallpaperLiveData.postValue(Resource.error(error))
     }
 }

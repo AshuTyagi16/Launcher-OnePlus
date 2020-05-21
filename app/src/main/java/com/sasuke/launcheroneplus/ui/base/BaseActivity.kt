@@ -2,6 +2,8 @@ package com.sasuke.launcheroneplus.ui.base
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
@@ -46,5 +48,11 @@ open class BaseActivity : DaggerAppCompatActivity() {
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             imm?.hideSoftInputFromWindow(v.windowToken, 0)
         }
+    }
+
+    fun openBrowser(url: String){
+        val i =  Intent(Intent.ACTION_VIEW)
+        i.data = Uri.parse(url)
+        startActivity(i)
     }
 }

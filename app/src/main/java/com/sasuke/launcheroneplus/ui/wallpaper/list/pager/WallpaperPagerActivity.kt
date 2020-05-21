@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.google.gson.Gson
 import com.mikhaellopez.gradientview.GradientView
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.Result
@@ -52,6 +53,9 @@ class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListe
 
     @Inject
     lateinit var glide: RequestManager
+
+    @Inject
+    lateinit var gson: Gson
 
     private var query: String? = null
 
@@ -216,7 +220,7 @@ class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListe
                 imagePair
             )
         startActivity(
-            WallpaperPreviewActivity.newIntent(this, result.urls.regular, position),
+            WallpaperPreviewActivity.newIntent(this, gson.toJson(result), position),
             activityOptions.toBundle()
         )
     }

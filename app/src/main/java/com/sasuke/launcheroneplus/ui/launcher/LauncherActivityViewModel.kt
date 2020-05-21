@@ -3,10 +3,6 @@ package com.sasuke.launcheroneplus.ui.launcher
 import androidx.lifecycle.*
 import com.sasuke.launcheroneplus.data.db.RoomRepository
 import com.sasuke.launcheroneplus.data.model.App
-import com.sasuke.launcheroneplus.data.model.Error
-import com.sasuke.launcheroneplus.data.model.Resource
-import com.sasuke.launcheroneplus.data.model.Wallpaper
-import com.sasuke.launcheroneplus.data.network.UnsplashRepository
 import com.sasuke.launcheroneplus.util.SearchUtils
 import com.sasuke.launcheroneplus.util.toLowerCased
 import kotlinx.coroutines.Dispatchers
@@ -15,15 +11,8 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-class LauncherActivityViewModel @Inject constructor(
-    roomRepository: RoomRepository,
-    private val unsplashRepository: UnsplashRepository
-) :
-    ViewModel(), UnsplashRepository.OnGetWallpaperListener {
-
-    private val _wallpaperLiveData = MutableLiveData<Resource<Wallpaper>>()
-    val wallpaperLiveData: LiveData<Resource<Wallpaper>>
-        get() = _wallpaperLiveData
+class LauncherActivityViewModel @Inject constructor(roomRepository: RoomRepository) :
+    ViewModel() {
 
     private var _appList = MediatorLiveData<MutableList<App>>()
     val appList: LiveData<MutableList<App>>
@@ -59,18 +48,5 @@ class LauncherActivityViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    fun getWallpaper() {
-        _wallpaperLiveData.postValue(Resource.loading())
-        unsplashRepository.getWallpapers(onGetWallpaperListener = this)
-    }
-
-    override fun onGetWallpaperSuccess(wallpaper: Wallpaper) {
-        _wallpaperLiveData.postValue(Resource.success(wallpaper))
-    }
-
-    override fun onGetWallpaperFailure(error: Error) {
-        _wallpaperLiveData.postValue(Resource.error(error))
     }
 }

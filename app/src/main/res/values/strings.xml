@@ -30,6 +30,13 @@
     <!-- Wallpaper -->
     <string name="wallpaper">Wallpapers</string>
     <string name="setting_wallpaper">Setting Wallpaper</string>
+    <string name="done">Done</string>
     <string name="wallpaper_updated_successfully">Wallpaper Updated Successfully</string>
+
+    <!-- Attribution -->
+    <string name="dummy_attribution">Photo by Ashu on Unsplash</string>
+    <string name="photo_by">Photo by</string>
+    <string name="on">on</string>
+    <string name="unsplash">Unsplash</string>
 
 </resources>

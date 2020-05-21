@@ -25,7 +25,7 @@ class NetworkModule {
         private const val WRITE_TIMEOUT: Long = 60
         private const val READ_TIMEOUT: Long = 60
         private const val MAX_STALE: Int = 7
-        private const val MAX_AGE: Int = 1
+        private const val MAX_AGE: Int = 0
         private const val CACHE_SIZE: Long = 10 * 1000 * 1000 //10 MB CACHE
         private const val CACHE_CONTROL = "Cache-Control"
         private const val PRAGMA = "Pragma"
@@ -141,7 +141,7 @@ class NetworkModule {
     @LauncherAppScope
     fun cacheControl(): CacheControl {
         return CacheControl.Builder()
-            .maxStale(MAX_STALE, TimeUnit.MINUTES)
+            .maxStale(MAX_STALE, TimeUnit.DAYS)
             .maxAge(MAX_AGE, TimeUnit.MINUTES)
             .build()
     }
@@ -151,10 +151,7 @@ class NetworkModule {
     @CacheInterceptor
     fun cacheInterceptor(cacheControl: CacheControl): Interceptor {
         return Interceptor { chain ->
-            var request = chain.request()
-            request = request.newBuilder()
-                .header(CACHE_CONTROL, cacheControl.toString())
-                .build()
+            val request = chain.request()
             var response = chain.proceed(request)
             response = response.newBuilder()
                 .removeHeader(PRAGMA)

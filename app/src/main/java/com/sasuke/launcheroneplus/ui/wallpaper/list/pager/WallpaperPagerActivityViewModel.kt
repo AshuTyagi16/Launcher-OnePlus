@@ -20,7 +20,7 @@ class WallpaperPagerActivityViewModel @Inject constructor(private val unsplashRe
 
     fun getWallpapersForQuery(query: String) {
         _wallpaperLiveData.postValue(Resource.loading())
-        unsplashRepository.getWallpapers(query, this)
+        unsplashRepository.getWallpapers(query, onGetWallpaperListener = this)
     }
 
     fun getPopularWalls() {

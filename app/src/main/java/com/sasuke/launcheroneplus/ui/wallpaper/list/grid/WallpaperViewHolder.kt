@@ -22,7 +22,7 @@ class WallpaperViewHolder(itemView: View, private val glide: RequestManager) :
     }
 
     fun setWallpaper(result: Result) {
-        glide.load(result.urls.regular)
+        glide.load(result.urls.small)
             .apply(requestOptions)
             .into(itemView.ivWallpaper)
 

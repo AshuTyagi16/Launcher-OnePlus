@@ -121,7 +121,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             ViewModelProvider(this, viewModelFactory).get(LauncherActivityViewModel::class.java)
         Sensey.getInstance().init(this)
         handler = Handler()
-        launcherActivityViewModel.getWallpaper()
     }
 
     private fun setWindowInsets() {

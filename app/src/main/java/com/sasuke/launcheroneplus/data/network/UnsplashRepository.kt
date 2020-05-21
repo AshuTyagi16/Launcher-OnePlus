@@ -9,18 +9,20 @@ class UnsplashRepository(private val unsplashService: UnsplashService) {
 
     fun getWallpapers(
         query: String = "Switzerland",
+        page: Int = 1,
         onGetWallpaperListener: OnGetWallpaperListener
     ) {
-        unsplashService.getWallpapersForQuery(query).enqueue(object : ApiCallback<Wallpaper>() {
-            override fun success(response: Wallpaper) {
-                onGetWallpaperListener.onGetWallpaperSuccess(response)
-            }
+        unsplashService.getWallpapersForQuery(query = query, pageNo = page)
+            .enqueue(object : ApiCallback<Wallpaper>() {
+                override fun success(response: Wallpaper) {
+                    onGetWallpaperListener.onGetWallpaperSuccess(response)
+                }
 
-            override fun failure(error: Error) {
-                onGetWallpaperListener.onGetWallpaperFailure(error)
-            }
+                override fun failure(error: Error) {
+                    onGetWallpaperListener.onGetWallpaperFailure(error)
+                }
 
-        })
+            })
     }
 
     fun getPopular(onGetPopularListener: OnGetPopularListener) {
