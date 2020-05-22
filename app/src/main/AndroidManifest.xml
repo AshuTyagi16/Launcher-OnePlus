@@ -61,6 +61,14 @@
             android:name=".ui.wallpaper.WallpaperPreviewActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
+        <activity
+            android:name=".ui.settings.LauncherSettingsActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".ui.settings.app_drawer.AppDrawerActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+
         <receiver android:name=".receiver.AppChangeReceiver">
             <intent-filter android:priority="100">
                 <action android:name="android.intent.action.PACKAGE_ADDED" />

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -159,14 +160,16 @@ class WallpaperSettingsActivity : BaseActivity(),
                         isFirstLoad = false
                         adapter.wallpapers.clear()
                         adapter.notifyDataSetChanged()
+                        runLayoutAnimation()
                     }
                     it.data?.let {
                         if (it.isNotEmpty()) {
                             val previousSize = adapter.wallpapers.size
                             adapter.addWallpapers(it)
-                            if (previousSize == 0)
+                            if (previousSize == 0) {
                                 adapter.notifyDataSetChanged()
-                            else
+                                runLayoutAnimation()
+                            } else
                                 adapter.notifyItemRangeInserted(
                                     previousSize,
                                     adapter.wallpapers.size - previousSize
@@ -201,6 +204,16 @@ class WallpaperSettingsActivity : BaseActivity(),
     private fun setNoMoreItems(noMoreItems: Boolean) {
         if (::paginate.isInitialized)
             paginate.setNoMoreItems(noMoreItems)
+    }
+
+    private fun runLayoutAnimation() {
+        val context = rvWallpaper.context
+        val controller =
+            AnimationUtils.loadLayoutAnimation(context, R.anim.grid_layout_animation_from_bottom)
+
+        rvWallpaper.layoutAnimation = controller
+        rvWallpaper.adapter?.notifyDataSetChanged()
+        rvWallpaper.scheduleLayoutAnimation()
     }
 
     override fun onBackPressed() {

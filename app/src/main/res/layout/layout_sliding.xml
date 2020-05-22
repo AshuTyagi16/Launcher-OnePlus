@@ -47,7 +47,6 @@
                 android:layout_gravity="center"
                 android:background="@null"
                 android:drawableStart="@drawable/ic_search_white"
-                android:drawableTint="@color/search_bar"
                 android:focusedByDefault="false"
                 android:gravity="start"
                 android:hint="@string/search_apps"

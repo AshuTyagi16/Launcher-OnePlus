@@ -5,6 +5,8 @@ import com.sasuke.launcheroneplus.di.scope.PerActivityScope
 import com.sasuke.launcheroneplus.ui.hidden_apps.HiddenAppsActivity
 import com.sasuke.launcheroneplus.ui.hidden_apps.app_selector.AppSelectionActivity
 import com.sasuke.launcheroneplus.ui.screen_off.ScreenOffActivity
+import com.sasuke.launcheroneplus.ui.settings.LauncherSettingsActivity
+import com.sasuke.launcheroneplus.ui.settings.app_drawer.AppDrawerActivity
 import com.sasuke.launcheroneplus.ui.wallpaper.WallpaperPreviewActivity
 import com.sasuke.launcheroneplus.ui.wallpaper.list.grid.WallpaperSettingsActivity
 import com.sasuke.launcheroneplus.ui.wallpaper.list.pager.WallpaperPagerActivity
@@ -41,4 +43,12 @@ abstract class ActivityBindingModule {
     @PerActivityScope
     @ContributesAndroidInjector(modules = [])
     internal abstract fun wallpaperPreviewActivity(): WallpaperPreviewActivity
+
+    @PerActivityScope
+    @ContributesAndroidInjector(modules = [LauncherSettingsActivityModule::class])
+    internal abstract fun launcherSettingsActivity(): LauncherSettingsActivity
+
+    @PerActivityScope
+    @ContributesAndroidInjector(modules = [AppDrawerActivityModule::class])
+    internal abstract fun appDrawerActivity(): AppDrawerActivity
 }

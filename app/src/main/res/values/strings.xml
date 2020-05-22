@@ -11,6 +11,7 @@
     <!-- Launcher -->
     <string name="search_apps">Search apps</string>
     <string name="shortcut_added_to_home_screen">Shortcut Added To Home Screen!!</string>
+    <string name="ez_settings">EZ Settings</string>
 
     <!-- Drag n Drop -->
     <string name="removeItem">Remove</string>
@@ -31,6 +32,7 @@
     <string name="wallpaper">Wallpapers</string>
     <string name="setting_wallpaper">Setting Wallpaper</string>
     <string name="done">Done</string>
+    <string name="cancel">Cancel</string>
     <string name="wallpaper_updated_successfully">Wallpaper Updated Successfully</string>
 
     <!-- Attribution -->
@@ -39,4 +41,38 @@
     <string name="on">on</string>
     <string name="unsplash">Unsplash</string>
 
+    <!-- Color Picker -->
+    <string name="select_color">Select color</string>
+    <string name="color_preference_name">EZ_COLOR_THEME</string>
+
+    <!-- Settings -->
+    <string name="home_screen">Home Screen</string>
+    <string name="app_drawer">App Drawer</string>
+    <string name="folders">Folders</string>
+    <string name="look_n_feel">Look &amp; Feel</string>
+    <string name="night_mode">Night Mode</string>
+    <string name="gesture_n_inputs">Gesture &amp; inputs</string>
+    <string name="notification_badges">Notification Badges</string>
+    <string name="select_default_launcher">Select default launcher</string>
+    <string name="say_thanks">Say thanks</string>
+    <string name="about">About</string>
+    <string name="contact_support">Contact support</string>
+
+    <!-- Settings Description -->
+
+    <string name="home_screen_description">Set grid, icon layout, dock settings, and more</string>
+    <string name="app_drawer_description">Set layout, style, opening gesture, and more</string>
+    <string name="folders_description">Set window styles, background colors, and icon layouts</string>
+    <string name="look_n_feel_description">Icon preference, animation and scroll speeds, and notification bar options</string>
+    <string name="night_mode_description">Schedule automatic dark mode based on time or location</string>
+    <string name="gesture_n_inputs_description">Define secondary home button action, along with swipe, tap, and pinch gestures on home screen</string>
+    <string name="notification_badges_description">Choose from dynamic badges, notification dots, or numeric badges</string>
+    <string name="select_default_launcher_description">OnePlus Launcher</string>
+    <string name="say_thanks_description">If you enjoy EZ launcher, drop us a comment in the Play Store</string>
+    <string name="about_description">EZ launcher information, open source licence etc</string>
+    <string name="contact_support_description">If you\'re having issues, have a question, or simply love EZ, this is where you can get in touch</string>
+
+    <!-- App Drawer -->
+    <string name="scroll_accent_color">Scroll accent color</string>
+    <string name="scroll_accent_color_description">Color os the scrollbar slider, letter bubble, overscroll glow and search bar</string>
 </resources>

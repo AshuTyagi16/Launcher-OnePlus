@@ -14,6 +14,7 @@ import com.sasuke.launcheroneplus.di.module.network.UnsplashRepositoryModule
 import com.sasuke.launcheroneplus.di.module.util.UtilsModule
 import com.sasuke.launcheroneplus.util.AppListUtil
 import com.sasuke.launcheroneplus.util.BitmapUtils
+import com.sasuke.launcheroneplus.util.SettingUtils
 import com.sasuke.launcheroneplus.util.StorageUtils
 import dagger.BindsInstance
 import dagger.Component
@@ -57,4 +58,6 @@ interface LauncherAppComponent : AndroidInjector<LauncherApp> {
     fun timberTree(): Timber.Tree
 
     fun calligraphyInterceptor(): CalligraphyInterceptor
+
+    fun getSettingUtils(): SettingUtils
 }

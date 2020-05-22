@@ -22,6 +22,8 @@ class AppAdapter(private val glide: RequestManager, private val consumeLongPress
     lateinit var appList: MutableList<App>
     private lateinit var onClickListeners: OnClickListeners
 
+    private var primaryColor: Int = 0
+
     init {
         setHasStableIds(true)
     }
@@ -77,9 +79,13 @@ class AppAdapter(private val glide: RequestManager, private val consumeLongPress
 
     override fun onUpdate(position: Int, popupTextView: TextView) {
         popupTextView.background.colorFilter = PorterDuffColorFilter(
-            ContextCompat.getColor(popupTextView.context, R.color.search_bar),
+            primaryColor,
             PorterDuff.Mode.SRC_IN
         )
         popupTextView.text = appList[position].label[0].toUpperCase().toString()
+    }
+
+    fun updatePrimaryColor(color: Int) {
+        primaryColor = color
     }
 }

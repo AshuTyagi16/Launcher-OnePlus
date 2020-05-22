@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/clParent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/dark_grey"
+    app:behavior_hideable="false"
+    app:layout_behavior="@string/bottom_sheet_behavior">
+
+    <ImageButton
+        android:id="@+id/btnDone"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@null"
+        android:contentDescription="@string/button"
+        android:foreground="@drawable/ripple_button"
+        android:src="@drawable/ic_check_white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        style="@style/Text.Primary.Bold"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="@string/select_color"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@id/btnDone"
+        app:layout_constraintEnd_toStartOf="@id/btnCancel"
+        app:layout_constraintStart_toEndOf="@id/btnDone"
+        app:layout_constraintTop_toTopOf="@id/btnDone" />
+
+    <ImageButton
+        android:id="@+id/btnCancel"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@null"
+        android:contentDescription="@string/button"
+        android:foreground="@drawable/ripple_button"
+        android:src="@drawable/ic_close_white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.sasuke.launcheroneplus.ui.widget.GridRecyclerView
+        android:id="@+id/rvDefaultColors"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layoutAnimation="@anim/grid_layout_animation_from_bottom"
+        android:overScrollMode="never"
+        app:layout_constraintTop_toBottomOf="@id/btnDone"
+        tools:itemCount="20"
+        tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        tools:listitem="@layout/cell_default_color"
+        tools:spanCount="5" />
+
+    <ImageButton
+        android:id="@+id/btnTogglePallete"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@null"
+        android:contentDescription="@string/button"
+        android:foreground="@drawable/ripple_button"
+        android:src="@drawable/ic_refresh_white"
+        app:layout_constraintBottom_toTopOf="@id/colorPicker"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rvDefaultColors" />
+
+    <com.skydoves.colorpickerview.ColorPickerView
+        android:id="@+id/colorPicker"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        app:layout_constraintTop_toBottomOf="@id/btnTogglePallete"
+        app:palette="@drawable/final_pallete" />
+
+    <com.skydoves.colorpickerview.sliders.AlphaSlideBar
+        android:id="@+id/alphaSlideBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="30dp"
+        app:borderColor_AlphaSlideBar="@android:color/darker_gray"
+        app:borderSize_AlphaSlideBar="5"
+        app:layout_constraintTop_toBottomOf="@id/colorPicker"
+        app:selector_AlphaSlideBar="@drawable/wheel" />
+
+    <com.skydoves.colorpickerview.sliders.BrightnessSlideBar
+        android:id="@+id/brightnessSlide"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp"
+        app:borderColor_BrightnessSlider="@android:color/darker_gray"
+        app:borderSize_BrightnessSlider="5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/alphaSlideBar"
+        app:selector_BrightnessSlider="@drawable/wheel" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

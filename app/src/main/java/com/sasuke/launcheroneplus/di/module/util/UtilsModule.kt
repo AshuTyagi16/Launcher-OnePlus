@@ -4,10 +4,7 @@ import android.content.Context
 import com.sasuke.launcheroneplus.data.db.RoomRepository
 import com.sasuke.launcheroneplus.di.module.local.RoomRepositoryModule
 import com.sasuke.launcheroneplus.di.scope.LauncherAppScope
-import com.sasuke.launcheroneplus.util.AppListUtil
-import com.sasuke.launcheroneplus.util.BitmapUtils
-import com.sasuke.launcheroneplus.util.NetworkUtil
-import com.sasuke.launcheroneplus.util.StorageUtils
+import com.sasuke.launcheroneplus.util.*
 import dagger.Module
 import dagger.Provides
 
@@ -41,5 +38,11 @@ class UtilsModule {
     @LauncherAppScope
     fun networkUtil(context: Context): NetworkUtil {
         return NetworkUtil(context)
+    }
+
+    @Provides
+    @LauncherAppScope
+    fun settingUtils(context: Context): SettingUtils {
+        return SettingUtils(context)
     }
 }

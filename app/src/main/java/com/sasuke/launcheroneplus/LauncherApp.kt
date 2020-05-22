@@ -37,6 +37,7 @@ class LauncherApp : Application(), HasAndroidInjector {
     }
 
     companion object {
+        var color = 0
         fun get(context: Context): LauncherApp {
             return context as LauncherApp
         }

@@ -138,6 +138,9 @@ dependencies {
     //Paginate
     implementation 'ru.alexbykov:nopaginate:0.9.9'
 
+    //Color Picker
+    implementation 'com.github.skydoves:colorpickerview:2.1.6'
+
 
 
 }

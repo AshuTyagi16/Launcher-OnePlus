@@ -1,6 +1,7 @@
 package com.sasuke.launcheroneplus.ui.launcher
 
 import android.animation.Animator
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.view.DragEvent
@@ -8,8 +9,11 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.EdgeEffect
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -22,7 +26,9 @@ import com.github.nisrulz.sensey.TouchTypeDetector
 import com.huxq17.handygridview.HandyGridView
 import com.huxq17.handygridview.listener.OnItemCapturedListener
 import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
+import com.sasuke.launcheroneplus.LauncherApp
 import com.sasuke.launcheroneplus.R
+import com.sasuke.launcheroneplus.data.event.PrimaryColorChangedEvent
 import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.data.model.DragData
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
@@ -31,7 +37,7 @@ import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
 import com.sasuke.launcheroneplus.ui.hidden_apps.HiddenAppsActivity
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppAdapter
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
-import com.sasuke.launcheroneplus.ui.screen_off.ScreenOffActivity
+import com.sasuke.launcheroneplus.ui.settings.LauncherSettingsActivity
 import com.sasuke.launcheroneplus.ui.wallpaper.list.grid.WallpaperSettingsActivity
 import com.sasuke.launcheroneplus.util.Constants
 import com.sasuke.launcheroneplus.util.KeyboardTriggerBehavior
@@ -41,6 +47,9 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import kotlinx.android.synthetic.main.activity_launcher.*
 import kotlinx.android.synthetic.main.layout_non_sliding.*
 import kotlinx.android.synthetic.main.layout_sliding.*
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import java.util.concurrent.Executor
 import javax.inject.Inject
 
@@ -80,6 +89,8 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
+    private var primaryColor = 0
+
     companion object {
         /** The magnitude of rotation while the list is scrolled. */
         private const val SCROLL_ROTATION_MAGNITUDE = 0.25f
@@ -107,6 +118,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         setupListeners()
         observeLiveData()
         initBiometric()
+        registerForEvents()
     }
 
     private fun inject() {
@@ -114,6 +126,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             ViewModelProvider(this, viewModelFactory).get(LauncherActivityViewModel::class.java)
         Sensey.getInstance().init(this)
         handler = Handler()
+        primaryColor = ContextCompat.getColor(this, R.color.search_bar)
     }
 
     private fun setWindowInsets() {
@@ -127,6 +140,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         rvHideApps.layoutManager = layoutManager
         rvHideApps.addItemDecoration(itemDecoration)
         rvHideApps.adapter = adapter
+        adapter.updatePrimaryColor(primaryColor)
         adapter.setOnClickListeners(this)
 
         fastscroller.setHandleStateListener(object : RecyclerViewFastScroller.HandleStateListener {
@@ -135,25 +149,16 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                 rvHideApps.forEachVisibleHolder { holder: AppViewHolder ->
                     if (adapter.appList[postion].label[0].toUpperCase() == adapter.appList[holder.adapterPosition].label[0].toUpperCase())
                         holder.itemView.setBackgroundColor(
-                            ContextCompat.getColor(
-                                this@LauncherActivity,
-                                R.color.app_highlight
-                            )
+                            ColorUtils.setAlphaComponent(primaryColor, 40)
                         )
                     else
                         holder.itemView.setBackgroundColor(
-                            ContextCompat.getColor(
-                                this@LauncherActivity,
-                                R.color.app_un_highlight
-                            )
+                            Color.TRANSPARENT
                         )
                 }
 
             }
 
-            override fun onReleased() {
-                super.onReleased()
-            }
         })
 
         rvHideApps.edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
@@ -253,8 +258,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
         touchTypeListener = object : TouchTypeDetector.TouchTypListener {
             override fun onDoubleTap() {
-                startActivity(ScreenOffActivity.newIntent(this@LauncherActivity))
-                overridePendingTransition(0, 0)
+                startActivity(LauncherSettingsActivity.newIntent(this@LauncherActivity))
             }
 
             override fun onSwipe(p0: Int) {
@@ -321,6 +325,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                 ivDragIcon.alpha = 1 - slideOffset
                 clSearchBar.alpha = slideOffset
                 gridApps.alpha = 1 - slideOffset
+                clWallpaperIcon.alpha = 1 - slideOffset
             }
 
             override fun onPanelStateChanged(
@@ -449,7 +454,22 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                 override fun onAnimationEnd(p0: Animator?) {
                     etSearch.apply {
                         compoundDrawablePadding = 40
-                        setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_back_white, 0, 0, 0)
+                        AppCompatResources.getDrawable(
+                            this@LauncherActivity,
+                            R.drawable.ic_back_white
+                        )?.let {
+                            val wrappedDrawable = DrawableCompat.wrap(it)
+                            DrawableCompat.setTint(
+                                wrappedDrawable,
+                                primaryColor
+                            )
+                            setCompoundDrawablesWithIntrinsicBounds(
+                                wrappedDrawable,
+                                null,
+                                null,
+                                null
+                            )
+                        }
                     }
                 }
 
@@ -476,7 +496,22 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                 override fun onAnimationEnd(p0: Animator?) {
                     etSearch.apply {
                         compoundDrawablePadding = 40
-                        setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_search_white, 0, 0, 0)
+                        AppCompatResources.getDrawable(
+                            this@LauncherActivity,
+                            R.drawable.ic_search_white
+                        )?.let {
+                            val wrappedDrawable = DrawableCompat.wrap(it)
+                            DrawableCompat.setTint(
+                                wrappedDrawable,
+                                primaryColor
+                            )
+                            setCompoundDrawablesWithIntrinsicBounds(
+                                wrappedDrawable,
+                                null,
+                                null,
+                                null
+                            )
+                        }
                     }
                     etSearch.clearFocus()
                     etSearch.setText("")
@@ -517,6 +552,11 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     }
 
+    private fun registerForEvents() {
+        if (!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this)
+    }
+
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         ev?.let {
             Sensey.getInstance().setupDispatchTouchEvent(it)
@@ -526,6 +566,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     override fun onDestroy() {
         Sensey.getInstance().stop()
+        EventBus.getDefault().unregister(this)
         super.onDestroy()
     }
 
@@ -543,5 +584,36 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
         } else
             super.onBackPressed()
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    fun onPrimaryColorChangeEvent(primaryColorChangedEvent: PrimaryColorChangedEvent) {
+        primaryColor = primaryColorChangedEvent.color
+        LauncherApp.color = primaryColor
+
+        fastscroller.handleDrawable?.let {
+            AppCompatResources.getDrawable(this, R.drawable.fast_scroll_handle)?.let {
+                val wrappedDrawable = DrawableCompat.wrap(it)
+                DrawableCompat.setTint(
+                    wrappedDrawable,
+                    primaryColor
+                )
+                fastscroller.handleDrawable = wrappedDrawable
+            }
+        }
+        adapter.updatePrimaryColor(primaryColor)
+
+        etSearch.setTextColor(primaryColor)
+        etSearch.setHintTextColor(primaryColor)
+        AppCompatResources.getDrawable(this@LauncherActivity, R.drawable.ic_search_white)?.let {
+            val wrappedDrawable = DrawableCompat.wrap(it)
+            DrawableCompat.setTint(
+                wrappedDrawable,
+                primaryColor
+            )
+            etSearch.setCompoundDrawablesWithIntrinsicBounds(wrappedDrawable, null, null, null)
+        }
+        ivSeparator.setBackgroundColor(primaryColor)
+        EventBus.getDefault().removeStickyEvent(primaryColorChangedEvent)
     }
 }
