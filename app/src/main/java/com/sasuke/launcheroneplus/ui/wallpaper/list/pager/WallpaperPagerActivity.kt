@@ -7,7 +7,6 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.os.Handler
 import android.view.View
 import android.widget.ImageView
 import androidx.core.app.ActivityOptionsCompat
@@ -29,12 +28,14 @@ import com.sasuke.launcheroneplus.data.model.Status
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
 import com.sasuke.launcheroneplus.ui.wallpaper.WallpaperPreviewActivity
-import com.sasuke.launcheroneplus.util.hide
-import com.sasuke.launcheroneplus.util.show
+import com.sasuke.launcheroneplus.util.Constants
 import kotlinx.android.synthetic.main.activity_wallpaper_pager.*
+import ru.alexbykov.nopaginate.callback.OnLoadMoreListener
+import ru.alexbykov.nopaginate.paginate.NoPaginate
 import javax.inject.Inject
 
-class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListener {
+class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListener,
+    OnLoadMoreListener {
 
     @Inject
     lateinit var adapter: WallpaperPagerAdapter
@@ -59,20 +60,26 @@ class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListe
 
     private var query: String? = null
 
+    private var page: Int = 1
+
     private var position: Int = 0
 
     private lateinit var wallpaperPagerActivityViewModel: WallpaperPagerActivityViewModel
 
-    private lateinit var handler: Handler
+    private lateinit var paginate: NoPaginate
+
+    private var isFirstLoad = true
 
     companion object {
         private const val EXTRA_QUERY = "EXTRA_QUERY"
+        private const val EXTRA_PAGE = "EXTRA_PAGE"
         private const val EXTRA_POSITION = "EXTRA_POSITION"
 
-        fun newIntent(context: Context, query: String?, position: Int): Intent {
+        fun newIntent(context: Context, query: String?, position: Int, page: Int): Intent {
             return Intent(context, WallpaperPagerActivity::class.java).apply {
                 putExtra(EXTRA_QUERY, query)
                 putExtra(EXTRA_POSITION, position)
+                putExtra(EXTRA_PAGE, page)
             }
         }
     }
@@ -82,11 +89,10 @@ class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListe
         setContentView(R.layout.activity_wallpaper_pager)
         inject()
         getArguments()
-        getWallpapers()
         setupRecyclerView()
-        initGridView()
+        initGradientView()
+        getWallpapers()
         observeLiveData()
-        handler = Handler()
     }
 
     private fun inject() {
@@ -98,13 +104,18 @@ class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListe
 
     private fun getArguments() {
         query = intent.getStringExtra(EXTRA_QUERY)
+        page = intent.getIntExtra(EXTRA_PAGE, 0)
         position = intent.getIntExtra(EXTRA_POSITION, 0)
     }
 
     private fun getWallpapers() {
-        if (!query.isNullOrEmpty())
-            wallpaperPagerActivityViewModel.getWallpapersForQuery(query!!)
-        else
+        if (!query.isNullOrEmpty()) {
+            paginate = NoPaginate.with(rvWallpaperPager)
+                .setLoadingTriggerThreshold(0)
+                .setOnLoadMoreListener(this)
+                .build()
+            wallpaperPagerActivityViewModel.getWallpapersForQuery(query!!, page)
+        } else
             wallpaperPagerActivityViewModel.getPopularWalls()
     }
 
@@ -169,7 +180,7 @@ class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListe
         })
     }
 
-    private fun initGridView() {
+    private fun initGradientView() {
         gradientView.apply {
             // Set Color Start
             start = Color.BLACK
@@ -187,27 +198,74 @@ class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListe
     }
 
     private fun observeLiveData() {
-        wallpaperPagerActivityViewModel.wallpaperLiveData.observe(this, Observer {
+        wallpaperPagerActivityViewModel.popularWallpaperLiveData.observe(this, Observer {
             when (it.status) {
                 Status.LOADING -> {
-                    rvWallpaperPager.hide()
-                    progressBar.show()
+
                 }
                 Status.SUCCESS -> {
-                    progressBar.hide()
-                    rvWallpaperPager.show()
                     it.data?.let {
                         adapter.addWallpapers(it)
                         adapter.notifyDataSetChanged()
-                        rvWallpaperPager.scrollToPosition(position)
                     }
                 }
                 Status.ERROR -> {
-                    progressBar.hide()
-                    rvWallpaperPager.hide()
+
                 }
             }
         })
+
+        wallpaperPagerActivityViewModel.wallpaperLiveData.observe(this, Observer {
+            when (it.status) {
+                Status.LOADING -> {
+                    showLoading(true)
+                    showError(false)
+                }
+                Status.SUCCESS -> {
+                    showLoading(false)
+                    showError(false)
+                    page++
+                    it.data?.let {
+                        if (it.isNotEmpty()) {
+                            val previousSize = adapter.wallpapers.size
+                            adapter.addWallpapers(it)
+                            if (previousSize == 0)
+                                adapter.notifyDataSetChanged()
+                            else
+                                adapter.notifyItemRangeInserted(
+                                    previousSize,
+                                    adapter.wallpapers.size - previousSize
+                                )
+                            if (isFirstLoad) {
+                                rvWallpaperPager.scrollToPosition(position % Constants.PAGE_SIZE)
+                                isFirstLoad = false
+                            }
+                        } else {
+                            setNoMoreItems(true)
+                        }
+                    }
+                }
+                Status.ERROR -> {
+                    showLoading(false)
+                    showError(true)
+                }
+            }
+        })
+    }
+
+    private fun showLoading(loading: Boolean) {
+        if (::paginate.isInitialized)
+            paginate.showLoading(loading)
+    }
+
+    private fun showError(error: Boolean) {
+        if (::paginate.isInitialized)
+            paginate.showError(error)
+    }
+
+    private fun setNoMoreItems(noMoreItems: Boolean) {
+        if (::paginate.isInitialized)
+            paginate.setNoMoreItems(noMoreItems)
     }
 
     override fun onItemClick(position: Int, result: Result, imageView: ImageView) {
@@ -223,5 +281,11 @@ class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListe
             WallpaperPreviewActivity.newIntent(this, gson.toJson(result), position),
             activityOptions.toBundle()
         )
+    }
+
+    override fun onLoadMore() {
+        query?.let {
+            wallpaperPagerActivityViewModel.getWallpapersForQuery(it, page)
+        }
     }
 }

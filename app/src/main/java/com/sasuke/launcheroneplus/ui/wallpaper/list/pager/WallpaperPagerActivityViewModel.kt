@@ -14,19 +14,22 @@ class WallpaperPagerActivityViewModel @Inject constructor(private val unsplashRe
     ViewModel(), UnsplashRepository.OnGetWallpaperListener,
     UnsplashRepository.OnGetPopularListener {
 
+    private val _popularWallpaperLiveData = MutableLiveData<Resource<List<Result>>>()
+    val popularWallpaperLiveData: LiveData<Resource<List<Result>>>
+        get() = _popularWallpaperLiveData
+
     private val _wallpaperLiveData = MutableLiveData<Resource<List<Result>>>()
     val wallpaperLiveData: LiveData<Resource<List<Result>>>
         get() = _wallpaperLiveData
 
-    fun getWallpapersForQuery(query: String) {
+    fun getWallpapersForQuery(query: String, page: Int) {
         _wallpaperLiveData.postValue(Resource.loading())
-        unsplashRepository.getWallpapers(query, onGetWallpaperListener = this)
+        unsplashRepository.getWallpapers(query, page, this)
     }
 
     fun getPopularWalls() {
-        _wallpaperLiveData.postValue(Resource.loading())
+        _popularWallpaperLiveData.postValue(Resource.loading())
         unsplashRepository.getPopular(this)
-
     }
 
     override fun onGetWallpaperSuccess(wallpaper: Wallpaper) {
@@ -38,10 +41,10 @@ class WallpaperPagerActivityViewModel @Inject constructor(private val unsplashRe
     }
 
     override fun onGetPopularSuccess(list: List<Result>) {
-        _wallpaperLiveData.postValue(Resource.success(list))
+        _popularWallpaperLiveData.postValue(Resource.success(list))
     }
 
     override fun onGetPopularFailure(error: Error) {
-        _wallpaperLiveData.postValue(Resource.error(error))
+        _popularWallpaperLiveData.postValue(Resource.error(error))
     }
 }

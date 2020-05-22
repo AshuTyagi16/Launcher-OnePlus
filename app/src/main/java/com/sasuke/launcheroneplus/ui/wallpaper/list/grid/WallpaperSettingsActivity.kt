@@ -13,6 +13,7 @@ import com.sasuke.launcheroneplus.data.model.Status
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
 import com.sasuke.launcheroneplus.ui.wallpaper.list.pager.WallpaperPagerActivity
+import com.sasuke.launcheroneplus.util.Constants
 import com.sasuke.launcheroneplus.util.DebouncingQueryTextListener
 import com.sasuke.launcheroneplus.util.hide
 import com.sasuke.launcheroneplus.util.show
@@ -20,6 +21,7 @@ import kotlinx.android.synthetic.main.activity_wallpaper_settings.*
 import ru.alexbykov.nopaginate.callback.OnLoadMoreListener
 import ru.alexbykov.nopaginate.paginate.NoPaginate
 import javax.inject.Inject
+import kotlin.math.ceil
 
 class WallpaperSettingsActivity : BaseActivity(),
     WallpaperAdapter.OnItemClickListener, OnLoadMoreListener {
@@ -210,7 +212,14 @@ class WallpaperSettingsActivity : BaseActivity(),
     }
 
     override fun onItemClick(position: Int, imageView: ImageView) {
-        startActivity(WallpaperPagerActivity.newIntent(this, query, position))
+        startActivity(
+            WallpaperPagerActivity.newIntent(
+                this,
+                query,
+                position,
+                ceil(position.toDouble() / Constants.PAGE_SIZE.toDouble()).toInt()
+            )
+        )
     }
 
     override fun onLoadMore() {

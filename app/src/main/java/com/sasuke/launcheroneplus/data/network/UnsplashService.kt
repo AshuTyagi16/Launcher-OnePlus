@@ -15,7 +15,7 @@ interface UnsplashService {
         @Query("client_id") client_id: String = Constants.EXTRA_API_KEY,
         @Query("orientation") orientation: String = "portrait",
         @Query("page") pageNo: Int = 1,
-        @Query("per_page") per_page: Int = 15
+        @Query("per_page") per_page: Int = Constants.PAGE_SIZE
     ): Call<Wallpaper>
 
     @GET("photos")

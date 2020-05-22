@@ -12,4 +12,6 @@ object Constants {
     const val EXTRA_API_KEY_HEADER = "Authorization"
     const val EXTRA_API_KEY = "EyEtfMPAXdnv-eM1WNQHahtRWGHbPBzFDqPBxZEPisE"
 
+    const val PAGE_SIZE = 15
+
 }

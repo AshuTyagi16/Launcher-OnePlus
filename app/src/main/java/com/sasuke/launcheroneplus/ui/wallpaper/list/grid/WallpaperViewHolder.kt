@@ -7,6 +7,7 @@ import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
+import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.Result
 import com.sasuke.launcheroneplus.util.dpToPx
 import kotlinx.android.synthetic.main.cell_wallpaper.view.*
@@ -23,6 +24,7 @@ class WallpaperViewHolder(itemView: View, private val glide: RequestManager) :
 
     fun setWallpaper(result: Result) {
         glide.load(result.urls.small)
+            .placeholder(R.drawable.placeholder_small_image)
             .apply(requestOptions)
             .into(itemView.ivWallpaper)
 

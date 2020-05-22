@@ -14,7 +14,7 @@ class WallpaperActivityViewModel @Inject constructor(private val unsplashReposit
     ViewModel(), UnsplashRepository.OnGetWallpaperListener,
     UnsplashRepository.OnGetPopularListener {
 
-    private var page = 1
+    var page = 1
 
     private val _popularWallpaperLiveData = MutableLiveData<Resource<List<Result>>>()
     val popularWallpaperLiveData: LiveData<Resource<List<Result>>>

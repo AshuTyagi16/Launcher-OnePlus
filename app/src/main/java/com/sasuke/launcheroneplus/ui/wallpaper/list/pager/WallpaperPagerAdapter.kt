@@ -38,7 +38,6 @@ class WallpaperPagerAdapter(private val glide: RequestManager) :
     }
 
     fun addWallpapers(list: List<Result>) {
-        wallpapers.clear()
         wallpapers.addAll(list)
     }
 
