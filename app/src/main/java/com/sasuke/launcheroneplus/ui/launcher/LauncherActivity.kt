@@ -153,16 +153,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
             override fun onReleased() {
                 super.onReleased()
-                handler.postDelayed({
-                    rvHideApps.forEachVisibleHolder { holder: AppViewHolder ->
-                        holder.itemView.setBackgroundColor(
-                            ContextCompat.getColor(
-                                this@LauncherActivity,
-                                R.color.app_un_highlight
-                            )
-                        )
-                    }
-                }, 500)
             }
         })
 
@@ -368,6 +358,14 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                     ivSeparator.visibility = View.VISIBLE
 
                 recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
+
+                    holder.itemView.setBackgroundColor(
+                        ContextCompat.getColor(
+                            this@LauncherActivity,
+                            R.color.app_un_highlight
+                        )
+                    )
+
                     holder.rotation
                         // Update the velocity.
                         // The velocity is calculated by the horizontal scroll offset.
