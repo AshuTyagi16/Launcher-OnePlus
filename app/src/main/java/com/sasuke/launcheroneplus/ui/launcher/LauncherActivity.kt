@@ -1,9 +1,6 @@
 package com.sasuke.launcheroneplus.ui.launcher
 
 import android.animation.Animator
-import android.app.WallpaperManager
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
 import android.view.DragEvent
@@ -19,8 +16,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.github.nisrulz.sensey.PinchScaleDetector
 import com.github.nisrulz.sensey.Sensey
 import com.github.nisrulz.sensey.TouchTypeDetector
@@ -30,8 +25,6 @@ import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.data.model.DragData
-import com.sasuke.launcheroneplus.data.model.Result
-import com.sasuke.launcheroneplus.data.model.Status
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
 import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
@@ -297,7 +290,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             }
 
             override fun onLongPress() {
-                startActivity(WallpaperSettingsActivity.newIntent(this@LauncherActivity))
+
             }
 
             override fun onThreeFingerSingleTap() {
@@ -419,6 +412,10 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                 }
             }
             return@setOnDragListener true
+        }
+
+        clWallpaperIcon.setOnClickListener {
+            startActivity(WallpaperSettingsActivity.newIntent(this@LauncherActivity))
         }
     }
 

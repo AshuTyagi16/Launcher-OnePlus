@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/non_sliding_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:background="@color/black_transparent">
 
     <View
         android:id="@+id/dragView"
@@ -23,7 +25,7 @@
         <com.huxq17.handygridview.HandyGridView
             android:id="@+id/gridApps"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="350dp"
             android:layout_marginTop="30dp"
             android:clipChildren="false"
             android:clipToPadding="false"
@@ -37,7 +39,53 @@
             android:scrollbars="vertical"
             android:stretchMode="columnWidth"
             android:translationZ="1dp"
-            android:verticalSpacing="10dp" />
+            android:verticalSpacing="10dp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clWallpaperIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:id="@+id/ivAppIcon"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:clickable="false"
+                android:contentDescription="@string/icon"
+                android:focusable="false"
+                android:src="@drawable/ic_wallpaper"
+                app:layout_constraintEnd_toEndOf="@id/tvAppLabel"
+                app:layout_constraintStart_toStartOf="@id/tvAppLabel"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvAppLabel"
+                style="@style/Text.Primary.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:clickable="false"
+                android:ellipsize="end"
+                android:focusable="false"
+                android:gravity="center"
+                android:maxWidth="100dp"
+                android:maxLines="1"
+                android:minWidth="100dp"
+                android:text="@string/wallpaper"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_small"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ivAppIcon" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

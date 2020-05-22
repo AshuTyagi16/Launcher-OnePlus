@@ -11,11 +11,11 @@
         android:id="@+id/ivDragIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/icon"
-        app:layout_constraintBottom_toTopOf="@id/clSearchBar"
-        android:src="@drawable/ic_arrow_up_white"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="20dp"
+        android:contentDescription="@string/icon"
+        android:src="@drawable/ic_arrow_up_white"
+        app:layout_constraintBottom_toTopOf="@id/clSearchBar"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -57,6 +57,7 @@
                 android:singleLine="true"
                 android:textColor="@color/search_bar"
                 android:textColorHint="@color/search_bar"
+                android:textCursorDrawable="@null"
                 android:textSize="@dimen/font_large" />
         </FrameLayout>
 
@@ -76,9 +77,9 @@
         android:id="@+id/fastscroller"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        app:handleDrawable="@drawable/fast_scroll_handle"
         app:handleHeight="40dp"
         app:handleWidth="15dp"
-        app:handleDrawable="@drawable/fast_scroll_handle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/clSearchBar">
 

@@ -96,6 +96,8 @@
 
         <!-- Hint for edit text-->
         <item name="android:hint">@string/search_hint</item>
+
+        <item name="android:colorControlActivated">@color/white</item>
     </style>
 
 
