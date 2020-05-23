@@ -3,11 +3,13 @@ package com.sasuke.launcheroneplus.di.module.activity
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
 import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.di.mapkey.ViewModelKey
 import com.sasuke.launcheroneplus.di.scope.PerActivityScope
 import com.sasuke.launcheroneplus.ui.base.GridSpacingItemDecoration
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
+import com.sasuke.launcheroneplus.ui.base.SnapToBlock
 import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
 import com.sasuke.launcheroneplus.ui.launcher.LauncherActivityViewModel
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppAdapter
@@ -47,6 +49,12 @@ abstract class LauncherActivityModule {
         @PerActivityScope
         fun gridViewAdapter(glide: RequestManager): GridViewAdapter {
             return GridViewAdapter(glide)
+        }
+
+        @Provides
+        @PerActivityScope
+        fun pageSnapHelper(): SnapToBlock {
+            return SnapToBlock(1)
         }
     }
 

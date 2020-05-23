@@ -18,6 +18,8 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
+import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.github.nisrulz.sensey.PinchScaleDetector
@@ -33,6 +35,7 @@ import com.sasuke.launcheroneplus.data.model.DragData
 import com.sasuke.launcheroneplus.data.model.SettingPreference
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
+import com.sasuke.launcheroneplus.ui.base.SnapToBlock
 import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
 import com.sasuke.launcheroneplus.ui.hidden_apps.HiddenAppsActivity
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppAdapter
@@ -70,6 +73,9 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     @Inject
     lateinit var sharedPreferencesSettingsLiveData: SharedPreferencesSettingsLiveData
+
+    @Inject
+    lateinit var pagerSnapHelper: SnapToBlock
 
     private lateinit var launcherActivityViewModel: LauncherActivityViewModel
 
@@ -584,29 +590,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     private fun updateUI(settingPreference: SettingPreference) {
         primaryColor = settingPreference.primaryColor
-        if (settingPreference.isFastScrollEnabled) {
-            fastscroller.handleDrawable?.let {
-                AppCompatResources.getDrawable(this, R.drawable.fast_scroll_handle)?.let {
-                    val wrappedDrawable = DrawableCompat.wrap(it)
-                    DrawableCompat.setTint(
-                        wrappedDrawable,
-                        primaryColor
-                    )
-                    fastscroller.handleDrawable = wrappedDrawable
-                }
-            }
-        } else {
-            fastscroller.handleDrawable?.let {
-                AppCompatResources.getDrawable(this, R.drawable.fast_scroll_handle)?.let {
-                    val wrappedDrawable = DrawableCompat.wrap(it)
-                    DrawableCompat.setTint(
-                        wrappedDrawable,
-                        Color.TRANSPARENT
-                    )
-                    fastscroller.handleDrawable = wrappedDrawable
-                }
-            }
-        }
         adapter.updatePrimaryColor(primaryColor)
 
         etSearch.setTextColor(primaryColor)
@@ -624,10 +607,49 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             Constants.Drawer.STYLE_VERTICAL_INDICATOR -> {
                 layoutManager.orientation = RecyclerView.VERTICAL
                 rvHideApps.layoutManager = layoutManager
+                pagerSnapHelper.attachToRecyclerView(null)
+                if (rvHideApps.onFlingListener == null)
+                    fastscroller.attachFastScrollerToRecyclerView(rvHideApps)
+                if (settingPreference.isFastScrollEnabled) {
+                    fastscroller.handleDrawable?.let {
+                        AppCompatResources.getDrawable(this, R.drawable.fast_scroll_handle)?.let {
+                            val wrappedDrawable = DrawableCompat.wrap(it)
+                            DrawableCompat.setTint(
+                                wrappedDrawable,
+                                primaryColor
+                            )
+                            fastscroller.handleDrawable = wrappedDrawable
+                        }
+                    }
+                } else {
+                    fastscroller.handleDrawable?.let {
+                        AppCompatResources.getDrawable(this, R.drawable.fast_scroll_handle)?.let {
+                            val wrappedDrawable = DrawableCompat.wrap(it)
+                            DrawableCompat.setTint(
+                                wrappedDrawable,
+                                Color.TRANSPARENT
+                            )
+                            fastscroller.handleDrawable = wrappedDrawable
+                        }
+                    }
+                }
             }
             Constants.Drawer.STYLE_HORIZONTAL_INDICATOR -> {
                 layoutManager.orientation = RecyclerView.HORIZONTAL
                 rvHideApps.layoutManager = layoutManager
+                fastscroller.detachFastScrollerFromRecyclerView()
+                pagerSnapHelper.attachToRecyclerView(rvHideApps)
+                fastscroller.handleDrawable?.let {
+                    AppCompatResources.getDrawable(this, R.drawable.fast_scroll_handle)?.let {
+                        val wrappedDrawable = DrawableCompat.wrap(it)
+                        DrawableCompat.setTint(
+                            wrappedDrawable,
+                            Color.TRANSPARENT
+                        )
+                        fastscroller.handleDrawable = wrappedDrawable
+                    }
+                }
+
             }
             Constants.Drawer.STYLE_LIST_INDICATOR -> {
             }
