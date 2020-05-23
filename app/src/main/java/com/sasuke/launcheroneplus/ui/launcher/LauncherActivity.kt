@@ -165,7 +165,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
         rvHideApps.edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
             override fun createEdgeEffect(recyclerView: RecyclerView, direction: Int): EdgeEffect {
-                return object : EdgeEffect(recyclerView.context) {
+                val edgeEffect = object : EdgeEffect(recyclerView.context) {
 
                     override fun onPull(deltaDistance: Float) {
                         super.onPull(deltaDistance)
@@ -220,6 +220,8 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                         }
                     }
                 }
+                edgeEffect.color = Color.TRANSPARENT
+                return edgeEffect
             }
         }
 

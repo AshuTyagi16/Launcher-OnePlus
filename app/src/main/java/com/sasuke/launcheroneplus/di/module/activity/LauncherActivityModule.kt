@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.di.mapkey.ViewModelKey
 import com.sasuke.launcheroneplus.di.scope.PerActivityScope
@@ -33,7 +34,12 @@ abstract class LauncherActivityModule {
         @Provides
         @PerActivityScope
         fun gridLayoutManager(context: Context): GridLayoutManager {
-            return GridLayoutManager(context, Constants.APP_LIST_SPAN_COUNT)
+            return GridLayoutManager(
+                context,
+                Constants.APP_LIST_SPAN_COUNT,
+                RecyclerView.VERTICAL,
+                false
+            )
         }
 
         @Provides
