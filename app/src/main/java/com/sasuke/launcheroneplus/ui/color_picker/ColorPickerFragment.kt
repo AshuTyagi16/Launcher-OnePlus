@@ -115,7 +115,6 @@ class ColorPickerFragment : RoundedBottomSheetDialogFragment(), ColorAdapter.OnC
             lastPosition = -1
             if (color != 0) {
                 onClickListeners?.onItemClick(color)
-                colorPickerFragmentViewModel.setPrimaryColor(color)
             }
             dismiss()
         }

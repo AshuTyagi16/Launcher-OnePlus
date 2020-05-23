@@ -4,12 +4,16 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.SeekBar
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.graphics.BlendModeColorFilterCompat
+import androidx.core.graphics.BlendModeCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -25,7 +29,7 @@ import kotlinx.android.synthetic.main.activity_app_drawer_setting.*
 import kotlinx.android.synthetic.main.activity_wallpaper_settings.toolbar
 import javax.inject.Inject
 
-class AppDrawerActivity : BaseActivity() {
+class AppDrawerActivity : BaseActivity(), ColorPickerFragment.OnClickListeners {
 
     @Inject
     lateinit var glide: RequestManager
@@ -44,6 +48,10 @@ class AppDrawerActivity : BaseActivity() {
 
     private var isSpinnerFirstCall = true
 
+    private var isPrimaryColorPicker = false
+
+    private var isBackgroundColorPicker = false
+
     companion object {
         fun newIntent(context: Context) = Intent(context, AppDrawerActivity::class.java)
     }
@@ -56,7 +64,6 @@ class AppDrawerActivity : BaseActivity() {
         setupSpinner()
         observeLiveData()
         setupListeners()
-        updateUI(LauncherApp.color)
         initColorPicker()
     }
 
@@ -92,16 +99,27 @@ class AppDrawerActivity : BaseActivity() {
 
     private fun setupListeners() {
         clScrollAccentColor.setOnClickListener {
+            isBackgroundColorPicker = false
+            isPrimaryColorPicker = true
             openColorPicker()
         }
+
+        clBackgroundColor.setOnClickListener {
+            isPrimaryColorPicker = false
+            isBackgroundColorPicker = true
+            openColorPicker()
+        }
+
         clFastScroller.setOnClickListener {
             isFastScrollEnabled = !isFastScrollEnabled
             cbFastScroller.isChecked = isFastScrollEnabled
             appDrawerActivityViewModel.setFastScrollState(isFastScrollEnabled)
         }
+
         clAppDrawerStyle.setOnClickListener {
             spinnerAppDrawerStyle.performClick()
         }
+
         spinnerAppDrawerStyle.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {
 
@@ -117,27 +135,25 @@ class AppDrawerActivity : BaseActivity() {
                 }
             }
         }
-    }
-
-    private fun updateUI(color: Int) {
-        if (color != 0) {
-            AppCompatResources.getDrawable(this, R.drawable.scroll_accent_drawable)?.let {
-                val wrappedDrawable = DrawableCompat.wrap(it)
-                DrawableCompat.setTint(
-                    wrappedDrawable,
-                    color
-                )
-                glide.load(wrappedDrawable)
-                    .into(ivIconScrollAccent)
+        seekbarBackgroundTransparency.setOnSeekBarChangeListener(object :
+            SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekbar: SeekBar, progress: Int, p2: Boolean) {
+                tvBackgroundTransparency.text = "$progress%"
             }
-            cbFastScroller.buttonTintList = ColorStateList.valueOf(color)
-            tvHeaderScroll.setTextColor(color)
-            tvHeaderLayout.setTextColor(color)
-        }
+
+            override fun onStartTrackingTouch(seekbar: SeekBar) {
+
+            }
+
+            override fun onStopTrackingTouch(seekbar: SeekBar) {
+                appDrawerActivityViewModel.setBackgroundTransparency(seekbar.progress)
+            }
+        })
     }
 
     private fun initColorPicker() {
         colorPickerFragment = ColorPickerFragment.newInstance()
+        colorPickerFragment.setOnClickListeners(this)
     }
 
     private fun openColorPicker() {
@@ -147,7 +163,39 @@ class AppDrawerActivity : BaseActivity() {
     private fun updateUI(settingPreference: SettingPreference) {
         cbFastScroller.isChecked = isFastScrollEnabled
         spinnerAppDrawerStyle.setSelection(settingPreference.drawerStyle)
-        updateUI(settingPreference.primaryColor)
+        val color = settingPreference.primaryColor
+        if (color != 0) {
+            AppCompatResources.getDrawable(this, R.drawable.scroll_accent_drawable)?.let {
+                val wrappedDrawable = DrawableCompat.wrap(it)
+                DrawableCompat.setTint(
+                    wrappedDrawable,
+                    color
+                )
+                ivIconScrollAccent.setImageDrawable(wrappedDrawable)
+            }
+            cbFastScroller.buttonTintList = ColorStateList.valueOf(color)
+            tvHeaderScroll.setTextColor(color)
+            tvHeaderLayout.setTextColor(color)
+            seekbarBackgroundTransparency.progress = 100 - settingPreference.backgroundColorAlpha
+            seekbarBackgroundTransparency.progressDrawable.colorFilter =
+                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                    color,
+                    BlendModeCompat.SRC_ATOP
+                )
+            seekbarBackgroundTransparency.thumb.colorFilter =
+                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                    color,
+                    BlendModeCompat.SRC_ATOP
+                )
+        }
+        AppCompatResources.getDrawable(this, R.drawable.scroll_accent_drawable)?.let {
+            val wrappedDrawable = DrawableCompat.wrap(it)
+            DrawableCompat.setTint(
+                wrappedDrawable,
+                settingPreference.backgroundColor
+            )
+            ivBackgroundColor.setImageDrawable(wrappedDrawable)
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -162,5 +210,12 @@ class AppDrawerActivity : BaseActivity() {
                 colorPickerFragment.dismiss()
         }
         super.onDestroy()
+    }
+
+    override fun onItemClick(color: Int) {
+        if (isPrimaryColorPicker)
+            appDrawerActivityViewModel.setPrimaryColor(color)
+        if (isBackgroundColorPicker)
+            appDrawerActivityViewModel.setBackgroundColor(color)
     }
 }

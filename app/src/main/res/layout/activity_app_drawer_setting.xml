@@ -83,6 +83,114 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clBackgroundColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/darker_grey"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="@drawable/ripple_cell"
+        android:padding="10dp"
+        app:layout_constraintTop_toBottomOf="@id/clAppDrawerStyle">
+
+        <ImageView
+            android:id="@+id/ivBackgroundColor"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:clickable="false"
+            android:contentDescription="@string/icon"
+            android:focusable="false"
+            android:src="@drawable/scroll_accent_drawable"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvSettingTitleBackgroundColor"
+            style="@style/Text.Primary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:clickable="false"
+            android:focusable="false"
+            android:text="@string/background_color"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toStartOf="@id/ivBackgroundColor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvSettingDescriptionBackgroundColor"
+            style="@style/Text.Primary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:clickable="false"
+            android:ellipsize="end"
+            android:focusable="false"
+            android:maxLines="2"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_small"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/ivBackgroundColor"
+            app:layout_constraintStart_toStartOf="@id/tvSettingTitleBackgroundColor"
+            app:layout_constraintTop_toBottomOf="@id/tvSettingTitleBackgroundColor" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clBackgroundTransparency"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/darker_grey"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="@drawable/ripple_cell"
+        android:padding="10dp"
+        app:layout_constraintTop_toBottomOf="@id/clBackgroundColor">
+
+        <TextView
+            android:id="@+id/tvBackgroundTransparency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:clickable="false"
+            android:focusable="false"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="@id/tvSettingTitleBackgroundTransparency"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvSettingTitleBackgroundTransparency"
+            tools:text="0%" />
+
+        <TextView
+            android:id="@+id/tvSettingTitleBackgroundTransparency"
+            style="@style/Text.Primary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:clickable="false"
+            android:focusable="false"
+            android:text="@string/background_transparent"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toStartOf="@id/tvBackgroundTransparency"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+            android:id="@+id/seekbarBackgroundTransparency"
+            style="@style/Text.Primary"
+            android:layout_width="match_parent"
+            android:padding="10dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSettingTitleBackgroundTransparency" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <TextView
         android:id="@+id/tvHeaderScroll"
         android:layout_width="match_parent"
@@ -92,7 +200,7 @@
         android:text="@string/header_scroll"
         android:textColor="@color/search_bar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/clAppDrawerStyle" />
+        app:layout_constraintTop_toBottomOf="@id/clBackgroundTransparency" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/clFastScroller"

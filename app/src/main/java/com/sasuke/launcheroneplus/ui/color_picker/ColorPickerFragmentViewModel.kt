@@ -15,9 +15,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class ColorPickerFragmentViewModel @Inject constructor(
-    private val colorUtils: ColorUtils,
-    private val sharedPreferenceUtil: SharedPreferenceUtil,
-    private val gson: Gson
+    private val colorUtils: ColorUtils
 ) :
     ViewModel() {
 
@@ -32,16 +30,4 @@ class ColorPickerFragmentViewModel @Inject constructor(
             }
         }
     }
-
-    fun setPrimaryColor(color: Int) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                sharedPreferenceUtil.getSettingPreference()?.let {
-                    it.primaryColor = color
-                    sharedPreferenceUtil.putString(Constants.Settings.PREFERENCES, gson.toJson(it))
-                }
-            }
-        }
-    }
-
 }

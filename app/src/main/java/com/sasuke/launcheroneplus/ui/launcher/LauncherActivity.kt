@@ -632,5 +632,10 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             Constants.Drawer.STYLE_LIST_INDICATOR -> {
             }
         }
+        clParent.coveredFadeColor =
+            ColorUtils.setAlphaComponent(
+                settingPreference.backgroundColor,
+                settingPreference.backgroundColorAlpha.alphaPercentage()
+            )
     }
 }

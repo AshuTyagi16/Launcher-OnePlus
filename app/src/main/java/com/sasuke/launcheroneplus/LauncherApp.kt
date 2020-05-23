@@ -89,7 +89,13 @@ class LauncherApp : Application(), HasAndroidInjector {
         val sharedPrefUtil = component.getSharedPreferenceUtil()
         if (!sharedPrefUtil.getBoolean(Constants.Settings.IS_PREFERENCES_SET, false)) {
             val defaultSettings =
-                SettingPreference(ContextCompat.getColor(this, R.color.search_bar), true)
+                SettingPreference(
+                    ContextCompat.getColor(this, R.color.search_bar),
+                    true,
+                    Constants.Drawer.STYLE_VERTICAL_INDICATOR,
+                    ContextCompat.getColor(this, R.color.black_transparent),
+                    20
+                )
             sharedPrefUtil.putStringSync(
                 Constants.Settings.PREFERENCES,
                 component.gson().toJson(defaultSettings)

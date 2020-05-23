@@ -36,3 +36,6 @@ fun Int.dpToPx(): Int {
     return (this * Resources.getSystem().displayMetrics.density).toInt()
 }
 
+fun Int.alphaPercentage(): Int {
+    return ((this.toDouble() / 100.0) * 255.0).toInt()
+}

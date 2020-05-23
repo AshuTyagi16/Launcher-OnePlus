@@ -43,4 +43,37 @@ class AppDrawerActivityViewModel @Inject constructor(
             }
         }
     }
+
+    fun setPrimaryColor(color: Int) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                sharedPreferenceUtil.getSettingPreference()?.let {
+                    it.primaryColor = color
+                    sharedPreferenceUtil.putString(Constants.Settings.PREFERENCES, gson.toJson(it))
+                }
+            }
+        }
+    }
+
+    fun setBackgroundColor(color: Int) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                sharedPreferenceUtil.getSettingPreference()?.let {
+                    it.backgroundColor = color
+                    sharedPreferenceUtil.putString(Constants.Settings.PREFERENCES, gson.toJson(it))
+                }
+            }
+        }
+    }
+
+    fun setBackgroundTransparency(transparency: Int) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                sharedPreferenceUtil.getSettingPreference()?.let {
+                    it.backgroundColorAlpha = 100 - transparency
+                    sharedPreferenceUtil.putString(Constants.Settings.PREFERENCES, gson.toJson(it))
+                }
+            }
+        }
+    }
 }

@@ -33,7 +33,7 @@
     <color name="default_search_bar_four">#f08a5d</color>
     <color name="default_search_bar_five">#b83b5e</color>
     <color name="default_search_bar_six">#95e1d3</color>
-    <color name="default_search_bar_seven">#f5f5f5</color>
+    <color name="default_search_bar_seven">@color/black_transparent</color>
     <color name="default_search_bar_eight">#3f72af</color>
     <color name="default_search_bar_nine">#e84545</color>
     <color name="default_search_bar_ten">#a2d5f2</color>
