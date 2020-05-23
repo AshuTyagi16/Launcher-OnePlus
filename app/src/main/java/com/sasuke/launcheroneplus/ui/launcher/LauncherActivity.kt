@@ -185,10 +185,12 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                         val translationYDelta =
                             sign * recyclerView.width * deltaDistance * OVERSCROLL_TRANSLATION_MAGNITUDE
                         recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
-                            holder.rotation.cancel()
-                            holder.translationY.cancel()
-                            holder.itemView.rotation += rotationDelta
-                            holder.itemView.translationY += translationYDelta
+                            if (layoutManager.orientation == RecyclerView.VERTICAL) {
+                                holder.rotation.cancel()
+                                holder.translationY.cancel()
+                                holder.itemView.rotation += rotationDelta
+                                holder.itemView.translationY += translationYDelta
+                            }
                         }
                     }
 
@@ -197,8 +199,10 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                         // The finger is lifted. This is when we should start the animations to bring
                         // the view property values back to their resting states.
                         recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
-                            holder.rotation.start()
-                            holder.translationY.start()
+                            if (layoutManager.orientation == RecyclerView.VERTICAL) {
+                                holder.rotation.start()
+                                holder.translationY.start()
+                            }
                         }
                     }
 
@@ -207,10 +211,12 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                         val sign = if (direction == DIRECTION_BOTTOM) -1 else 1
                         // The list has reached the edge on fling.
                         val translationVelocity = sign * velocity * FLING_TRANSLATION_MAGNITUDE
-                        recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
-                            holder.translationY
-                                .setStartVelocity(translationVelocity)
-                                .start()
+                        if (layoutManager.orientation == RecyclerView.VERTICAL) {
+                            recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
+                                holder.translationY
+                                    .setStartVelocity(translationVelocity)
+                                    .start()
+                            }
                         }
                     }
                 }
@@ -359,10 +365,12 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         rvHideApps.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
 
-                if (layoutManager.findFirstCompletelyVisibleItemPosition() >= Constants.APP_LIST_SPAN_COUNT)
-                    ivSeparator.visibility = View.GONE
-                else
-                    ivSeparator.visibility = View.VISIBLE
+                if (layoutManager.orientation == RecyclerView.VERTICAL) {
+                    if (layoutManager.findFirstCompletelyVisibleItemPosition() >= Constants.APP_LIST_SPAN_COUNT)
+                        ivSeparator.visibility = View.GONE
+                    else
+                        ivSeparator.visibility = View.VISIBLE
+                }
 
                 recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
 
@@ -373,12 +381,14 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                         )
                     )
 
-                    holder.rotation
-                        // Update the velocity.
-                        // The velocity is calculated by the horizontal scroll offset.
-                        .setStartVelocity(holder.currentVelocity - dx * SCROLL_ROTATION_MAGNITUDE)
-                        // Start the animation. This does nothing if the animation is already running.
-                        .start()
+                    if (layoutManager.orientation == RecyclerView.VERTICAL) {
+                        holder.rotation
+                            // Update the velocity.
+                            // The velocity is calculated by the horizontal scroll offset.
+                            .setStartVelocity(holder.currentVelocity - dx * SCROLL_ROTATION_MAGNITUDE)
+                            // Start the animation. This does nothing if the animation is already running.
+                            .start()
+                    }
                 }
             }
         })
