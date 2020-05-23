@@ -14,7 +14,7 @@ import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
 
-class AppAdapter(private val glide: RequestManager, private val consumeLongPress: Boolean) :
+class AppAdapter(private val glide: RequestManager, private var consumeLongPress: Boolean) :
     RecyclerView.Adapter<AppViewHolder>(),
     RecyclerViewFastScroller.OnPopupViewUpdate,
     AppViewHolder.OnClickListeners {
@@ -44,6 +44,7 @@ class AppAdapter(private val glide: RequestManager, private val consumeLongPress
 
     override fun onBindViewHolder(holder: AppViewHolder, position: Int) {
         if (::appList.isInitialized) {
+            holder.updateConsumeLongPress(consumeLongPress)
             holder.setAppInfo(appList[position])
             holder.setOnClickListeners(this)
         }
@@ -87,5 +88,11 @@ class AppAdapter(private val glide: RequestManager, private val consumeLongPress
 
     fun updatePrimaryColor(color: Int) {
         primaryColor = color
+    }
+
+    fun consumeLongPress(consumeLongPress: Boolean, shouldNotify: Boolean) {
+        this.consumeLongPress = consumeLongPress
+        if (shouldNotify)
+            notifyDataSetChanged()
     }
 }

@@ -18,8 +18,6 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearSnapHelper
-import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.github.nisrulz.sensey.PinchScaleDetector
@@ -93,6 +91,8 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
     private var primaryColor = 0
+
+    private var shouldNotify: Boolean = true
 
     companion object {
         /** The magnitude of rotation while the list is scrolled. */
@@ -355,9 +355,12 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                     SlidingUpPanelLayout.PanelState.EXPANDED -> {
                         Sensey.getInstance().stopTouchTypeDetection()
                         Sensey.getInstance().stopPinchScaleDetection()
+                        shouldNotify = true
+                        adapter.consumeLongPress(true, shouldNotify)
                     }
                     SlidingUpPanelLayout.PanelState.DRAGGING -> {
-
+                        adapter.consumeLongPress(false, shouldNotify)
+                        shouldNotify = false
                     }
                     SlidingUpPanelLayout.PanelState.COLLAPSED -> {
                         Sensey.getInstance().startTouchTypeDetection(

@@ -15,7 +15,7 @@ import java.io.File
 class AppViewHolder(
     itemView: View,
     private val glide: RequestManager,
-    private val consumeLongPress: Boolean = true
+    private var consumeLongPress: Boolean = true
 ) :
     RecyclerView.ViewHolder(itemView) {
 
@@ -24,6 +24,10 @@ class AppViewHolder(
     private val dir = itemView.context.getExternalFilesDir("app_icon")
 
     var currentVelocity = 0f
+
+    fun updateConsumeLongPress(consumeLongPress: Boolean) {
+        this.consumeLongPress = consumeLongPress
+    }
 
     /**
      * A [SpringAnimation] for this RecyclerView item. This animation rotates the view with a bouncy
@@ -55,7 +59,7 @@ class AppViewHolder(
         )
 
     fun setAppInfo(appInfo: App) {
-        glide.load(File("$dir${File.separator}${appInfo.label.replace("[\\W]|_".toRegex(),"")}"))
+        glide.load(File("$dir${File.separator}${appInfo.label.replace("[\\W]|_".toRegex(), "")}"))
             .into(itemView.ivAppIcon)
         itemView.tvAppLabel.text = appInfo.label
 
