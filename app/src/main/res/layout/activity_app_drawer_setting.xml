@@ -16,6 +16,76 @@
         app:title="@string/app_drawer"
         app:titleTextColor="@color/white" />
 
+
+    <TextView
+        android:id="@+id/tvHeaderScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/darker_grey"
+        android:padding="10dp"
+        android:text="@string/header_scroll"
+        android:textColor="@color/search_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clFastScroller"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/darker_grey"
+        android:foreground="@drawable/ripple_cell"
+        android:padding="10dp"
+        android:clickable="false"
+        android:focusable="false"
+        app:layout_constraintTop_toBottomOf="@id/tvHeaderScroll">
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/cbFastScroller"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:contentDescription="@string/icon"
+            android:minWidth="0dp"
+            android:checked="false"
+            android:minHeight="0dp"
+            android:clickable="false"
+            android:focusable="false"
+            android:theme="@style/CheckBox"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvSettingTitleFastScroller"
+            style="@style/Text.Primary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:text="@string/fast_scrollbar"
+            android:clickable="false"
+            android:focusable="false"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toStartOf="@id/cbFastScroller"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvSettingDescriptionFastScroller"
+            style="@style/Text.Primary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:text="@string/fast_scrollbar_description"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_small"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/cbFastScroller"
+            app:layout_constraintStart_toStartOf="@id/tvSettingTitleFastScroller"
+            app:layout_constraintTop_toBottomOf="@id/tvSettingTitleFastScroller" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/clScrollAccentColor"
         android:layout_width="match_parent"
@@ -23,7 +93,7 @@
         android:background="@color/darker_grey"
         android:foreground="@drawable/ripple_cell"
         android:padding="10dp"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        app:layout_constraintTop_toBottomOf="@id/clFastScroller">
 
         <ImageView
             android:id="@+id/ivIconScrollAccent"

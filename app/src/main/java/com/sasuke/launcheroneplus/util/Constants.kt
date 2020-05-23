@@ -26,6 +26,8 @@ object Constants {
         const val SAY_THANKS = 9
         const val ABOUT = 10
         const val CONTACT_SUPPORT = 11
+        const val PREFERENCES = "SETTINGS_PREFERENCES"
+        const val IS_PREFERENCES_SET = "IS_PREFERENCES_SET"
     }
 
 }

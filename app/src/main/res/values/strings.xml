@@ -73,6 +73,10 @@
     <string name="contact_support_description">If you\'re having issues, have a question, or simply love EZ, this is where you can get in touch</string>
 
     <!-- App Drawer -->
+    <string name="header_scroll">Scroll</string>
     <string name="scroll_accent_color">Scroll accent color</string>
     <string name="scroll_accent_color_description">Color os the scrollbar slider, letter bubble, overscroll glow and search bar</string>
+
+    <string name="fast_scrollbar">Fast scrollbar</string>
+    <string name="fast_scrollbar_description">Add a thumb slider to quickly navigate apps alphabetically</string>
 </resources>

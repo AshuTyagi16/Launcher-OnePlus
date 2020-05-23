@@ -2,6 +2,7 @@ package com.sasuke.launcheroneplus.di.component
 
 import android.content.Context
 import com.bumptech.glide.RequestManager
+import com.google.gson.Gson
 import com.sasuke.launcheroneplus.LauncherApp
 import com.sasuke.launcheroneplus.data.db.RoomRepository
 import com.sasuke.launcheroneplus.data.network.UnsplashRepository
@@ -11,6 +12,7 @@ import com.sasuke.launcheroneplus.di.module.activity.ActivityBindingModule
 import com.sasuke.launcheroneplus.di.module.application.LauncherApplicationModule
 import com.sasuke.launcheroneplus.di.module.library.GlideModule
 import com.sasuke.launcheroneplus.di.module.network.UnsplashRepositoryModule
+import com.sasuke.launcheroneplus.di.module.util.SharedPreferenceModule
 import com.sasuke.launcheroneplus.di.module.util.UtilsModule
 import com.sasuke.launcheroneplus.util.*
 import dagger.BindsInstance
@@ -27,6 +29,7 @@ import timber.log.Timber
         UnsplashRepositoryModule::class,
         GlideModule::class,
         UtilsModule::class,
+        SharedPreferenceModule::class,
         AndroidSupportInjectionModule::class,
         ViewModelFactoryModule::class,
         ActivityBindingModule::class]
@@ -59,4 +62,10 @@ interface LauncherAppComponent : AndroidInjector<LauncherApp> {
     fun getSettingUtils(): SettingUtils
 
     fun getColorUtils(): ColorUtils
+
+    fun getSharedPreferenceUtil(): SharedPreferenceUtil
+
+    fun getSharedPreferencesSettingsLiveData(): SharedPreferencesSettingsLiveData
+
+    fun gson(): Gson
 }

@@ -1,7 +1,6 @@
 package com.sasuke.launcheroneplus.ui.color_picker
 
 import android.content.DialogInterface
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +14,6 @@ import androidx.transition.TransitionManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.sasuke.launcheroneplus.LauncherApp
 import com.sasuke.launcheroneplus.R
-import com.sasuke.launcheroneplus.data.event.PrimaryColorChangedEvent
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
 import com.sasuke.launcheroneplus.ui.base.RoundedBottomSheetDialogFragment
 import com.skydoves.colorpickerview.ColorEnvelope
@@ -116,9 +114,8 @@ class ColorPickerFragment : RoundedBottomSheetDialogFragment(), ColorAdapter.OnC
         btnDone.setOnClickListener {
             lastPosition = -1
             if (color != 0) {
-                LauncherApp.color = color
                 onClickListeners?.onItemClick(color)
-                EventBus.getDefault().postSticky(PrimaryColorChangedEvent(color))
+                colorPickerFragmentViewModel.setPrimaryColor(color)
             }
             dismiss()
         }

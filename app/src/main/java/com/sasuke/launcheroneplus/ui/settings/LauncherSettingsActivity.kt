@@ -8,11 +8,11 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sasuke.launcheroneplus.R
-import com.sasuke.launcheroneplus.data.event.PrimaryColorChangedEvent
 import com.sasuke.launcheroneplus.data.model.Setting
 import com.sasuke.launcheroneplus.data.model.Status
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.settings.app_drawer.AppDrawerActivity
+import com.sasuke.launcheroneplus.util.SharedPreferencesSettingsLiveData
 import kotlinx.android.synthetic.main.activity_launcher_settings.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -29,6 +29,9 @@ class LauncherSettingsActivity : BaseActivity(), LauncherSettingAdapter.OnItemCl
 
     @Inject
     lateinit var launcherAdapter: LauncherSettingAdapter
+
+    @Inject
+    lateinit var sharedPreferencesSettingsLiveData: SharedPreferencesSettingsLiveData
 
     private lateinit var launcherSettingsActivityViewModel: LauncherSettingsActivityViewModel
 
@@ -82,6 +85,12 @@ class LauncherSettingsActivity : BaseActivity(), LauncherSettingAdapter.OnItemCl
                 }
             }
         })
+
+        sharedPreferencesSettingsLiveData.observe(this, Observer {
+            it?.let {
+                launcherAdapter.notifyDataSetChanged()
+            }
+        })
     }
 
     private fun runLayoutAnimation() {
@@ -101,20 +110,5 @@ class LauncherSettingsActivity : BaseActivity(), LauncherSettingAdapter.OnItemCl
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return super.onSupportNavigateUp()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        EventBus.getDefault().register(this)
-    }
-
-    override fun onStop() {
-        EventBus.getDefault().unregister(this)
-        super.onStop()
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    fun onPrimaryColorChangeEvent(primaryColorChangedEvent: PrimaryColorChangedEvent) {
-        launcherAdapter.notifyDataSetChanged()
     }
 }

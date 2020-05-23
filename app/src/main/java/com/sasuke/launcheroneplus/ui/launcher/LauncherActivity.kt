@@ -28,9 +28,9 @@ import com.huxq17.handygridview.listener.OnItemCapturedListener
 import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
 import com.sasuke.launcheroneplus.LauncherApp
 import com.sasuke.launcheroneplus.R
-import com.sasuke.launcheroneplus.data.event.PrimaryColorChangedEvent
 import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.data.model.DragData
+import com.sasuke.launcheroneplus.data.model.SettingPreference
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
 import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
@@ -39,17 +39,11 @@ import com.sasuke.launcheroneplus.ui.launcher.apps.AppAdapter
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
 import com.sasuke.launcheroneplus.ui.settings.LauncherSettingsActivity
 import com.sasuke.launcheroneplus.ui.wallpaper.list.grid.WallpaperSettingsActivity
-import com.sasuke.launcheroneplus.util.Constants
-import com.sasuke.launcheroneplus.util.KeyboardTriggerBehavior
-import com.sasuke.launcheroneplus.util.forEachVisibleHolder
-import com.sasuke.launcheroneplus.util.openApp
+import com.sasuke.launcheroneplus.util.*
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import kotlinx.android.synthetic.main.activity_launcher.*
 import kotlinx.android.synthetic.main.layout_non_sliding.*
 import kotlinx.android.synthetic.main.layout_sliding.*
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 import java.util.concurrent.Executor
 import javax.inject.Inject
 
@@ -73,6 +67,9 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     @Inject
     lateinit var glide: RequestManager
+
+    @Inject
+    lateinit var sharedPreferencesSettingsLiveData: SharedPreferencesSettingsLiveData
 
     private lateinit var launcherActivityViewModel: LauncherActivityViewModel
 
@@ -118,7 +115,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         setupListeners()
         observeLiveData()
         initBiometric()
-        registerForEvents()
     }
 
     private fun inject() {
@@ -126,7 +122,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             ViewModelProvider(this, viewModelFactory).get(LauncherActivityViewModel::class.java)
         Sensey.getInstance().init(this)
         handler = Handler()
-        primaryColor = ContextCompat.getColor(this, R.color.search_bar)
+        primaryColor = LauncherApp.color
     }
 
     private fun setWindowInsets() {
@@ -435,6 +431,12 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                 adapter.setApps(it)
             }
         })
+
+        sharedPreferencesSettingsLiveData.observe(this, Observer {
+            it?.let {
+                updateUI(it)
+            }
+        })
     }
 
     private fun setMode(mode: HandyGridView.MODE) {
@@ -552,11 +554,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     }
 
-    private fun registerForEvents() {
-        if (!EventBus.getDefault().isRegistered(this))
-            EventBus.getDefault().register(this)
-    }
-
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         ev?.let {
             Sensey.getInstance().setupDispatchTouchEvent(it)
@@ -566,7 +563,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     override fun onDestroy() {
         Sensey.getInstance().stop()
-        EventBus.getDefault().unregister(this)
         super.onDestroy()
     }
 
@@ -586,18 +582,29 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             super.onBackPressed()
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    fun onPrimaryColorChangeEvent(primaryColorChangedEvent: PrimaryColorChangedEvent) {
-        primaryColor = primaryColorChangedEvent.color
-
-        fastscroller.handleDrawable?.let {
-            AppCompatResources.getDrawable(this, R.drawable.fast_scroll_handle)?.let {
-                val wrappedDrawable = DrawableCompat.wrap(it)
-                DrawableCompat.setTint(
-                    wrappedDrawable,
-                    primaryColor
-                )
-                fastscroller.handleDrawable = wrappedDrawable
+    private fun updateUI(settingPreference: SettingPreference) {
+        primaryColor = settingPreference.primaryColor
+        if (settingPreference.isFastScrollEnabled) {
+            fastscroller.handleDrawable?.let {
+                AppCompatResources.getDrawable(this, R.drawable.fast_scroll_handle)?.let {
+                    val wrappedDrawable = DrawableCompat.wrap(it)
+                    DrawableCompat.setTint(
+                        wrappedDrawable,
+                        primaryColor
+                    )
+                    fastscroller.handleDrawable = wrappedDrawable
+                }
+            }
+        } else {
+            fastscroller.handleDrawable?.let {
+                AppCompatResources.getDrawable(this, R.drawable.fast_scroll_handle)?.let {
+                    val wrappedDrawable = DrawableCompat.wrap(it)
+                    DrawableCompat.setTint(
+                        wrappedDrawable,
+                        Color.TRANSPARENT
+                    )
+                    fastscroller.handleDrawable = wrappedDrawable
+                }
             }
         }
         adapter.updatePrimaryColor(primaryColor)
@@ -613,6 +620,5 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             etSearch.setCompoundDrawablesWithIntrinsicBounds(wrappedDrawable, null, null, null)
         }
         ivSeparator.setBackgroundColor(primaryColor)
-        EventBus.getDefault().removeStickyEvent(primaryColorChangedEvent)
     }
 }
