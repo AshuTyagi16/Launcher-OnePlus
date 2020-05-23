@@ -24,4 +24,19 @@
     <color name="search_bar_alter">#FF6E40</color>
     <color name="app_highlight">#4d0080ff</color>
     <color name="app_un_highlight">#00ffffff</color>
+
+
+    <!-- Default Search Bar Color -->
+    <color name="default_search_bar_one">#303960</color>
+    <color name="default_search_bar_two">#2fc4b2</color>
+    <color name="default_search_bar_three">#00adb5</color>
+    <color name="default_search_bar_four">#f08a5d</color>
+    <color name="default_search_bar_five">#b83b5e</color>
+    <color name="default_search_bar_six">#95e1d3</color>
+    <color name="default_search_bar_seven">#f5f5f5</color>
+    <color name="default_search_bar_eight">#3f72af</color>
+    <color name="default_search_bar_nine">#e84545</color>
+    <color name="default_search_bar_ten">#a2d5f2</color>
+    <color name="default_search_bar_eleven">#769fcd</color>
+    <color name="default_search_bar_twelve">#ea9a96</color>
 </resources>

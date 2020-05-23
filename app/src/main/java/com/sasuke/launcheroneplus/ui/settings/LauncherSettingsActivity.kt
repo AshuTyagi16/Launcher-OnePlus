@@ -8,11 +8,15 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sasuke.launcheroneplus.R
+import com.sasuke.launcheroneplus.data.event.PrimaryColorChangedEvent
 import com.sasuke.launcheroneplus.data.model.Setting
 import com.sasuke.launcheroneplus.data.model.Status
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.settings.app_drawer.AppDrawerActivity
 import kotlinx.android.synthetic.main.activity_launcher_settings.*
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import javax.inject.Inject
 
 class LauncherSettingsActivity : BaseActivity(), LauncherSettingAdapter.OnItemClickListener {
@@ -36,6 +40,7 @@ class LauncherSettingsActivity : BaseActivity(), LauncherSettingAdapter.OnItemCl
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launcher_settings)
         inject()
+        setupToolbar()
         setupRecyclerView()
         getSettings()
         observeLiveData()
@@ -46,6 +51,10 @@ class LauncherSettingsActivity : BaseActivity(), LauncherSettingAdapter.OnItemCl
             this,
             viewModelFactory
         ).get(LauncherSettingsActivityViewModel::class.java)
+    }
+
+    private fun setupToolbar() {
+        setSupportActionBar(toolbar)
     }
 
     private fun setupRecyclerView() {
@@ -87,5 +96,25 @@ class LauncherSettingsActivity : BaseActivity(), LauncherSettingAdapter.OnItemCl
 
     override fun onItemClick(setting: Setting) {
         startActivity(AppDrawerActivity.newIntent(this))
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return super.onSupportNavigateUp()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        EventBus.getDefault().register(this)
+    }
+
+    override fun onStop() {
+        EventBus.getDefault().unregister(this)
+        super.onStop()
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    fun onPrimaryColorChangeEvent(primaryColorChangedEvent: PrimaryColorChangedEvent) {
+        launcherAdapter.notifyDataSetChanged()
     }
 }

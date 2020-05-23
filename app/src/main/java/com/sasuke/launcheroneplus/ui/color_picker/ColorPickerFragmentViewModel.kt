@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class ColorPickerFragmentViewModel @Inject constructor() : ViewModel() {
+class ColorPickerFragmentViewModel @Inject constructor(private val colorUtils: ColorUtils) : ViewModel() {
 
     private val _defaultColorsLiveData = MutableLiveData<MutableList<DefaultColor>>()
     val defaultColorsLiveData: LiveData<MutableList<DefaultColor>>
@@ -20,7 +20,7 @@ class ColorPickerFragmentViewModel @Inject constructor() : ViewModel() {
     fun getDefaultColorList() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                _defaultColorsLiveData.postValue(ColorUtils.getDefaultColorHexList())
+                _defaultColorsLiveData.postValue(colorUtils.getDefaultColorHexList())
             }
         }
     }

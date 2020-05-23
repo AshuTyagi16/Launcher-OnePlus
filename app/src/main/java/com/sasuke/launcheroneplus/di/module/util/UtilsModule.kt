@@ -45,4 +45,10 @@ class UtilsModule {
     fun settingUtils(context: Context): SettingUtils {
         return SettingUtils(context)
     }
+
+    @Provides
+    @LauncherAppScope
+    fun colorUtils(context: Context): ColorUtils {
+        return ColorUtils(context)
+    }
 }

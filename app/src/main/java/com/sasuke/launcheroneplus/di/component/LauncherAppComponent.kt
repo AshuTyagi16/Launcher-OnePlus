@@ -12,10 +12,7 @@ import com.sasuke.launcheroneplus.di.module.application.LauncherApplicationModul
 import com.sasuke.launcheroneplus.di.module.library.GlideModule
 import com.sasuke.launcheroneplus.di.module.network.UnsplashRepositoryModule
 import com.sasuke.launcheroneplus.di.module.util.UtilsModule
-import com.sasuke.launcheroneplus.util.AppListUtil
-import com.sasuke.launcheroneplus.util.BitmapUtils
-import com.sasuke.launcheroneplus.util.SettingUtils
-import com.sasuke.launcheroneplus.util.StorageUtils
+import com.sasuke.launcheroneplus.util.*
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector
@@ -60,4 +57,6 @@ interface LauncherAppComponent : AndroidInjector<LauncherApp> {
     fun calligraphyInterceptor(): CalligraphyInterceptor
 
     fun getSettingUtils(): SettingUtils
+
+    fun getColorUtils(): ColorUtils
 }

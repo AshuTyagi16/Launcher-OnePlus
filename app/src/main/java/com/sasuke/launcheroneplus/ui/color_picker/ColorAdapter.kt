@@ -7,7 +7,7 @@ import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.DefaultColor
 
-class ColorAdapter(private val glide: RequestManager) : RecyclerView.Adapter<ColorViewHolder>(),
+class ColorAdapter : RecyclerView.Adapter<ColorViewHolder>(),
     ColorViewHolder.OnClickListeners {
 
     private lateinit var colors: List<DefaultColor>
@@ -18,7 +18,7 @@ class ColorAdapter(private val glide: RequestManager) : RecyclerView.Adapter<Col
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ColorViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.cell_default_color, parent, false)
-        val holder = ColorViewHolder(view, glide)
+        val holder = ColorViewHolder(view)
         holder.setOnClickListeners(this)
         return holder
     }
@@ -49,14 +49,14 @@ class ColorAdapter(private val glide: RequestManager) : RecyclerView.Adapter<Col
     }
 
     interface OnClickListeners {
-        fun onItemClick(position: Int, color: String)
+        fun onItemClick(position: Int, color: Int)
     }
 
     fun setOnClickListeners(onClickListeners: OnClickListeners) {
         this.onClickListeners = onClickListeners
     }
 
-    override fun onItemClick(position: Int, color: String) {
+    override fun onItemClick(position: Int, color: Int) {
         if (::onClickListeners.isInitialized)
             onClickListeners.onItemClick(position, color)
     }

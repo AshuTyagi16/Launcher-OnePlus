@@ -149,7 +149,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                 rvHideApps.forEachVisibleHolder { holder: AppViewHolder ->
                     if (adapter.appList[postion].label[0].toUpperCase() == adapter.appList[holder.adapterPosition].label[0].toUpperCase())
                         holder.itemView.setBackgroundColor(
-                            ColorUtils.setAlphaComponent(primaryColor, 40)
+                            ColorUtils.setAlphaComponent(primaryColor, 90)
                         )
                     else
                         holder.itemView.setBackgroundColor(
@@ -589,7 +589,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     fun onPrimaryColorChangeEvent(primaryColorChangedEvent: PrimaryColorChangedEvent) {
         primaryColor = primaryColorChangedEvent.color
-        LauncherApp.color = primaryColor
 
         fastscroller.handleDrawable?.let {
             AppCompatResources.getDrawable(this, R.drawable.fast_scroll_handle)?.let {

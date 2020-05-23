@@ -21,8 +21,8 @@ abstract class ColorPickerFragmentModule {
 
         @Provides
         @PerFragmentScope
-        fun adapter(glide: RequestManager): ColorAdapter {
-            return ColorAdapter(glide)
+        fun adapter(): ColorAdapter {
+            return ColorAdapter()
         }
 
         @Provides

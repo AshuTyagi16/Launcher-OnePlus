@@ -1,5 +1,6 @@
 package com.sasuke.launcheroneplus.ui.color_picker
 
+import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
@@ -12,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.transition.TransitionManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.sasuke.launcheroneplus.LauncherApp
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.event.PrimaryColorChangedEvent
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
@@ -72,6 +74,11 @@ class ColorPickerFragment : RoundedBottomSheetDialogFragment(), ColorAdapter.OnC
         configurePeekHeight()
     }
 
+    override fun onDismiss(dialog: DialogInterface) {
+        lastPosition = -1
+        super.onDismiss(dialog)
+    }
+
     private fun inject() {
         colorPickerFragmentViewModel =
             ViewModelProvider(this, viewModelFactory).get(ColorPickerFragmentViewModel::class.java)
@@ -102,11 +109,14 @@ class ColorPickerFragment : RoundedBottomSheetDialogFragment(), ColorAdapter.OnC
 
     private fun setupListeners() {
         btnCancel.setOnClickListener {
+            lastPosition = -1
             dismiss()
         }
 
         btnDone.setOnClickListener {
+            lastPosition = -1
             if (color != 0) {
+                LauncherApp.color = color
                 onClickListeners?.onItemClick(color)
                 EventBus.getDefault().postSticky(PrimaryColorChangedEvent(color))
             }
@@ -180,10 +190,10 @@ class ColorPickerFragment : RoundedBottomSheetDialogFragment(), ColorAdapter.OnC
         rvDefaultColors.scheduleLayoutAnimation()
     }
 
-    override fun onItemClick(position: Int, color: String) {
+    override fun onItemClick(position: Int, color: Int) {
         if (colorAdapter.toggle(position)) {
             lastPosition = position
-            this.color = Color.parseColor(color)
+            this.color = color
         } else {
             this.color = 0
             lastPosition = -1

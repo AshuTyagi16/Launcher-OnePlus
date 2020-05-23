@@ -4,14 +4,13 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import androidx.core.content.ContextCompat
 import com.sasuke.launcheroneplus.di.component.DaggerLauncherAppComponent
 import com.sasuke.launcheroneplus.di.component.LauncherAppComponent
 import com.sasuke.launcheroneplus.receiver.AppChangeReceiver
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
-import io.github.inflationx.calligraphy3.CalligraphyConfig
-import io.github.inflationx.calligraphy3.CalligraphyInterceptor
 import io.github.inflationx.viewpump.ViewPump
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -29,6 +28,7 @@ class LauncherApp : Application(), HasAndroidInjector {
 
     override fun onCreate() {
         super.onCreate()
+        color = ContextCompat.getColor(this, R.color.search_bar)
         initComponent()
         initTimber()
         initFont()
