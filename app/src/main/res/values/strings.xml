@@ -76,7 +76,26 @@
     <string name="header_scroll">Scroll</string>
     <string name="scroll_accent_color">Scroll accent color</string>
     <string name="scroll_accent_color_description">Color os the scrollbar slider, letter bubble, overscroll glow and search bar</string>
-
     <string name="fast_scrollbar">Fast scrollbar</string>
     <string name="fast_scrollbar_description">Add a thumb slider to quickly navigate apps alphabetically</string>
+
+    <string name="header_layout">Layout</string>
+    <string name="app_drawer_style">App drawer style</string>
+    <string-array name="app_drawer_spinner">
+        <item>Vertical</item>
+        <item>List</item>
+        <item>Horizontal</item>
+    </string-array>
+    <string name="drawer_app_grid">Drawer App Grid</string>
+    <string name="icon_layout">Icon layout</string>
+    <string name="icon_layout_description">Match desktop size, Labels: On</string>
+    <string name="background_color">Background color</string>
+    <string name="background_transparent">Background transparency</string>
+    <string name="card_background">Card background</string>
+    <string name="frequently_used_apps">Frequently used apps</string>
+    <string name="frequently_used_apps_description">Keep commonly used apps in the top row for quick access</string>
+    <string name="top_bar">Top bar</string>
+    <string name="tab_style">Tab style</string>
+
+
 </resources>

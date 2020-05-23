@@ -3,7 +3,12 @@ package com.sasuke.launcheroneplus.ui.settings.app_drawer
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.Observer
@@ -45,6 +50,7 @@ class AppDrawerActivity : BaseActivity() {
         setContentView(R.layout.activity_app_drawer_setting)
         inject()
         setupToolbar()
+        setupSpinner()
         observeLiveData()
         setupListeners()
         updateUI(LauncherApp.color)
@@ -58,6 +64,18 @@ class AppDrawerActivity : BaseActivity() {
 
     private fun setupToolbar() {
         setSupportActionBar(toolbar)
+    }
+
+    private fun setupSpinner() {
+        ArrayAdapter.createFromResource(
+            this,
+            R.array.app_drawer_spinner,
+            android.R.layout.simple_spinner_item
+        ).also { adapter ->
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinnerAppDrawerStyle.adapter = adapter
+        }
+
     }
 
     private fun observeLiveData() {
@@ -78,6 +96,20 @@ class AppDrawerActivity : BaseActivity() {
             cbFastScroller.isChecked = isFastScrollEnabled
             appDrawerActivityViewModel.setFastScrollState(isFastScrollEnabled)
         }
+        clAppDrawerStyle.setOnClickListener {
+            spinnerAppDrawerStyle.performClick()
+        }
+        spinnerAppDrawerStyle.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, pos: Int, id: Long) {
+                parent?.let {
+                    (it.getChildAt(0) as TextView).setTextColor(Color.WHITE)
+                }
+            }
+        }
     }
 
     private fun updateUI(color: Int) {
@@ -93,6 +125,7 @@ class AppDrawerActivity : BaseActivity() {
             }
             cbFastScroller.buttonTintList = ColorStateList.valueOf(color)
             tvHeaderScroll.setTextColor(color)
+            tvHeaderLayout.setTextColor(color)
         }
     }
 
