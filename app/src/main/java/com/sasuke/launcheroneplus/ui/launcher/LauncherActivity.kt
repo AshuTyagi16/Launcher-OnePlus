@@ -149,11 +149,19 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             override fun onDragged(offset: Float, postion: Int) {
                 super.onDragged(offset, postion)
                 rvHideApps.forEachVisibleHolder { holder: AppViewHolder ->
-                    if (adapter.appList[postion].label[0].toUpperCase() == adapter.appList[holder.adapterPosition].label[0].toUpperCase())
-                        holder.itemView.setBackgroundColor(
-                            ColorUtils.setAlphaComponent(primaryColor, 90)
-                        )
-                    else
+                    if (adapter.appList[postion].label[0].toUpperCase() == adapter.appList[holder.adapterPosition].label[0].toUpperCase()) {
+                        AppCompatResources.getDrawable(
+                            this@LauncherActivity,
+                            R.drawable.bg_app_highlight
+                        )?.let {
+                            val wrappedDrawable = DrawableCompat.wrap(it)
+                            DrawableCompat.setTint(
+                                wrappedDrawable,
+                                ColorUtils.setAlphaComponent(primaryColor, 90)
+                            )
+                            holder.itemView.background = wrappedDrawable
+                        }
+                    } else
                         holder.itemView.setBackgroundColor(
                             Color.TRANSPARENT
                         )
