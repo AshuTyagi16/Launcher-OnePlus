@@ -620,5 +620,17 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             etSearch.setCompoundDrawablesWithIntrinsicBounds(wrappedDrawable, null, null, null)
         }
         ivSeparator.setBackgroundColor(primaryColor)
+        when (settingPreference.drawerStyle) {
+            Constants.Drawer.STYLE_VERTICAL_INDICATOR -> {
+                layoutManager.orientation = RecyclerView.VERTICAL
+                rvHideApps.layoutManager = layoutManager
+            }
+            Constants.Drawer.STYLE_HORIZONTAL_INDICATOR -> {
+                layoutManager.orientation = RecyclerView.HORIZONTAL
+                rvHideApps.layoutManager = layoutManager
+            }
+            Constants.Drawer.STYLE_LIST_INDICATOR -> {
+            }
+        }
     }
 }

@@ -26,4 +26,21 @@ class AppDrawerActivityViewModel @Inject constructor(
             }
         }
     }
+
+    fun setDrawerStyle(style: String) {
+        var indicator = Constants.Drawer.STYLE_VERTICAL_INDICATOR
+        when (style) {
+            Constants.Drawer.VERTICAL -> indicator = Constants.Drawer.STYLE_VERTICAL_INDICATOR
+            Constants.Drawer.HORIZONTAL -> indicator = Constants.Drawer.STYLE_HORIZONTAL_INDICATOR
+            Constants.Drawer.LIST -> indicator = Constants.Drawer.STYLE_LIST_INDICATOR
+        }
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                sharedPreferenceUtil.getSettingPreference()?.let {
+                    it.drawerStyle = indicator
+                    sharedPreferenceUtil.putString(Constants.Settings.PREFERENCES, gson.toJson(it))
+                }
+            }
+        }
+    }
 }

@@ -19,6 +19,7 @@ import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.SettingPreference
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.color_picker.ColorPickerFragment
+import com.sasuke.launcheroneplus.util.Constants
 import com.sasuke.launcheroneplus.util.SharedPreferencesSettingsLiveData
 import kotlinx.android.synthetic.main.activity_app_drawer_setting.*
 import kotlinx.android.synthetic.main.activity_wallpaper_settings.toolbar
@@ -40,6 +41,8 @@ class AppDrawerActivity : BaseActivity() {
     private lateinit var colorPickerFragment: ColorPickerFragment
 
     private var isFastScrollEnabled = false
+
+    private var isSpinnerFirstCall = true
 
     companion object {
         fun newIntent(context: Context) = Intent(context, AppDrawerActivity::class.java)
@@ -107,6 +110,10 @@ class AppDrawerActivity : BaseActivity() {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, pos: Int, id: Long) {
                 parent?.let {
                     (it.getChildAt(0) as TextView).setTextColor(Color.WHITE)
+                    if (!isSpinnerFirstCall) {
+                        appDrawerActivityViewModel.setDrawerStyle(spinnerAppDrawerStyle.selectedItem.toString())
+                    }
+                    isSpinnerFirstCall = false
                 }
             }
         }
@@ -139,6 +146,7 @@ class AppDrawerActivity : BaseActivity() {
 
     private fun updateUI(settingPreference: SettingPreference) {
         cbFastScroller.isChecked = isFastScrollEnabled
+        spinnerAppDrawerStyle.setSelection(settingPreference.drawerStyle)
         updateUI(settingPreference.primaryColor)
     }
 

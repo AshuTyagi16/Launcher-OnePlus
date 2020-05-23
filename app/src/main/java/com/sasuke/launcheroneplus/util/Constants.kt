@@ -30,4 +30,14 @@ object Constants {
         const val IS_PREFERENCES_SET = "IS_PREFERENCES_SET"
     }
 
+    object Drawer {
+        const val STYLE_VERTICAL_INDICATOR = 0
+        const val STYLE_LIST_INDICATOR = 1
+        const val STYLE_HORIZONTAL_INDICATOR = 2
+
+        const val VERTICAL = "Vertical"
+        const val LIST = "List"
+        const val HORIZONTAL = "Horizontal"
+    }
+
 }
