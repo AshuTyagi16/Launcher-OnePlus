@@ -40,6 +40,7 @@ object PackageResolverUtils {
     fun getAppInfoFromPackageName(packageManager: PackageManager, packageName: String): AppInfo {
         val intent = Intent()
         intent.`package` = packageName
+        intent.addCategory(Intent.CATEGORY_LAUNCHER)
         val resolveInfo = packageManager.resolveActivity(intent, 0)
         return AppInfo(
             icon = resolveInfo.loadIcon(packageManager),

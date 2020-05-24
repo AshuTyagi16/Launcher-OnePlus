@@ -8,10 +8,18 @@
     <string name="separator">Separator</string>
     <string name="button">Button</string>
 
+    <!-- APP LEVEL -->
+    <!-- String representing the intent to delete a package.-->
+    <string name="delete_package_intent" translatable="false">#Intent;action=android.intent.action.DELETE;launchFlags=0x10800000;end</string>
+
     <!-- Launcher -->
     <string name="search_apps">Search apps</string>
     <string name="shortcut_added_to_home_screen">Shortcut Added To Home Screen!!</string>
     <string name="ez_settings">EZ Settings</string>
+    <string name="app_info">App info</string>
+    <string name="edit">Edit</string>
+    <string name="uninstall">Uninstall</string>
+    <string name="widgets">Widgets</string>
 
     <!-- Drag n Drop -->
     <string name="removeItem">Remove</string>

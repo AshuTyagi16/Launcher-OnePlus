@@ -94,7 +94,7 @@ class LauncherApp : Application(), HasAndroidInjector {
                     true,
                     Constants.Drawer.STYLE_VERTICAL_INDICATOR,
                     ContextCompat.getColor(this, R.color.black_transparent),
-                    20
+                    80
                 )
             sharedPrefUtil.putStringSync(
                 Constants.Settings.PREFERENCES,

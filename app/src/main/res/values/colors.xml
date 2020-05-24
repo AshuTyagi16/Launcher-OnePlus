@@ -7,6 +7,7 @@
     <!-- Solid -->
     <color name="black">#ff000000</color>
     <color name="black_transparent">#cc000000</color>
+    <color name="light_grey">#383838</color>
     <color name="dark_grey">#212121</color>
     <color name="darker_grey">#191919</color>
     <color name="white">#ffffffff</color>

@@ -92,8 +92,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     private var primaryColor = 0
 
-    private var shouldNotify: Boolean = true
-
     companion object {
         /** The magnitude of rotation while the list is scrolled. */
         private const val SCROLL_ROTATION_MAGNITUDE = 0.25f
@@ -355,12 +353,18 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                     SlidingUpPanelLayout.PanelState.EXPANDED -> {
                         Sensey.getInstance().stopTouchTypeDetection()
                         Sensey.getInstance().stopPinchScaleDetection()
-                        shouldNotify = true
-                        adapter.consumeLongPress(true, shouldNotify)
                     }
                     SlidingUpPanelLayout.PanelState.DRAGGING -> {
-                        adapter.consumeLongPress(false, shouldNotify)
-                        shouldNotify = false
+                        rvHideApps.forEachVisibleHolder { holder: AppViewHolder ->
+
+                            holder.itemView.setBackgroundColor(
+                                ContextCompat.getColor(
+                                    this@LauncherActivity,
+                                    R.color.app_un_highlight
+                                )
+                            )
+                        }
+
                     }
                     SlidingUpPanelLayout.PanelState.COLLAPSED -> {
                         Sensey.getInstance().startTouchTypeDetection(
@@ -602,6 +606,18 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     override fun onItemLongClick(position: Int, parent: View, appInfo: App) {
         dragView.visibility = View.VISIBLE
         clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+    }
+
+    override fun onAppInfoClick(position: Int, appInfo: App) {
+        openAppInfo(appInfo.packageName)
+    }
+
+    override fun onAppUninstallClick(position: Int, appInfo: App) {
+        startUninstall(appInfo.packageName)
+    }
+
+    override fun onAppEditClick(position: Int, appInfo: App) {
+
     }
 
     override fun onBackPressed() {

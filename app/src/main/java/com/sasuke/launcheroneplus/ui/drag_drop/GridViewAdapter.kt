@@ -79,4 +79,16 @@ class GridViewAdapter(private val glide: RequestManager) : BaseAdapter(), OnItem
     override fun onItemLongClick(position: Int, parent: View, appInfo: App) {
 
     }
+
+    override fun onAppInfoClick(position: Int, appInfo: App) {
+
+    }
+
+    override fun onAppUninstallClick(position: Int, appInfo: App) {
+
+    }
+
+    override fun onAppEditClick(position: Int, appInfo: App) {
+
+    }
 }

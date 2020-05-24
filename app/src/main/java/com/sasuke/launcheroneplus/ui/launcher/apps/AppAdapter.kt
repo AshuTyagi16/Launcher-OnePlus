@@ -19,14 +19,14 @@ class AppAdapter(private val glide: RequestManager, private var consumeLongPress
     RecyclerViewFastScroller.OnPopupViewUpdate,
     AppViewHolder.OnClickListeners {
 
+    init {
+        setHasStableIds(true)
+    }
+
     lateinit var appList: MutableList<App>
     private lateinit var onClickListeners: OnClickListeners
 
     private var primaryColor: Int = 0
-
-    init {
-        setHasStableIds(true)
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
         val view =
@@ -44,7 +44,6 @@ class AppAdapter(private val glide: RequestManager, private var consumeLongPress
 
     override fun onBindViewHolder(holder: AppViewHolder, position: Int) {
         if (::appList.isInitialized) {
-            holder.updateConsumeLongPress(consumeLongPress)
             holder.setAppInfo(appList[position])
             holder.setOnClickListeners(this)
         }
@@ -62,6 +61,9 @@ class AppAdapter(private val glide: RequestManager, private var consumeLongPress
     interface OnClickListeners {
         fun onItemClick(position: Int, parent: View, appInfo: App)
         fun onItemLongClick(position: Int, parent: View, appInfo: App)
+        fun onAppInfoClick(position: Int, appInfo: App)
+        fun onAppUninstallClick(position: Int, appInfo: App)
+        fun onAppEditClick(position: Int, appInfo: App)
     }
 
     fun setOnClickListeners(onClickListeners: OnClickListeners) {
@@ -78,6 +80,21 @@ class AppAdapter(private val glide: RequestManager, private var consumeLongPress
             onClickListeners.onItemLongClick(position, parent, appInfo)
     }
 
+    override fun onAppInfoClick(position: Int, appInfo: App) {
+        if (::onClickListeners.isInitialized)
+            onClickListeners.onAppInfoClick(position, appInfo)
+    }
+
+    override fun onAppUninstallClick(position: Int, appInfo: App) {
+        if (::onClickListeners.isInitialized)
+            onClickListeners.onAppUninstallClick(position, appInfo)
+    }
+
+    override fun onAppEditClick(position: Int, appInfo: App) {
+        if (::onClickListeners.isInitialized)
+            onClickListeners.onAppEditClick(position, appInfo)
+    }
+
     override fun onUpdate(position: Int, popupTextView: TextView) {
         popupTextView.background.colorFilter = PorterDuffColorFilter(
             primaryColor,
@@ -88,11 +105,5 @@ class AppAdapter(private val glide: RequestManager, private var consumeLongPress
 
     fun updatePrimaryColor(color: Int) {
         primaryColor = color
-    }
-
-    fun consumeLongPress(consumeLongPress: Boolean, shouldNotify: Boolean) {
-        this.consumeLongPress = consumeLongPress
-        if (shouldNotify)
-            notifyDataSetChanged()
     }
 }

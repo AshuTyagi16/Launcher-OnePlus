@@ -144,6 +144,7 @@ dependencies {
     //Preferences
     implementation 'androidx.preference:preference-ktx:1.1.1'
 
-
+    //Popup View
+    implementation 'com.github.skydoves:balloon:1.1.7'
 
 }
