@@ -182,15 +182,11 @@ class HiddenAppsActivity : BaseActivity(), AppAdapter.OnClickListeners {
 
     }
 
-    override fun onAppInfoClick(position: Int, appInfo: App) {
+    override fun onDragStarted(position: Int, parent: View, appInfo: App) {
 
     }
 
-    override fun onAppUninstallClick(position: Int, appInfo: App) {
-
-    }
-
-    override fun onAppEditClick(position: Int, appInfo: App) {
+    override fun onEventCancel(position: Int, appInfo: App) {
 
     }
 }

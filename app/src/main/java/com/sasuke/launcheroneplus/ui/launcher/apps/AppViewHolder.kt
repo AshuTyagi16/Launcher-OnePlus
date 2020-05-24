@@ -4,9 +4,7 @@ import android.animation.Animator
 import android.os.Handler
 import android.view.MotionEvent
 import android.view.View
-import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -25,8 +23,7 @@ import java.io.File
 
 class AppViewHolder(
     itemView: View,
-    private val glide: RequestManager,
-    private var consumeLongPress: Boolean = true
+    private val glide: RequestManager
 ) :
     RecyclerView.ViewHolder(itemView) {
 
@@ -44,36 +41,6 @@ class AppViewHolder(
 
     private var isDragAllowed = false
     private var isDragStarted = false
-
-    private val popup = createBalloon(itemView.context) {
-        setArrowVisible(true)
-        setArrowSize(10)
-        setCircularDuration(200)
-        setArrowColor(ContextCompat.getColor(itemView.context, R.color.light_grey))
-        setArrowOrientation(ArrowOrientation.BOTTOM)
-        setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.transparent))
-        setBalloonAnimation(BalloonAnimation.OVERSHOOT)
-        setLayout(R.layout.popup_app_options)
-        setDismissWhenTouchOutside(true)
-    }
-
-    init {
-        popup.getContentView().findViewById<LinearLayout>(R.id.ivUninstall).setOnClickListener {
-            popup.dismiss()
-            if (::onClickListeners.isInitialized)
-                onClickListeners.onAppUninstallClick(adapterPosition, app)
-        }
-        popup.getContentView().findViewById<LinearLayout>(R.id.ivEdit).setOnClickListener {
-            popup.dismiss()
-            if (::onClickListeners.isInitialized)
-                onClickListeners.onAppEditClick(adapterPosition, app)
-        }
-        popup.getContentView().findViewById<LinearLayout>(R.id.ivAppInfo).setOnClickListener {
-            popup.dismiss()
-            if (::onClickListeners.isInitialized)
-                onClickListeners.onAppInfoClick(adapterPosition, app)
-        }
-    }
 
     private val longPressRunnable = Runnable {
         isDragAllowed = true
@@ -100,7 +67,8 @@ class AppViewHolder(
 
             })
             .start()
-        popup.showAlignTop(itemView, 0, 40)
+        if (::onClickListeners.isInitialized)
+            onClickListeners.onItemLongClick(adapterPosition, itemView, app)
     }
 
     private val handler = Handler()
@@ -147,12 +115,11 @@ class AppViewHolder(
                 }
                 MotionEvent.ACTION_MOVE -> {
                     if (isDragAllowed) {
-                        popup.dismiss()
                         itemView.animate().scaleX(1f).scaleY(1f)
                             .translationY(0f)
                             .start()
                         if (::onClickListeners.isInitialized)
-                            onClickListeners.onItemLongClick(adapterPosition, itemView, app)
+                            onClickListeners.onDragStart(adapterPosition, itemView, app)
                         val icon = itemView.ivAppIcon
                         val state =
                             DragData(
@@ -175,7 +142,6 @@ class AppViewHolder(
 //                            Toast.LENGTH_SHORT
 //                        ).show()
                     } else {
-                        popup.dismiss()
                         if (::onClickListeners.isInitialized)
                             onClickListeners.onItemClick(adapterPosition, itemView, appInfo)
                     }
@@ -186,7 +152,6 @@ class AppViewHolder(
                         .start()
                 }
                 MotionEvent.ACTION_CANCEL -> {
-                    popup.dismiss()
                     itemView.animate().scaleX(1f).scaleY(1f)
                         .translationY(0f)
                         .start()
@@ -196,31 +161,13 @@ class AppViewHolder(
             }
             return@setOnTouchListener true
         }
-
-//        itemView.setOnLongClickListener {
-//            if (::onClickListeners.isInitialized)
-//                onClickListeners.onItemLongClick(adapterPosition, itemView, appInfo)
-//            if (consumeLongPress) {
-//                val icon = itemView.ivAppIcon
-//                val state =
-//                    DragData(
-//                        appInfo,
-//                        icon.width,
-//                        icon.height
-//                    )
-//                val shadow = MyDragShadowBuilder(icon)
-//                ViewCompat.startDragAndDrop(icon, null, shadow, state, 0)
-//            }
-//            return@setOnLongClickListener consumeLongPress
-//        }
     }
 
     interface OnClickListeners {
         fun onItemClick(position: Int, parent: View, appInfo: App)
         fun onItemLongClick(position: Int, parent: View, appInfo: App)
-        fun onAppInfoClick(position: Int, appInfo: App)
-        fun onAppUninstallClick(position: Int, appInfo: App)
-        fun onAppEditClick(position: Int, appInfo: App)
+        fun onDragStart(position: Int, parent: View, appInfo: App)
+        fun onEventCancel(position: Int, appInfo: App)
     }
 
     fun setOnClickListeners(onClickListeners: OnClickListeners) {

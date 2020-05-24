@@ -9,6 +9,7 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.EdgeEffect
+import android.widget.LinearLayout
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
@@ -41,6 +42,10 @@ import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
 import com.sasuke.launcheroneplus.ui.settings.LauncherSettingsActivity
 import com.sasuke.launcheroneplus.ui.wallpaper.list.grid.WallpaperSettingsActivity
 import com.sasuke.launcheroneplus.util.*
+import com.skydoves.balloon.ArrowOrientation
+import com.skydoves.balloon.Balloon
+import com.skydoves.balloon.BalloonAnimation
+import com.skydoves.balloon.createBalloon
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import kotlinx.android.synthetic.main.activity_launcher.*
 import kotlinx.android.synthetic.main.layout_non_sliding.*
@@ -91,6 +96,8 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
     private var primaryColor = 0
+
+    private lateinit var popup: Balloon
 
     companion object {
         /** The magnitude of rotation while the list is scrolled. */
@@ -601,23 +608,21 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     override fun onItemClick(position: Int, parent: View, appInfo: App) {
         openApp(appInfo)
+        popup.dismiss()
     }
 
     override fun onItemLongClick(position: Int, parent: View, appInfo: App) {
+        showPopup(position, parent, appInfo)
+    }
+
+    override fun onDragStarted(position: Int, parent: View, appInfo: App) {
         dragView.visibility = View.VISIBLE
         clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+        popup.dismiss()
     }
 
-    override fun onAppInfoClick(position: Int, appInfo: App) {
-        openAppInfo(appInfo.packageName)
-    }
-
-    override fun onAppUninstallClick(position: Int, appInfo: App) {
-        startUninstall(appInfo.packageName)
-    }
-
-    override fun onAppEditClick(position: Int, appInfo: App) {
-
+    override fun onEventCancel(position: Int, appInfo: App) {
+        popup.dismiss()
     }
 
     override fun onBackPressed() {
@@ -698,5 +703,42 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                 settingPreference.backgroundColor,
                 settingPreference.backgroundColorAlpha.alphaPercentage()
             )
+    }
+
+    private fun showPopup(position: Int, view: View, app: App) {
+        val arrpos = when {
+            position % 5 == 0 -> 0.13f
+            position % 5 == 1 -> 0.37f
+            position % 5 == 2 -> 0.5f
+            position % 5 == 3 -> 0.64f
+            position % 5 == 4 -> 0.87f
+            else -> 0.5f
+        }
+        popup = createBalloon(this) {
+            setArrowVisible(true)
+            setArrowSize(10)
+            setArrowPosition(arrpos)
+            setCircularDuration(200)
+            setArrowColor(ContextCompat.getColor(this@LauncherActivity, R.color.light_grey))
+            setArrowOrientation(ArrowOrientation.BOTTOM)
+            setBackgroundColor(ContextCompat.getColor(this@LauncherActivity, R.color.transparent))
+            setBalloonAnimation(BalloonAnimation.OVERSHOOT)
+            setLayout(R.layout.popup_app_options)
+            setDismissWhenTouchOutside(true)
+            setLifecycleOwner(this@LauncherActivity)
+        }
+        popup.getContentView().findViewById<LinearLayout>(R.id.ivUninstall).setOnClickListener {
+            popup.dismiss()
+            startUninstall(app.packageName)
+        }
+        popup.getContentView().findViewById<LinearLayout>(R.id.ivEdit).setOnClickListener {
+            popup.dismiss()
+
+        }
+        popup.getContentView().findViewById<LinearLayout>(R.id.ivAppInfo).setOnClickListener {
+            popup.dismiss()
+            openAppInfo(app.packageName)
+        }
+        popup.showAlignTop(view, 0, 40)
     }
 }

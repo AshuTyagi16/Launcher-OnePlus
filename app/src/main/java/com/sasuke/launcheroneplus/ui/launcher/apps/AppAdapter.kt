@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.core.view.doOnLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
@@ -14,7 +13,7 @@ import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
 
-class AppAdapter(private val glide: RequestManager, private var consumeLongPress: Boolean) :
+class AppAdapter(private val glide: RequestManager) :
     RecyclerView.Adapter<AppViewHolder>(),
     RecyclerViewFastScroller.OnPopupViewUpdate,
     AppViewHolder.OnClickListeners {
@@ -31,7 +30,7 @@ class AppAdapter(private val glide: RequestManager, private var consumeLongPress
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.cell_app_info, parent, false)
-        return AppViewHolder(view, glide, consumeLongPress).apply {
+        return AppViewHolder(view, glide).apply {
             // The rotation pivot should be at the center of the top edge.
             itemView.doOnLayout { v -> v.pivotX = v.width / 2f }
             itemView.pivotY = 0f
@@ -61,9 +60,8 @@ class AppAdapter(private val glide: RequestManager, private var consumeLongPress
     interface OnClickListeners {
         fun onItemClick(position: Int, parent: View, appInfo: App)
         fun onItemLongClick(position: Int, parent: View, appInfo: App)
-        fun onAppInfoClick(position: Int, appInfo: App)
-        fun onAppUninstallClick(position: Int, appInfo: App)
-        fun onAppEditClick(position: Int, appInfo: App)
+        fun onDragStarted(position: Int, parent: View, appInfo: App)
+        fun onEventCancel(position: Int, appInfo: App)
     }
 
     fun setOnClickListeners(onClickListeners: OnClickListeners) {
@@ -80,19 +78,14 @@ class AppAdapter(private val glide: RequestManager, private var consumeLongPress
             onClickListeners.onItemLongClick(position, parent, appInfo)
     }
 
-    override fun onAppInfoClick(position: Int, appInfo: App) {
+    override fun onDragStart(position: Int, parent: View, appInfo: App) {
         if (::onClickListeners.isInitialized)
-            onClickListeners.onAppInfoClick(position, appInfo)
+            onClickListeners.onDragStarted(position, parent, appInfo)
     }
 
-    override fun onAppUninstallClick(position: Int, appInfo: App) {
+    override fun onEventCancel(position: Int, appInfo: App) {
         if (::onClickListeners.isInitialized)
-            onClickListeners.onAppUninstallClick(position, appInfo)
-    }
-
-    override fun onAppEditClick(position: Int, appInfo: App) {
-        if (::onClickListeners.isInitialized)
-            onClickListeners.onAppEditClick(position, appInfo)
+            onClickListeners.onEventCancel(position, appInfo)
     }
 
     override fun onUpdate(position: Int, popupTextView: TextView) {
