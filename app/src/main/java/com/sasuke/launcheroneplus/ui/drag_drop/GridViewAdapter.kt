@@ -8,17 +8,16 @@ import com.bumptech.glide.RequestManager
 import com.huxq17.handygridview.scrollrunner.OnItemMovedListener
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
-import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
 
 class GridViewAdapter(private val glide: RequestManager) : BaseAdapter(), OnItemMovedListener,
-    AppViewHolder.OnClickListeners {
+    GridAppViewHolder.OnClickListeners {
 
     private lateinit var onClickListeners: OnClickListeners
     private val list: MutableList<App> = ArrayList()
     private var inEditMode = false
 
     override fun getView(position: Int, convertview: View?, parent: ViewGroup): View {
-        val appViewHolder: AppViewHolder
+        val appViewHolder: GridAppViewHolder
         val myView: View =
             convertview
                 ?: LayoutInflater.from(parent.context).inflate(
@@ -26,7 +25,7 @@ class GridViewAdapter(private val glide: RequestManager) : BaseAdapter(), OnItem
                     parent,
                     false
                 )
-        appViewHolder = AppViewHolder(myView, glide, false)
+        appViewHolder = GridAppViewHolder(myView, glide)
         appViewHolder.setAppInfo(getItem(position) as App)
         appViewHolder.setOnClickListeners(this)
         return myView
@@ -74,21 +73,5 @@ class GridViewAdapter(private val glide: RequestManager) : BaseAdapter(), OnItem
     override fun onItemClick(position: Int, parent: View, appInfo: App) {
         if (::onClickListeners.isInitialized)
             onClickListeners.onItemClick(position, parent, appInfo)
-    }
-
-    override fun onItemLongClick(position: Int, parent: View, appInfo: App) {
-
-    }
-
-    override fun onAppInfoClick(position: Int, appInfo: App) {
-
-    }
-
-    override fun onAppUninstallClick(position: Int, appInfo: App) {
-
-    }
-
-    override fun onAppEditClick(position: Int, appInfo: App) {
-
     }
 }

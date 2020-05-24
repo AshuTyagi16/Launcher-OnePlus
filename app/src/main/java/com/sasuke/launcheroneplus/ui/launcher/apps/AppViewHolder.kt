@@ -153,17 +153,15 @@ class AppViewHolder(
                             .start()
                         if (::onClickListeners.isInitialized)
                             onClickListeners.onItemLongClick(adapterPosition, itemView, app)
-                        if (consumeLongPress) {
-                            val icon = itemView.ivAppIcon
-                            val state =
-                                DragData(
-                                    app,
-                                    icon.width,
-                                    icon.height
-                                )
-                            val shadow = MyDragShadowBuilder(icon)
-                            ViewCompat.startDragAndDrop(icon, null, shadow, state, 0)
-                        }
+                        val icon = itemView.ivAppIcon
+                        val state =
+                            DragData(
+                                app,
+                                icon.width,
+                                icon.height
+                            )
+                        val shadow = MyDragShadowBuilder(icon)
+                        ViewCompat.startDragAndDrop(icon, null, shadow, state, 0)
                         isDragStarted = true
                     }
                     isDragAllowed = false
