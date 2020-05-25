@@ -607,8 +607,9 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     }
 
     override fun onItemClick(position: Int, parent: View, appInfo: App) {
-        openApp(appInfo)
-        popup.dismiss()
+        openApp(parent, appInfo)
+        if (::popup.isInitialized)
+            popup.dismiss()
     }
 
     override fun onItemLongClick(position: Int, parent: View, appInfo: App) {

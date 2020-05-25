@@ -1,19 +1,26 @@
 package com.sasuke.launcheroneplus.ui.base
 
 import android.annotation.SuppressLint
+import android.annotation.TargetApi
+import android.app.ActivityOptions
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import android.widget.Toast
 import com.jaeger.library.StatusBarUtil
 import com.sasuke.launcheroneplus.R
+import com.sasuke.launcheroneplus.data.model.App
+import com.sasuke.launcheroneplus.util.Constants
 import dagger.android.support.DaggerAppCompatActivity
 import io.github.inflationx.viewpump.ViewPumpContextWrapper
-import java.lang.Exception
 
 open class BaseActivity : DaggerAppCompatActivity() {
 
@@ -85,4 +92,54 @@ open class BaseActivity : DaggerAppCompatActivity() {
             e.printStackTrace()
         }
     }
+
+    fun openApp(view: View, appInfo: App) {
+        packageManager.getLaunchIntentForPackage(appInfo.packageName)?.let {
+            it.sourceBounds = getViewBounds(view)
+            startActivity(
+                it,
+                getActivityLaunchOptions(
+                    view,
+                    view.findViewById<ImageView>(R.id.ivAppIcon).drawable
+                )
+            )
+        }
+    }
+
+    private fun getViewBounds(v: View): Rect? {
+        val pos = IntArray(2)
+        v.getLocationOnScreen(pos)
+        return Rect(
+            pos[0],
+            pos[1],
+            pos[0] + v.width,
+            pos[1] + v.height
+        )
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    fun getActivityLaunchOptions(v: View, icon: Drawable): Bundle? {
+        if (Constants.ATLEAST_MARSHMALLOW) {
+            var left = 0
+            var top = 0
+            var width = v.measuredWidth
+            var height = v.measuredHeight
+            // Launch from center of icon, not entire view
+            val bounds = icon.bounds
+            left = (width - bounds.width()) / 2
+            top = v.paddingTop
+            width = bounds.width()
+            height = bounds.height()
+            return ActivityOptions.makeClipRevealAnimation(v, left, top, width, height).toBundle()
+        } else if (Constants.ATLEAST_LOLLIPOP_MR1) {
+            // On L devices, we use the device default slide-up transition.
+            // On L MR1 devices, we use a custom version of the slide-up transition which
+            // doesn't have the delay present in the device default.
+            return ActivityOptions.makeCustomAnimation(
+                this, R.anim.task_open_enter, R.anim.no_anim
+            ).toBundle()
+        }
+        return null
+    }
+
 }

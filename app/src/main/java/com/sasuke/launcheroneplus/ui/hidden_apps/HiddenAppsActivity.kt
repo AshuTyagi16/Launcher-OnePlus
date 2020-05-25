@@ -175,7 +175,7 @@ class HiddenAppsActivity : BaseActivity(), AppAdapter.OnClickListeners {
     }
 
     override fun onItemClick(position: Int, parent: View, appInfo: App) {
-        openApp(appInfo)
+        openApp(parent, appInfo)
     }
 
     override fun onItemLongClick(position: Int, parent: View, appInfo: App) {
