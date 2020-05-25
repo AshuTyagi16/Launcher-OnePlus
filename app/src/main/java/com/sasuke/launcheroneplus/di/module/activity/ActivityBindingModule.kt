@@ -8,7 +8,7 @@ import com.sasuke.launcheroneplus.ui.screen_off.ScreenOffActivity
 import com.sasuke.launcheroneplus.ui.settings.LauncherSettingsActivity
 import com.sasuke.launcheroneplus.ui.settings.app_drawer.AppDrawerActivity
 import com.sasuke.launcheroneplus.ui.wallpaper.WallpaperPreviewActivity
-import com.sasuke.launcheroneplus.ui.wallpaper.list.grid.WallpaperSettingsActivity
+import com.sasuke.launcheroneplus.ui.wallpaper.list.grid.WallpaperGridActivity
 import com.sasuke.launcheroneplus.ui.wallpaper.list.pager.WallpaperPagerActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -34,7 +34,7 @@ abstract class ActivityBindingModule {
 
     @PerActivityScope
     @ContributesAndroidInjector(modules = [WallpaperActivityModule::class])
-    internal abstract fun wallpaperSettingsActivity(): WallpaperSettingsActivity
+    internal abstract fun wallpaperSettingsActivity(): WallpaperGridActivity
 
     @PerActivityScope
     @ContributesAndroidInjector(modules = [WallpaperPagerActivityModule::class])

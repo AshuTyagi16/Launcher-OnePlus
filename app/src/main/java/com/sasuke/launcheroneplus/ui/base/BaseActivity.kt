@@ -118,23 +118,16 @@ open class BaseActivity : DaggerAppCompatActivity() {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    fun getActivityLaunchOptions(v: View, icon: Drawable): Bundle? {
+    private fun getActivityLaunchOptions(v: View, icon: Drawable): Bundle? {
         if (Constants.ATLEAST_MARSHMALLOW) {
-            var left = 0
-            var top = 0
             var width = v.measuredWidth
-            var height = v.measuredHeight
-            // Launch from center of icon, not entire view
             val bounds = icon.bounds
-            left = (width - bounds.width()) / 2
-            top = v.paddingTop
+            val left = (width - bounds.width()) / 2
+            val top = v.paddingTop
             width = bounds.width()
-            height = bounds.height()
+            val height = bounds.height()
             return ActivityOptions.makeClipRevealAnimation(v, left, top, width, height).toBundle()
         } else if (Constants.ATLEAST_LOLLIPOP_MR1) {
-            // On L devices, we use the device default slide-up transition.
-            // On L MR1 devices, we use a custom version of the slide-up transition which
-            // doesn't have the delay present in the device default.
             return ActivityOptions.makeCustomAnimation(
                 this, R.anim.task_open_enter, R.anim.no_anim
             ).toBundle()

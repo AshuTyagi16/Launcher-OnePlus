@@ -24,7 +24,7 @@ import ru.alexbykov.nopaginate.paginate.NoPaginate
 import javax.inject.Inject
 import kotlin.math.ceil
 
-class WallpaperSettingsActivity : BaseActivity(),
+class WallpaperGridActivity : BaseActivity(),
     WallpaperAdapter.OnItemClickListener, OnLoadMoreListener {
 
     @Inject
@@ -48,7 +48,7 @@ class WallpaperSettingsActivity : BaseActivity(),
     private lateinit var paginate: NoPaginate
 
     companion object {
-        fun newIntent(context: Context) = Intent(context, WallpaperSettingsActivity::class.java)
+        fun newIntent(context: Context) = Intent(context, WallpaperGridActivity::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -233,6 +233,7 @@ class WallpaperSettingsActivity : BaseActivity(),
                 ceil((position + 1).toDouble() / Constants.PAGE_SIZE.toDouble()).toInt()
             )
         )
+        overridePendingTransition(R.anim.task_open_enter,R.anim.task_open_enter)
     }
 
     override fun onLoadMore() {

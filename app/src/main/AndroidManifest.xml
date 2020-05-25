@@ -51,7 +51,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
-            android:name=".ui.wallpaper.list.grid.WallpaperSettingsActivity"
+            android:name=".ui.wallpaper.list.grid.WallpaperGridActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity

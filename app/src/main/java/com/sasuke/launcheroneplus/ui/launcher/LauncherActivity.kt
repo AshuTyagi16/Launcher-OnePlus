@@ -40,7 +40,7 @@ import com.sasuke.launcheroneplus.ui.hidden_apps.HiddenAppsActivity
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppAdapter
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
 import com.sasuke.launcheroneplus.ui.settings.LauncherSettingsActivity
-import com.sasuke.launcheroneplus.ui.wallpaper.list.grid.WallpaperSettingsActivity
+import com.sasuke.launcheroneplus.ui.wallpaper.list.grid.WallpaperGridActivity
 import com.sasuke.launcheroneplus.util.*
 import com.skydoves.balloon.ArrowOrientation
 import com.skydoves.balloon.Balloon
@@ -454,7 +454,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         }
 
         clWallpaperIcon.setOnClickListener {
-            startActivity(WallpaperSettingsActivity.newIntent(this@LauncherActivity))
+            startActivity(WallpaperGridActivity.newIntent(this@LauncherActivity))
         }
     }
 
