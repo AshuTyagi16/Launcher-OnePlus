@@ -19,6 +19,7 @@ import com.jaeger.library.StatusBarUtil
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.util.Constants
+import com.sasuke.launcheroneplus.util.GeneralUtils
 import dagger.android.support.DaggerAppCompatActivity
 import io.github.inflationx.viewpump.ViewPumpContextWrapper
 
@@ -119,7 +120,7 @@ open class BaseActivity : DaggerAppCompatActivity() {
 
     @TargetApi(Build.VERSION_CODES.M)
     private fun getActivityLaunchOptions(v: View, icon: Drawable): Bundle? {
-        if (Constants.ATLEAST_MARSHMALLOW) {
+        if (GeneralUtils.ATLEAST_MARSHMALLOW) {
             var width = v.measuredWidth
             val bounds = icon.bounds
             val left = (width - bounds.width()) / 2
@@ -127,7 +128,7 @@ open class BaseActivity : DaggerAppCompatActivity() {
             width = bounds.width()
             val height = bounds.height()
             return ActivityOptions.makeClipRevealAnimation(v, left, top, width, height).toBundle()
-        } else if (Constants.ATLEAST_LOLLIPOP_MR1) {
+        } else if (GeneralUtils.ATLEAST_LOLLIPOP_MR1) {
             return ActivityOptions.makeCustomAnimation(
                 this, R.anim.task_open_enter, R.anim.no_anim
             ).toBundle()

@@ -42,9 +42,7 @@ object Constants {
         const val HORIZONTAL = "Horizontal"
     }
 
-    val ATLEAST_MARSHMALLOW = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-
-    val ATLEAST_LOLLIPOP_MR1 =
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1
+    const val MOVE_THRESHOLD_HORIZONTAL = 10f
+    const val MOVE_THRESHOLD_VERTICAL = 8f
 
 }

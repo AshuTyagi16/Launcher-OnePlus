@@ -614,16 +614,20 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     override fun onItemLongClick(position: Int, parent: View, appInfo: App) {
         showPopup(position, parent, appInfo)
+        clParent.isTouchEnabled = false
+        rvHideApps.isLayoutFrozen = true
     }
 
     override fun onDragStarted(position: Int, parent: View, appInfo: App) {
         dragView.visibility = View.VISIBLE
         clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
-        popup.dismiss()
+        if (::popup.isInitialized)
+            popup.dismiss()
     }
 
     override fun onEventCancel(position: Int, appInfo: App) {
-        popup.dismiss()
+        if (::popup.isInitialized)
+            popup.dismiss()
     }
 
     override fun onBackPressed() {
@@ -726,6 +730,11 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             setBalloonAnimation(BalloonAnimation.OVERSHOOT)
             setLayout(R.layout.popup_app_options)
             setDismissWhenTouchOutside(true)
+            setOnBalloonDismissListener {
+                clParent.isTouchEnabled = true
+                rvHideApps.isLayoutFrozen = false
+            }
+            setDismissWhenShowAgain(true)
             setLifecycleOwner(this@LauncherActivity)
         }
         popup.getContentView().findViewById<LinearLayout>(R.id.ivUninstall).setOnClickListener {

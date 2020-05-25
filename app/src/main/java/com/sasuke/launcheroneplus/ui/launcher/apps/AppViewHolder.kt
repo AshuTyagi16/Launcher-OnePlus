@@ -15,11 +15,14 @@ import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.data.model.DragData
 import com.sasuke.launcheroneplus.ui.base.MyDragShadowBuilder
+import com.sasuke.launcheroneplus.util.Constants
 import com.skydoves.balloon.ArrowOrientation
 import com.skydoves.balloon.BalloonAnimation
 import com.skydoves.balloon.createBalloon
 import kotlinx.android.synthetic.main.cell_app_info.view.*
+import timber.log.Timber
 import java.io.File
+import kotlin.math.abs
 
 class AppViewHolder(
     itemView: View,
@@ -34,6 +37,9 @@ class AppViewHolder(
     var currentVelocity = 0f
 
     private lateinit var app: App
+
+    private var dX = 0f
+    private var dY = 0f
 
     companion object {
         private const val LONG_PRESS_DURATION = 600L
@@ -111,25 +117,30 @@ class AppViewHolder(
         itemView.setOnTouchListener { view, event ->
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
+                    dX = event.rawX
+                    dY = event.rawY
                     handler.postDelayed(longPressRunnable, LONG_PRESS_DURATION)
                 }
                 MotionEvent.ACTION_MOVE -> {
                     if (isDragAllowed) {
-                        itemView.animate().scaleX(1f).scaleY(1f)
-                            .translationY(0f)
-                            .start()
-                        if (::onClickListeners.isInitialized)
-                            onClickListeners.onDragStart(adapterPosition, itemView, app)
-                        val icon = itemView.ivAppIcon
-                        val state =
-                            DragData(
-                                app,
-                                icon.width,
-                                icon.height
-                            )
-                        val shadow = MyDragShadowBuilder(icon)
-                        ViewCompat.startDragAndDrop(icon, null, shadow, state, 0)
-                        isDragStarted = true
+                        if (abs(event.rawX - dX) > Constants.MOVE_THRESHOLD_HORIZONTAL ||
+                            abs(event.rawY - dY) > Constants.MOVE_THRESHOLD_VERTICAL) {
+                            itemView.animate().scaleX(1f).scaleY(1f)
+                                .translationY(0f)
+                                .start()
+                            if (::onClickListeners.isInitialized)
+                                onClickListeners.onDragStart(adapterPosition, itemView, app)
+                            val icon = itemView.ivAppIcon
+                            val state =
+                                DragData(
+                                    app,
+                                    icon.width,
+                                    icon.height
+                                )
+                            val shadow = MyDragShadowBuilder(icon)
+                            ViewCompat.startDragAndDrop(icon, null, shadow, state, 0)
+                            isDragStarted = true
+                        }
                     }
                     isDragAllowed = false
                 }
@@ -142,8 +153,10 @@ class AppViewHolder(
 //                            Toast.LENGTH_SHORT
 //                        ).show()
                     } else {
-                        if (::onClickListeners.isInitialized)
-                            onClickListeners.onItemClick(adapterPosition, itemView, appInfo)
+                        if (event.eventTime - event.downTime < 200) {
+                            if (::onClickListeners.isInitialized)
+                                onClickListeners.onItemClick(adapterPosition, itemView, appInfo)
+                        }
                     }
                     isDragAllowed = false
                     isDragStarted = false
