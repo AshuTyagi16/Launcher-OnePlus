@@ -153,20 +153,10 @@ class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListe
                                     resource.let {
                                         Palette.Builder(it).generate {
                                             it?.let { palette ->
-                                                gradientView.apply {
-                                                    // Set Color Start
-                                                    start = palette.getDarkVibrantColor(0)
-                                                    alphaStart = 1f
-
-                                                    // Set Color End
-                                                    end = palette.getDominantColor(0)
-                                                    alphaEnd = 1f
-
-                                                    // Set Gradient Direction
-                                                    direction =
-                                                        GradientView.GradientDirection.LEFT_TO_RIGHT
-                                                }
-                                                gradientView.animate()
+                                                initGradientView(
+                                                    palette.getDarkVibrantColor(0),
+                                                    palette.getDominantColor(0)
+                                                )
                                             }
                                         }
                                     }
@@ -180,14 +170,14 @@ class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListe
         })
     }
 
-    private fun initGradientView() {
+    private fun initGradientView(colorStart: Int = Color.BLACK, colorEnd: Int = Color.BLACK) {
         gradientView.apply {
             // Set Color Start
-            start = Color.BLACK
+            start = colorStart
             alphaStart = 1f
 
             // Set Color End
-            end = Color.BLACK
+            end = colorEnd
             alphaEnd = 1f
 
             // Set Gradient Direction
@@ -207,6 +197,8 @@ class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListe
                     it.data?.let {
                         adapter.addWallpapers(it)
                         adapter.notifyDataSetChanged()
+                        rvWallpaperPager.scrollToPosition(position - 1)
+                        rvWallpaperPager.smoothScrollToPosition(position)
                     }
                 }
                 Status.ERROR -> {
@@ -237,7 +229,8 @@ class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListe
                                     adapter.wallpapers.size - previousSize
                                 )
                             if (isFirstLoad) {
-                                rvWallpaperPager.scrollToPosition(position % Constants.PAGE_SIZE)
+                                rvWallpaperPager.scrollToPosition((position % Constants.PAGE_SIZE) - 1)
+                                rvWallpaperPager.smoothScrollToPosition(position % Constants.PAGE_SIZE)
                                 isFirstLoad = false
                             }
                         } else {

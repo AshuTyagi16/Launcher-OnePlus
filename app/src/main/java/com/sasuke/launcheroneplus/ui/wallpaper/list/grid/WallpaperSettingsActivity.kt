@@ -230,7 +230,7 @@ class WallpaperSettingsActivity : BaseActivity(),
                 this,
                 query,
                 position,
-                ceil(position.toDouble() / Constants.PAGE_SIZE.toDouble()).toInt()
+                ceil((position + 1).toDouble() / Constants.PAGE_SIZE.toDouble()).toInt()
             )
         )
     }
