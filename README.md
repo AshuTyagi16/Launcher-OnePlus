@@ -1,5 +1,5 @@
 # Launcher-OnePlus
-Customizable and Open Source Launcher for Android. It demonstrate use of Modern Android development tools - (Kotlin, Coroutines, Dagger 2, Architecture Components, MVVM, Retrofit, OkHttp, Material Components).
+Customizable and Open Source Launcher for Android. It demonstrate use of Modern Android development tools - (Kotlin, Coroutines, Dagger 2, Architecture Components, MVVM, Room, Retrofit, OkHttp, Material Components).
 
 ### Description
 
@@ -35,10 +35,16 @@ This is an open source launcher project for Android devices that has been built 
   - [ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel) - Stores UI-related data that isn't destroyed on UI changes. 
 - [Dagger 2](https://dagger.dev/) - Dependency Injection Framework
 - [Retrofit](https://square.github.io/retrofit/) - A type-safe HTTP client for Android and Java.
+- [Room](https://developer.android.com/topic/libraries/architecture/room) - SQLite object mapping library.
 - [OkHttp](https://github.com/square/okhttp/) - Square’s meticulous HTTP client for Java and Kotlin.
 - [Gson](https://github.com/google/gson) - A Java serialization/deserialization library to convert Java Objects into JSON and back.
 - [Glide](https://github.com/bumptech/glide) - An image loading and caching library for Android focused on smooth scrolling.
 - [Material Components for Android](https://github.com/material-components/material-components-android) - Modular and customizable Material Design UI components for Android.
+
+### Architecture
+This app uses [***MVVM (Model View View-Model)***](https://developer.android.com/jetpack/docs/guide#recommended-app-arch) architecture.
+
+![](https://developer.android.com/topic/libraries/architecture/images/final-architecture.png)
 
 ### Features
 
