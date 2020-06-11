@@ -1,7 +1,5 @@
 package com.sasuke.launcheroneplus.util
 
-import android.os.Build
-
 object Constants {
 
     const val APP_LIST_SPAN_COUNT = 5
@@ -11,8 +9,7 @@ object Constants {
     const val EXTRA_API_VERSION_HEADER = "Accept-Version"
     const val EXTRA_API_VERSION = "v1"
 
-    const val EXTRA_API_KEY_HEADER = "Authorization"
-    const val EXTRA_API_KEY = "EyEtfMPAXdnv-eM1WNQHahtRWGHbPBzFDqPBxZEPisE"
+    const val EXTRA_API_KEY = "S3wNzdfiMMhrwSDEJFIp-fPrzORJMXLBSyz_OIk5khE"
 
     const val PAGE_SIZE = 15
 
