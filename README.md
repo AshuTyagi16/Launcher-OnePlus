@@ -1,5 +1,5 @@
 # Launcher-OnePlus
-Customizable and Open Source Launcher for Android. It demonstrate use of Modern Android development tools - (Kotlin, Coroutines, Dagger 2, Architecture Components, MVVM, Room, Retrofit, OkHttp, Material Components).
+Customizable and Open Source Launcher for Android.
 
 ### Description
 
