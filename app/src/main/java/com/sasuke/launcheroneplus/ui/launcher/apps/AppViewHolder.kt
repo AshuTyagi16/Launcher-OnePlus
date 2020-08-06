@@ -1,26 +1,20 @@
 package com.sasuke.launcheroneplus.ui.launcher.apps
 
 import android.animation.Animator
+import android.annotation.SuppressLint
 import android.os.Handler
 import android.view.MotionEvent
 import android.view.View
-import android.widget.LinearLayout
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.dynamicanimation.animation.SpringForce
 import com.bumptech.glide.RequestManager
-import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.data.model.DragData
 import com.sasuke.launcheroneplus.ui.base.MyDragShadowBuilder
 import com.sasuke.launcheroneplus.util.Constants
-import com.skydoves.balloon.ArrowOrientation
-import com.skydoves.balloon.BalloonAnimation
-import com.skydoves.balloon.createBalloon
 import kotlinx.android.synthetic.main.cell_app_info.view.*
-import timber.log.Timber
 import java.io.File
 import kotlin.math.abs
 
@@ -108,6 +102,7 @@ class AppViewHolder(
                 .setStiffness(SpringForce.STIFFNESS_LOW)
         )
 
+    @SuppressLint("ClickableViewAccessibility")
     fun setAppInfo(appInfo: App) {
         this.app = appInfo
         glide.load(File("$dir${File.separator}${appInfo.label.replace("[\\W]|_".toRegex(), "")}"))

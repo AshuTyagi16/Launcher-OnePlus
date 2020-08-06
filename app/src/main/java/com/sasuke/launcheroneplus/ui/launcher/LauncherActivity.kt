@@ -42,10 +42,7 @@ import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
 import com.sasuke.launcheroneplus.ui.settings.LauncherSettingsActivity
 import com.sasuke.launcheroneplus.ui.wallpaper.list.grid.WallpaperGridActivity
 import com.sasuke.launcheroneplus.util.*
-import com.skydoves.balloon.ArrowOrientation
-import com.skydoves.balloon.Balloon
-import com.skydoves.balloon.BalloonAnimation
-import com.skydoves.balloon.createBalloon
+import com.skydoves.balloon.*
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import kotlinx.android.synthetic.main.activity_launcher.*
 import kotlinx.android.synthetic.main.layout_non_sliding.*
@@ -711,18 +708,11 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     }
 
     private fun showPopup(position: Int, view: View, app: App) {
-        val arrpos = when {
-            position % 5 == 0 -> 0.13f
-            position % 5 == 1 -> 0.37f
-            position % 5 == 2 -> 0.5f
-            position % 5 == 3 -> 0.64f
-            position % 5 == 4 -> 0.87f
-            else -> 0.5f
-        }
         popup = createBalloon(this) {
             setArrowVisible(true)
             setArrowSize(10)
-            setArrowPosition(arrpos)
+            setArrowPosition(0.5f)
+            setArrowConstraints(ArrowConstraints.ALIGN_ANCHOR)
             setCircularDuration(200)
             setArrowColor(ContextCompat.getColor(this@LauncherActivity, R.color.light_grey))
             setArrowOrientation(ArrowOrientation.BOTTOM)
@@ -734,7 +724,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                 clParent.isTouchEnabled = true
                 rvHideApps.isLayoutFrozen = false
             }
-            setDismissWhenShowAgain(true)
             setLifecycleOwner(this@LauncherActivity)
         }
         popup.getContentView().findViewById<LinearLayout>(R.id.ivUninstall).setOnClickListener {
