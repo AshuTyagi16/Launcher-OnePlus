@@ -1,6 +1,5 @@
 package com.sasuke.launcheroneplus.ui.launcher.apps
 
-import android.animation.Animator
 import android.annotation.SuppressLint
 import android.os.Handler
 import android.view.MotionEvent
@@ -13,10 +12,9 @@ import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.data.model.DragData
 import com.sasuke.launcheroneplus.ui.base.MyDragShadowBuilder
-import com.sasuke.launcheroneplus.util.Constants
+import com.sasuke.launcheroneplus.util.getIconFolderPath
 import kotlinx.android.synthetic.main.cell_app_info.view.*
 import java.io.File
-import kotlin.math.abs
 
 class AppViewHolder(
     itemView: View,
@@ -26,21 +24,15 @@ class AppViewHolder(
 
     private lateinit var onClickListeners: OnClickListeners
 
-    private val dir = itemView.context.getExternalFilesDir("app_icon")
-
     var currentVelocity = 0f
 
     private lateinit var app: App
 
-    private var dX = 0f
-    private var dY = 0f
-
     companion object {
-        private const val LONG_PRESS_DURATION = 600L
+        private const val LONG_PRESS_DURATION = 200L
     }
 
     private var isDragAllowed = false
-    private var isDragStarted = false
 
     private val longPressRunnable = Runnable {
         isDragAllowed = true
@@ -48,27 +40,11 @@ class AppViewHolder(
             .scaleX(1.2f)
             .scaleY(1.2f)
             .translationY(-itemView.height / 6f)
-            .setListener(object : Animator.AnimatorListener {
-                override fun onAnimationRepeat(p0: Animator?) {
-
-                }
-
-                override fun onAnimationEnd(p0: Animator?) {
-
-                }
-
-                override fun onAnimationCancel(p0: Animator?) {
-
-                }
-
-                override fun onAnimationStart(p0: Animator?) {
-
-                }
-
-            })
+            .withEndAction {
+                if (::onClickListeners.isInitialized)
+                    onClickListeners.onItemLongClick(bindingAdapterPosition, itemView, app)
+            }
             .start()
-        if (::onClickListeners.isInitialized)
-            onClickListeners.onItemLongClick(adapterPosition, itemView, app)
     }
 
     private val handler = Handler()
@@ -105,56 +81,47 @@ class AppViewHolder(
     @SuppressLint("ClickableViewAccessibility")
     fun setAppInfo(appInfo: App) {
         this.app = appInfo
-        glide.load(File("$dir${File.separator}${appInfo.label.replace("[\\W]|_".toRegex(), "")}"))
+        glide.load(File(itemView.context.getIconFolderPath(appInfo.label)))
             .into(itemView.ivAppIcon)
         itemView.tvAppLabel.text = appInfo.label
 
-        itemView.setOnTouchListener { view, event ->
+        itemView.setOnTouchListener { _, event ->
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
-                    dX = event.rawX
-                    dY = event.rawY
                     handler.postDelayed(longPressRunnable, LONG_PRESS_DURATION)
                 }
                 MotionEvent.ACTION_MOVE -> {
                     if (isDragAllowed) {
-                        if (abs(event.rawX - dX) > Constants.MOVE_THRESHOLD_HORIZONTAL ||
-                            abs(event.rawY - dY) > Constants.MOVE_THRESHOLD_VERTICAL) {
-                            itemView.animate().scaleX(1f).scaleY(1f)
-                                .translationY(0f)
-                                .start()
-                            if (::onClickListeners.isInitialized)
-                                onClickListeners.onDragStart(adapterPosition, itemView, app)
-                            val icon = itemView.ivAppIcon
-                            val state =
-                                DragData(
-                                    app,
-                                    icon.width,
-                                    icon.height
-                                )
-                            val shadow = MyDragShadowBuilder(icon)
-                            ViewCompat.startDragAndDrop(icon, null, shadow, state, 0)
-                            isDragStarted = true
-                        }
+                        itemView.animate().scaleX(1f).scaleY(1f)
+                            .translationY(0f)
+                            .start()
+                        if (::onClickListeners.isInitialized)
+                            onClickListeners.onDragStart(bindingAdapterPosition, itemView, app)
+                        val icon = itemView.ivAppIcon
+                        val state =
+                            DragData(
+                                app,
+                                icon.width,
+                                icon.height
+                            )
+                        val shadow = MyDragShadowBuilder(icon)
+                        ViewCompat.startDragAndDrop(icon, null, shadow, state, 0)
                     }
                     isDragAllowed = false
                 }
                 MotionEvent.ACTION_UP -> {
                     handler.removeCallbacks(longPressRunnable)
-                    if (!isDragStarted && isDragAllowed) {
-//                        Toast.makeText(
-//                            itemView.context,
-//                            "LONG PRESS WITHOUT DRAG",
-//                            Toast.LENGTH_SHORT
-//                        ).show()
-                    } else {
-                        if (event.eventTime - event.downTime < 200) {
+                    if (!isDragAllowed) {
+                        if (event.eventTime - event.downTime < LONG_PRESS_DURATION) {
                             if (::onClickListeners.isInitialized)
-                                onClickListeners.onItemClick(adapterPosition, itemView, appInfo)
+                                onClickListeners.onItemClick(
+                                    bindingAdapterPosition,
+                                    itemView,
+                                    appInfo
+                                )
                         }
                     }
                     isDragAllowed = false
-                    isDragStarted = false
                     itemView.animate().scaleX(1f).scaleY(1f)
                         .translationY(0f)
                         .start()

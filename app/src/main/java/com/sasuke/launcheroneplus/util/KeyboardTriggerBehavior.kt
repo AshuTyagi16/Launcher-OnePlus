@@ -8,14 +8,14 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 
-open class KeyboardTriggerBehavior(activity: Activity, val minKeyboardHeight: Int = 0) : LiveData<KeyboardTriggerBehavior.Status>() {
+open class KeyboardTriggerBehavior(activity: Activity, private val minKeyboardHeight: Int = 0) : LiveData<KeyboardTriggerBehavior.Status>() {
     enum class Status {
         OPEN, CLOSED
     }
 
-    val contentView = activity.findViewById<View>(android.R.id.content)
+    private val contentView: View = activity.findViewById(android.R.id.content)
 
-    val globalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+    private val globalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
         val displayRect = Rect().apply { contentView.getWindowVisibleDisplayFrame(this) }
         val keypadHeight = contentView.rootView.height - displayRect.bottom
         if (keypadHeight > minKeyboardHeight) {
@@ -45,7 +45,7 @@ open class KeyboardTriggerBehavior(activity: Activity, val minKeyboardHeight: In
         observersUpdated()
     }
 
-    private fun setDistinctValue(newValue: KeyboardTriggerBehavior.Status) {
+    private fun setDistinctValue(newValue: Status) {
         if (value != newValue) {
             value = newValue
         }

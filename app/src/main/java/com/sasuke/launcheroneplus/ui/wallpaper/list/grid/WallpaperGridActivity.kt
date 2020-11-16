@@ -15,7 +15,7 @@ import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
 import com.sasuke.launcheroneplus.ui.wallpaper.list.pager.WallpaperPagerActivity
 import com.sasuke.launcheroneplus.util.Constants
-import com.sasuke.launcheroneplus.util.DebouncingQueryTextListener
+import com.sasuke.launcheroneplus.util.DebouncingSearchViewQueryTextListener
 import com.sasuke.launcheroneplus.util.hide
 import com.sasuke.launcheroneplus.util.show
 import kotlinx.android.synthetic.main.activity_wallpaper_settings.*
@@ -89,7 +89,7 @@ class WallpaperGridActivity : BaseActivity(),
     }
 
     private fun setupListeners() {
-        searchView.setOnQueryTextListener(DebouncingQueryTextListener(this.lifecycle) {
+        searchView.setOnQueryTextListener(DebouncingSearchViewQueryTextListener(this.lifecycle) {
             it?.let {
                 if (it.isNotBlank()) {
                     if (query == null) {

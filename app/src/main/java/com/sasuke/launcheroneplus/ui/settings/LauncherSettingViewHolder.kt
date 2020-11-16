@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.LauncherApp
 import com.sasuke.launcheroneplus.data.model.Setting
+import com.sasuke.launcheroneplus.util.updateTint
 import kotlinx.android.synthetic.main.cell_setting.view.*
 
 class LauncherSettingViewHolder(itemView: View, private val glide: RequestManager) :
@@ -16,18 +17,12 @@ class LauncherSettingViewHolder(itemView: View, private val glide: RequestManage
 
     fun setSettingInfo(setting: Setting) {
         if (LauncherApp.color != 0) {
-            val drawable =
-                AppCompatResources.getDrawable(itemView.context, setting.icon)
-            drawable?.let {
-                val wrappedDrawable = DrawableCompat.wrap(it)
-                DrawableCompat.setTint(
-                    wrappedDrawable,
-                    LauncherApp.color
-                )
+            AppCompatResources.getDrawable(itemView.context, setting.icon)?.let {
+                it.updateTint(LauncherApp.color)
+                glide
+                    .load(it)
+                    .into(itemView.ivIcon)
             }
-            glide
-                .load(drawable)
-                .into(itemView.ivIcon)
         } else {
             glide
                 .load(setting.icon)

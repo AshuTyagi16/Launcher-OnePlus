@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:background="@color/black">
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivDragIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -36,40 +36,32 @@
             android:id="@+id/etContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="52dp"
+            android:background="@drawable/bg_search"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <EditText
+            <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/etSearch"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:background="@null"
                 android:drawableStart="@drawable/ic_search_white"
-                android:focusedByDefault="false"
-                android:gravity="start"
+                android:drawablePadding="10dp"
+                android:drawableTint="#9a9a9c"
+                android:gravity="start|center_horizontal"
                 android:hint="@string/search_apps"
-                android:maxLength="20"
                 android:maxLines="1"
                 android:padding="10dp"
                 android:singleLine="true"
-                android:textColor="@color/search_bar"
-                android:textColorHint="@color/search_bar"
+                android:textColor="#9a9a9c"
+                android:textColorHint="#E69A9A9C"
                 android:textCursorDrawable="@null"
-                android:textSize="@dimen/font_large" />
+                android:textSize="@dimen/font_large"
+                tools:gravity="start" />
         </FrameLayout>
-
-
-        <ImageView
-            android:id="@+id/ivSeparator"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="10dp"
-            android:background="@color/search_bar"
-            android:contentDescription="@string/image"
-            app:layout_constraintTop_toBottomOf="@id/etContainer"
-            tools:layout_marginBottom="20dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
@@ -83,7 +75,7 @@
         app:layout_constraintTop_toBottomOf="@id/clSearchBar">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvHideApps"
+            android:id="@+id/rvAllApps"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:itemCount="25"

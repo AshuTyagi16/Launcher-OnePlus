@@ -31,16 +31,16 @@ class LauncherActivityViewModel @Inject constructor(roomRepository: RoomReposito
     val filterAppsLiveData: LiveData<MutableList<App>>
         get() = _filterAppsLiveData
 
-    fun filterApps(query: String) {
+    fun filterApps(query: CharSequence?) {
         if (::list.isInitialized) {
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
-                    if (query.isBlank())
+                    if (query.isNullOrBlank())
                         _filterAppsLiveData.postValue(list)
                     else {
                         val filtered = ArrayList<App>()
                         list.forEach {
-                            if (SearchUtils.matches(it.label.toLowerCased(), query.toLowerCased()))
+                            if (SearchUtils.matches(it.label.toLowerCased(), query.toString().toLowerCased()))
                                 filtered.add(it)
                         }
                         _filterAppsLiveData.postValue(filtered)

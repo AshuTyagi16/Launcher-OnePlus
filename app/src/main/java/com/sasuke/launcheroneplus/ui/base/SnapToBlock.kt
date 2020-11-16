@@ -8,6 +8,7 @@ import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.*
 
 /**@param maxFlingBlocks Maxim blocks to move during most vigorous fling*/
+
 class SnapToBlock constructor(private val maxFlingBlocks: Int) : SnapHelper() {
     private var recyclerView: RecyclerView? = null
 
@@ -312,7 +313,7 @@ class SnapToBlock constructor(private val maxFlingBlocks: Int) : SnapHelper() {
             t * t * t + 1.0f
         }
 
-        private val MILLISECONDS_PER_INCH = 100f
-        private val TAG = "SnapToBlock"
+        private const val MILLISECONDS_PER_INCH = 100f
+        private const val TAG = "SnapToBlock"
     }
 }

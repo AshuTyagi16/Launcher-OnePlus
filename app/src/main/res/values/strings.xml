@@ -90,9 +90,8 @@
     <string name="header_layout">Layout</string>
     <string name="app_drawer_style">App drawer style</string>
     <string-array name="app_drawer_spinner">
-        <item>Vertical</item>
-        <item>List</item>
-        <item>Horizontal</item>
+        <item>VERTICAL</item>
+        <item>LIST</item>
     </string-array>
     <string name="drawer_app_grid">Drawer App Grid</string>
     <string name="icon_layout">Icon layout</string>

@@ -21,6 +21,7 @@ import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import com.transitionseverywhere.Rotate
 import kotlinx.android.synthetic.main.fragment_color_picker.*
 import org.greenrobot.eventbus.EventBus
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 class ColorPickerFragment : RoundedBottomSheetDialogFragment(), ColorAdapter.OnClickListeners {
@@ -37,7 +38,7 @@ class ColorPickerFragment : RoundedBottomSheetDialogFragment(), ColorAdapter.OnC
     @Inject
     lateinit var itemDecorator: ItemDecorator
 
-    private var isCustom = true
+    private var isCustom = AtomicBoolean(true)
 
     private lateinit var colorPickerFragmentViewModel: ColorPickerFragmentViewModel
 
@@ -123,15 +124,10 @@ class ColorPickerFragment : RoundedBottomSheetDialogFragment(), ColorAdapter.OnC
         rotate.duration = 500
         btnTogglePallete.setOnClickListener {
             TransitionManager.beginDelayedTransition(clParent, rotate)
-            if (isCustom) {
+            if (isCustom.get()) {
                 btnTogglePallete.rotation = 360f
-                colorPicker.setPaletteDrawable(
-                    ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.palette
-                    )!!
-                )
-                isCustom = false
+                colorPicker.setHsvPaletteDrawable()
+                isCustom.set(false)
             } else {
                 btnTogglePallete.rotation = 0f
                 colorPicker.setPaletteDrawable(
@@ -140,7 +136,7 @@ class ColorPickerFragment : RoundedBottomSheetDialogFragment(), ColorAdapter.OnC
                         R.drawable.final_pallete
                     )!!
                 )
-                isCustom = true
+                isCustom.set(true)
             }
         }
     }

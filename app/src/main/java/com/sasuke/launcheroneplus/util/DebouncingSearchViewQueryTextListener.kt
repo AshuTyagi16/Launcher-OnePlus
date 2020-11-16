@@ -6,10 +6,11 @@ import androidx.lifecycle.OnLifecycleEvent
 import com.miguelcatalan.materialsearchview.MaterialSearchView
 import kotlinx.coroutines.*
 
-class DebouncingQueryTextListener(
+class DebouncingSearchViewQueryTextListener(
     lifecycle: Lifecycle,
     private val onDebouncingQueryTextChange: (String?) -> Unit
 ) : MaterialSearchView.OnQueryTextListener, LifecycleObserver {
+
     private var debouncePeriod: Long = 700
 
     private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main)

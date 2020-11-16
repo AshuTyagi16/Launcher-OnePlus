@@ -11,7 +11,7 @@
     app:umanoFadeColor="@color/black_transparent"
     app:umanoOverlay="true"
     app:umanoPanelHeight="68dp"
-    app:umanoScrollableView="@id/rvHideApps"
+    app:umanoScrollableView="@id/rvAllApps"
     app:umanoShadowHeight="0dp"
     tools:context=".ui.launcher.LauncherActivity">
 
@@ -24,6 +24,5 @@
         layout="@layout/layout_sliding"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
 
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>

@@ -1,6 +1,5 @@
 package com.sasuke.launcheroneplus.ui.launcher
 
-import android.animation.Animator
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
@@ -8,15 +7,11 @@ import android.view.DragEvent
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
-import android.widget.EdgeEffect
 import android.widget.LinearLayout
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.drawable.DrawableCompat
-import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -33,8 +28,8 @@ import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.data.model.DragData
 import com.sasuke.launcheroneplus.data.model.SettingPreference
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
+import com.sasuke.launcheroneplus.ui.base.BaseEdgeEffectFactory
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
-import com.sasuke.launcheroneplus.ui.base.SnapToBlock
 import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
 import com.sasuke.launcheroneplus.ui.hidden_apps.HiddenAppsActivity
 import com.sasuke.launcheroneplus.ui.launcher.apps.AppAdapter
@@ -72,14 +67,16 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     lateinit var glide: RequestManager
 
     @Inject
-    lateinit var sharedPreferencesSettingsLiveData: SharedPreferencesSettingsLiveData
+    lateinit var baseEdgeEffectFactory: BaseEdgeEffectFactory
 
     @Inject
-    lateinit var pagerSnapHelper: SnapToBlock
+    lateinit var sharedPreferencesSettingsLiveData: SharedPreferencesSettingsLiveData
 
     private lateinit var launcherActivityViewModel: LauncherActivityViewModel
 
-    private lateinit var handler: Handler
+    private val handler: Handler by lazy {
+        Handler()
+    }
 
     private lateinit var keyboardTriggerBehavior: KeyboardTriggerBehavior
 
@@ -96,21 +93,11 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     private lateinit var popup: Balloon
 
+    private var isKeyboardOpen = false
+
     companion object {
         /** The magnitude of rotation while the list is scrolled. */
         private const val SCROLL_ROTATION_MAGNITUDE = 0.25f
-
-        /** The magnitude of rotation while the list is over-scrolled. */
-        private const val OVERSCROLL_ROTATION_MAGNITUDE = -10
-
-        /** The magnitude of translation distance while the list is over-scrolled. */
-        private const val OVERSCROLL_TRANSLATION_MAGNITUDE = 0.2f
-
-        /** The magnitude of translation distance when the list reaches the edge on fling. */
-        private const val FLING_TRANSLATION_MAGNITUDE = 0.5f
-
-        private const val REQUEST_CODE_ADMIN_RIGHTS = 567
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -129,7 +116,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         launcherActivityViewModel =
             ViewModelProvider(this, viewModelFactory).get(LauncherActivityViewModel::class.java)
         Sensey.getInstance().init(this)
-        handler = Handler()
         primaryColor = LauncherApp.color
     }
 
@@ -141,100 +127,12 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     }
 
     private fun setupRecyclerView() {
-        rvHideApps.layoutManager = layoutManager
-        rvHideApps.addItemDecoration(itemDecoration)
-        rvHideApps.adapter = adapter
+        rvAllApps.layoutManager = layoutManager
+        rvAllApps.addItemDecoration(itemDecoration)
+        rvAllApps.adapter = adapter
         adapter.updatePrimaryColor(primaryColor)
         adapter.setOnClickListeners(this)
-
-        fastscroller.setHandleStateListener(object : RecyclerViewFastScroller.HandleStateListener {
-            override fun onDragged(offset: Float, postion: Int) {
-                super.onDragged(offset, postion)
-                rvHideApps.forEachVisibleHolder { holder: AppViewHolder ->
-                    if (adapter.appList[postion].label[0].toUpperCase() == adapter.appList[holder.adapterPosition].label[0].toUpperCase()) {
-                        AppCompatResources.getDrawable(
-                            this@LauncherActivity,
-                            R.drawable.bg_app_highlight
-                        )?.let {
-                            val wrappedDrawable = DrawableCompat.wrap(it)
-                            DrawableCompat.setTint(
-                                wrappedDrawable,
-                                ColorUtils.setAlphaComponent(primaryColor, 90)
-                            )
-                            holder.itemView.background = wrappedDrawable
-                        }
-                    } else
-                        holder.itemView.setBackgroundColor(
-                            Color.TRANSPARENT
-                        )
-                }
-
-            }
-
-        })
-
-        rvHideApps.edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
-            override fun createEdgeEffect(recyclerView: RecyclerView, direction: Int): EdgeEffect {
-                val edgeEffect = object : EdgeEffect(recyclerView.context) {
-
-                    override fun onPull(deltaDistance: Float) {
-                        super.onPull(deltaDistance)
-                        handlePull(deltaDistance)
-                    }
-
-                    override fun onPull(deltaDistance: Float, displacement: Float) {
-                        super.onPull(deltaDistance, displacement)
-                        handlePull(deltaDistance)
-                    }
-
-                    private fun handlePull(deltaDistance: Float) {
-                        // This is called on every touch event while the list is scrolled with a finger.
-                        // We simply update the view properties without animation.
-                        val sign = if (direction == DIRECTION_BOTTOM) -1 else 1
-                        val rotationDelta = sign * deltaDistance * OVERSCROLL_ROTATION_MAGNITUDE
-                        val translationYDelta =
-                            sign * recyclerView.width * deltaDistance * OVERSCROLL_TRANSLATION_MAGNITUDE
-                        recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
-                            if (layoutManager.orientation == RecyclerView.VERTICAL) {
-                                holder.rotation.cancel()
-                                holder.translationY.cancel()
-                                holder.itemView.rotation += rotationDelta
-                                holder.itemView.translationY += translationYDelta
-                            }
-                        }
-                    }
-
-                    override fun onRelease() {
-                        super.onRelease()
-                        // The finger is lifted. This is when we should start the animations to bring
-                        // the view property values back to their resting states.
-                        recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
-                            if (layoutManager.orientation == RecyclerView.VERTICAL) {
-                                holder.rotation.start()
-                                holder.translationY.start()
-                            }
-                        }
-                    }
-
-                    override fun onAbsorb(velocity: Int) {
-                        super.onAbsorb(velocity)
-                        val sign = if (direction == DIRECTION_BOTTOM) -1 else 1
-                        // The list has reached the edge on fling.
-                        val translationVelocity = sign * velocity * FLING_TRANSLATION_MAGNITUDE
-                        if (layoutManager.orientation == RecyclerView.VERTICAL) {
-                            recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
-                                holder.translationY
-                                    .setStartVelocity(translationVelocity)
-                                    .start()
-                            }
-                        }
-                    }
-                }
-                edgeEffect.color = Color.TRANSPARENT
-                return edgeEffect
-            }
-        }
-
+        rvAllApps.edgeEffectFactory = baseEdgeEffectFactory
     }
 
     private fun setupGridView() {
@@ -268,10 +166,12 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     private fun setupListeners() {
         keyboardTriggerBehavior = KeyboardTriggerBehavior(this).apply {
-            observe(this@LauncherActivity, Observer {
-                when (it) {
-                    KeyboardTriggerBehavior.Status.OPEN -> keyboardOpen()
-                    KeyboardTriggerBehavior.Status.CLOSED -> keyboardClosed()
+            observe(this@LauncherActivity, {
+                it?.let {
+                    when (it) {
+                        KeyboardTriggerBehavior.Status.OPEN -> isKeyboardOpen = true
+                        KeyboardTriggerBehavior.Status.CLOSED -> isKeyboardOpen = false
+                    }
                 }
             })
         }
@@ -314,7 +214,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             override fun onTwoFingerSingleTap() {
 
             }
-
         }
 
         pinchScaleListener = object : PinchScaleDetector.PinchScaleListener {
@@ -359,8 +258,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                         Sensey.getInstance().stopPinchScaleDetection()
                     }
                     SlidingUpPanelLayout.PanelState.DRAGGING -> {
-                        rvHideApps.forEachVisibleHolder { holder: AppViewHolder ->
-
+                        rvAllApps.forEachVisibleHolder { holder: AppViewHolder ->
                             holder.itemView.setBackgroundColor(
                                 ContextCompat.getColor(
                                     this@LauncherActivity,
@@ -368,7 +266,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                                 )
                             )
                         }
-
                     }
                     SlidingUpPanelLayout.PanelState.COLLAPSED -> {
                         Sensey.getInstance().startTouchTypeDetection(
@@ -378,21 +275,19 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                         Sensey.getInstance()
                             .startPinchScaleDetection(this@LauncherActivity, pinchScaleListener)
                         hideKeyboard()
+                        etSearch.clearFocus()
+                        etSearch.text?.clear()
+                        dismissPopup()
+                    }
+                    else -> {
+
                     }
                 }
             }
         })
 
-        rvHideApps.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        rvAllApps.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-
-                if (layoutManager.orientation == RecyclerView.VERTICAL) {
-                    if (layoutManager.findFirstCompletelyVisibleItemPosition() >= Constants.APP_LIST_SPAN_COUNT)
-                        ivSeparator.visibility = View.GONE
-                    else
-                        ivSeparator.visibility = View.VISIBLE
-                }
-
                 recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
 
                     holder.itemView.setBackgroundColor(
@@ -401,24 +296,19 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                             R.color.app_un_highlight
                         )
                     )
-
-                    if (layoutManager.orientation == RecyclerView.VERTICAL) {
-                        holder.rotation
-                            // Update the velocity.
-                            // The velocity is calculated by the horizontal scroll offset.
-                            .setStartVelocity(holder.currentVelocity - dx * SCROLL_ROTATION_MAGNITUDE)
-                            // Start the animation. This does nothing if the animation is already running.
-                            .start()
-                    }
+                    holder.rotation
+                        // Update the velocity.
+                        // The velocity is calculated by the horizontal scroll offset.
+                        .setStartVelocity(holder.currentVelocity - dx * SCROLL_ROTATION_MAGNITUDE)
+                        // Start the animation. This does nothing if the animation is already running.
+                        .start()
                 }
             }
         })
 
-        etSearch.addTextChangedListener {
-            it?.let {
-                launcherActivityViewModel.filterApps(it.toString())
-            }
-        }
+        etSearch.addTextChangedListener(DebouncingEditTextQueryTextListener(lifecycle) {
+            launcherActivityViewModel.filterApps(it)
+        })
 
         dragView.setOnDragListener { _, dragEvent ->
             when (dragEvent.action) {
@@ -453,23 +343,40 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         clWallpaperIcon.setOnClickListener {
             startActivity(WallpaperGridActivity.newIntent(this@LauncherActivity))
         }
+
+        fastscroller.setHandleStateListener(object : RecyclerViewFastScroller.HandleStateListener {
+            override fun onDragged(offset: Float, position: Int) {
+                super.onDragged(offset, position)
+                rvAllApps.forEachVisibleHolder { holder: AppViewHolder ->
+                    if (adapter.appList[position].label[0].toUpperCase() == adapter.appList[holder.bindingAdapterPosition].label[0].toUpperCase()) {
+                        AppCompatResources.getDrawable(
+                            this@LauncherActivity,
+                            R.drawable.bg_app_highlight
+                        )?.let {
+                            it.updateTint(ColorUtils.setAlphaComponent(primaryColor, 90))
+                            holder.itemView.background = it
+                        }
+                    } else
+                        holder.itemView.setBackgroundColor(Color.TRANSPARENT)
+                }
+            }
+        })
     }
 
     private fun observeLiveData() {
-
-        launcherActivityViewModel.appList.observe(this, Observer {
+        launcherActivityViewModel.appList.observe(this, {
             it?.let {
                 adapter.setApps(it)
             }
         })
 
-        launcherActivityViewModel.filterAppsLiveData.observe(this, Observer {
+        launcherActivityViewModel.filterAppsLiveData.observe(this, {
             it?.let {
                 adapter.setApps(it)
             }
         })
 
-        sharedPreferencesSettingsLiveData.observe(this, Observer {
+        sharedPreferencesSettingsLiveData.observe(this, {
             it?.let {
                 updateUI(it)
             }
@@ -479,93 +386,6 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     private fun setMode(mode: HandyGridView.MODE) {
         gridApps.mode = mode
         gridAdapter.setInEditMode(mode == HandyGridView.MODE.TOUCH)
-    }
-
-    private fun keyboardOpen() {
-        etSearch.animate()
-            .x(0f)
-            .setDuration(100)
-            .setListener(object : Animator.AnimatorListener {
-                override fun onAnimationRepeat(p0: Animator?) {
-
-                }
-
-                override fun onAnimationEnd(p0: Animator?) {
-                    etSearch.apply {
-                        compoundDrawablePadding = 40
-                        AppCompatResources.getDrawable(
-                            this@LauncherActivity,
-                            R.drawable.ic_back_white
-                        )?.let {
-                            val wrappedDrawable = DrawableCompat.wrap(it)
-                            DrawableCompat.setTint(
-                                wrappedDrawable,
-                                primaryColor
-                            )
-                            setCompoundDrawablesWithIntrinsicBounds(
-                                wrappedDrawable,
-                                null,
-                                null,
-                                null
-                            )
-                        }
-                    }
-                }
-
-                override fun onAnimationCancel(p0: Animator?) {
-
-                }
-
-                override fun onAnimationStart(p0: Animator?) {
-
-                }
-
-            })
-    }
-
-    private fun keyboardClosed() {
-        etSearch.animate()
-            .x(300f)
-            .setDuration(100)
-            .setListener(object : Animator.AnimatorListener {
-                override fun onAnimationRepeat(p0: Animator?) {
-
-                }
-
-                override fun onAnimationEnd(p0: Animator?) {
-                    etSearch.apply {
-                        compoundDrawablePadding = 40
-                        AppCompatResources.getDrawable(
-                            this@LauncherActivity,
-                            R.drawable.ic_search_white
-                        )?.let {
-                            val wrappedDrawable = DrawableCompat.wrap(it)
-                            DrawableCompat.setTint(
-                                wrappedDrawable,
-                                primaryColor
-                            )
-                            setCompoundDrawablesWithIntrinsicBounds(
-                                wrappedDrawable,
-                                null,
-                                null,
-                                null
-                            )
-                        }
-                    }
-                    etSearch.clearFocus()
-                    etSearch.setText("")
-                }
-
-                override fun onAnimationCancel(p0: Animator?) {
-
-                }
-
-                override fun onAnimationStart(p0: Animator?) {
-
-                }
-
-            })
-
     }
 
     private fun initBiometric() {
@@ -605,32 +425,30 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     override fun onItemClick(position: Int, parent: View, appInfo: App) {
         openApp(parent, appInfo)
-        if (::popup.isInitialized)
-            popup.dismiss()
+        dismissPopup()
     }
 
     override fun onItemLongClick(position: Int, parent: View, appInfo: App) {
-        showPopup(position, parent, appInfo)
+        showPopup(parent, appInfo)
         clParent.isTouchEnabled = false
-        rvHideApps.isLayoutFrozen = true
+        rvAllApps.suppressLayout(true)
     }
 
     override fun onDragStarted(position: Int, parent: View, appInfo: App) {
         dragView.visibility = View.VISIBLE
         clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
-        if (::popup.isInitialized)
-            popup.dismiss()
+        dismissPopup()
     }
 
     override fun onEventCancel(position: Int, appInfo: App) {
-        if (::popup.isInitialized)
-            popup.dismiss()
+        dismissPopup()
     }
 
     override fun onBackPressed() {
         if (clParent.panelState === SlidingUpPanelLayout.PanelState.EXPANDED) {
             clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
-        } else
+        }
+        if (isKeyboardOpen)
             super.onBackPressed()
     }
 
@@ -638,66 +456,26 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         primaryColor = settingPreference.primaryColor
         adapter.updatePrimaryColor(primaryColor)
 
-        etSearch.setTextColor(primaryColor)
-        etSearch.setHintTextColor(primaryColor)
-        AppCompatResources.getDrawable(this@LauncherActivity, R.drawable.ic_search_white)?.let {
-            val wrappedDrawable = DrawableCompat.wrap(it)
-            DrawableCompat.setTint(
-                wrappedDrawable,
-                primaryColor
-            )
-            etSearch.setCompoundDrawablesWithIntrinsicBounds(wrappedDrawable, null, null, null)
-        }
-        ivSeparator.setBackgroundColor(primaryColor)
         when (settingPreference.drawerStyle) {
-            Constants.Drawer.STYLE_VERTICAL_INDICATOR -> {
-                layoutManager.orientation = RecyclerView.VERTICAL
-                rvHideApps.layoutManager = layoutManager
-                pagerSnapHelper.attachToRecyclerView(null)
-                if (rvHideApps.onFlingListener == null)
-                    fastscroller.attachFastScrollerToRecyclerView(rvHideApps)
+            Constants.DrawerStyle.VERTICAL -> {
+                rvAllApps.layoutManager = layoutManager
                 if (settingPreference.isFastScrollEnabled) {
                     fastscroller.handleDrawable?.let {
                         AppCompatResources.getDrawable(this, R.drawable.fast_scroll_handle)?.let {
-                            val wrappedDrawable = DrawableCompat.wrap(it)
-                            DrawableCompat.setTint(
-                                wrappedDrawable,
-                                primaryColor
-                            )
-                            fastscroller.handleDrawable = wrappedDrawable
+                            it.updateTint(primaryColor)
+                            fastscroller.handleDrawable = it
                         }
                     }
                 } else {
                     fastscroller.handleDrawable?.let {
                         AppCompatResources.getDrawable(this, R.drawable.fast_scroll_handle)?.let {
-                            val wrappedDrawable = DrawableCompat.wrap(it)
-                            DrawableCompat.setTint(
-                                wrappedDrawable,
-                                Color.TRANSPARENT
-                            )
-                            fastscroller.handleDrawable = wrappedDrawable
+                            it.updateTint(Color.TRANSPARENT)
+                            fastscroller.handleDrawable = it
                         }
                     }
                 }
             }
-            Constants.Drawer.STYLE_HORIZONTAL_INDICATOR -> {
-                layoutManager.orientation = RecyclerView.HORIZONTAL
-                rvHideApps.layoutManager = layoutManager
-                fastscroller.detachFastScrollerFromRecyclerView()
-                pagerSnapHelper.attachToRecyclerView(rvHideApps)
-                fastscroller.handleDrawable?.let {
-                    AppCompatResources.getDrawable(this, R.drawable.fast_scroll_handle)?.let {
-                        val wrappedDrawable = DrawableCompat.wrap(it)
-                        DrawableCompat.setTint(
-                            wrappedDrawable,
-                            Color.TRANSPARENT
-                        )
-                        fastscroller.handleDrawable = wrappedDrawable
-                    }
-                }
-
-            }
-            Constants.Drawer.STYLE_LIST_INDICATOR -> {
+            Constants.DrawerStyle.LIST -> {
             }
         }
         clParent.coveredFadeColor =
@@ -707,7 +485,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             )
     }
 
-    private fun showPopup(position: Int, view: View, app: App) {
+    private fun showPopup(view: View, app: App) {
         popup = createBalloon(this) {
             setArrowVisible(true)
             setArrowSize(10)
@@ -722,22 +500,26 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             setDismissWhenTouchOutside(true)
             setOnBalloonDismissListener {
                 clParent.isTouchEnabled = true
-                rvHideApps.isLayoutFrozen = false
+                rvAllApps.suppressLayout(false)
             }
-            setLifecycleOwner(this@LauncherActivity)
         }
         popup.getContentView().findViewById<LinearLayout>(R.id.ivUninstall).setOnClickListener {
-            popup.dismiss()
+            dismissPopup()
             startUninstall(app.packageName)
         }
         popup.getContentView().findViewById<LinearLayout>(R.id.ivEdit).setOnClickListener {
-            popup.dismiss()
+            dismissPopup()
 
         }
         popup.getContentView().findViewById<LinearLayout>(R.id.ivAppInfo).setOnClickListener {
-            popup.dismiss()
+            dismissPopup()
             openAppInfo(app.packageName)
         }
         popup.showAlignTop(view, 0, 40)
+    }
+
+    private fun dismissPopup() {
+        if (::popup.isInitialized && popup.isShowing)
+            popup.dismiss()
     }
 }

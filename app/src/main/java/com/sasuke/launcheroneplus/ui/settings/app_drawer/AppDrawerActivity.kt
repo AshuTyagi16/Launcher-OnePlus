@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
@@ -14,17 +13,15 @@ import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.RequestManager
-import com.sasuke.launcheroneplus.LauncherApp
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.SettingPreference
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.color_picker.ColorPickerFragment
-import com.sasuke.launcheroneplus.util.Constants
 import com.sasuke.launcheroneplus.util.SharedPreferencesSettingsLiveData
+import com.sasuke.launcheroneplus.util.updateTint
 import kotlinx.android.synthetic.main.activity_app_drawer_setting.*
 import kotlinx.android.synthetic.main.activity_wallpaper_settings.toolbar
 import javax.inject.Inject
@@ -162,16 +159,12 @@ class AppDrawerActivity : BaseActivity(), ColorPickerFragment.OnClickListeners {
 
     private fun updateUI(settingPreference: SettingPreference) {
         cbFastScroller.isChecked = isFastScrollEnabled
-        spinnerAppDrawerStyle.setSelection(settingPreference.drawerStyle)
+        spinnerAppDrawerStyle.setSelection(settingPreference.drawerStyle.ordinal)
         val color = settingPreference.primaryColor
         if (color != 0) {
             AppCompatResources.getDrawable(this, R.drawable.scroll_accent_drawable)?.let {
-                val wrappedDrawable = DrawableCompat.wrap(it)
-                DrawableCompat.setTint(
-                    wrappedDrawable,
-                    color
-                )
-                ivIconScrollAccent.setImageDrawable(wrappedDrawable)
+                it.updateTint(color)
+                ivIconScrollAccent.setImageDrawable(it)
             }
             cbFastScroller.buttonTintList = ColorStateList.valueOf(color)
             tvHeaderScroll.setTextColor(color)
@@ -189,12 +182,8 @@ class AppDrawerActivity : BaseActivity(), ColorPickerFragment.OnClickListeners {
                 )
         }
         AppCompatResources.getDrawable(this, R.drawable.scroll_accent_drawable)?.let {
-            val wrappedDrawable = DrawableCompat.wrap(it)
-            DrawableCompat.setTint(
-                wrappedDrawable,
-                settingPreference.backgroundColor
-            )
-            ivBackgroundColor.setImageDrawable(wrappedDrawable)
+            it.updateTint(settingPreference.backgroundColor)
+            ivBackgroundColor.setImageDrawable(it)
         }
     }
 

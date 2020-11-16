@@ -3,7 +3,6 @@ package com.sasuke.launcheroneplus.ui.hidden_apps.app_selector
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
@@ -62,9 +61,9 @@ class AppSelectionActivity : BaseActivity(), VisibleAppSelectionAdapter.OnClickL
     }
 
     private fun setupRecyclerView() {
-        rvHideApps.layoutManager = visibleAppsLayoutManager
-        rvHideApps.addItemDecoration(itemDecoration)
-        rvHideApps.adapter = adapterVisibleApps
+        rvAllApps.layoutManager = visibleAppsLayoutManager
+        rvAllApps.addItemDecoration(itemDecoration)
+        rvAllApps.adapter = adapterVisibleApps
         adapterVisibleApps.setOnClickListeners(this)
 
         rvUnHideApps.layoutManager = hiddenAppsLayoutManager
@@ -76,9 +75,9 @@ class AppSelectionActivity : BaseActivity(), VisibleAppSelectionAdapter.OnClickL
     private fun getApps() {
         appSelectionActivityViewModel.visibleAppListLiveData.observe(this, Observer {
             if (it.isEmpty()) {
-                rvHideApps.hide()
+                rvAllApps.hide()
             } else {
-                rvHideApps.show()
+                rvAllApps.show()
             }
             appSelectionActivityViewModel.setVisibleApps()
         })

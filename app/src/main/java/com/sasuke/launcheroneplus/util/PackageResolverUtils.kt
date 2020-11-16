@@ -10,7 +10,7 @@ import kotlin.collections.ArrayList
 object PackageResolverUtils {
 
     @WorkerThread
-    suspend fun getSortedAppList(
+    fun getSortedAppList(
         packageManager: PackageManager
     ): MutableList<AppInfo> {
 
@@ -37,15 +37,18 @@ object PackageResolverUtils {
     }
 
     @WorkerThread
-    fun getAppInfoFromPackageName(packageManager: PackageManager, packageName: String): AppInfo {
+    fun getAppInfoFromPackageName(packageManager: PackageManager, packageName: String): AppInfo? {
         val intent = Intent()
         intent.`package` = packageName
         intent.addCategory(Intent.CATEGORY_LAUNCHER)
-        val resolveInfo = packageManager.resolveActivity(intent, 0)
-        return AppInfo(
-            icon = resolveInfo.loadIcon(packageManager),
-            packageName = resolveInfo.activityInfo.packageName,
-            label = resolveInfo.loadLabel(packageManager).toString()
-        )
+        var appInfo: AppInfo? = null
+        packageManager.resolveActivity(intent, 0)?.let {
+            appInfo = AppInfo(
+                icon = it.loadIcon(packageManager),
+                packageName = it.activityInfo.packageName,
+                label = it.loadLabel(packageManager).toString()
+            )
+        }
+        return appInfo
     }
 }

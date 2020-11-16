@@ -4,6 +4,8 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.data.model.App
+import com.sasuke.launcheroneplus.util.Constants
+import com.sasuke.launcheroneplus.util.getIconFolderPath
 import kotlinx.android.synthetic.main.cell_app_selector.view.*
 import java.io.File
 
@@ -11,10 +13,9 @@ class HiddenAppSelectionViewHolder(itemView: View, private val glide: RequestMan
     RecyclerView.ViewHolder(itemView) {
 
     private lateinit var onClickListeners: OnClickListeners
-    private val dir = itemView.context.getExternalFilesDir("app_icon")
 
     fun setApp(appInfo: App) {
-        glide.load(File("$dir${File.separator}${appInfo.label.replace("[\\W]|_".toRegex(),"")}"))
+        glide.load(File(itemView.context.getIconFolderPath(appInfo.label)))
             .into(itemView.ivAppIcon)
         itemView.tvAppLabel.text = appInfo.label
 

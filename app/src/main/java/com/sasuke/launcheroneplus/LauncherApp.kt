@@ -92,7 +92,7 @@ class LauncherApp : Application(), HasAndroidInjector {
                 SettingPreference(
                     ContextCompat.getColor(this, R.color.search_bar),
                     true,
-                    Constants.Drawer.STYLE_VERTICAL_INDICATOR,
+                    Constants.DrawerStyle.VERTICAL,
                     ContextCompat.getColor(this, R.color.black_transparent),
                     80
                 )

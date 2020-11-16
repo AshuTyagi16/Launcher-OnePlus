@@ -104,11 +104,11 @@
                     android:background="@color/shadow_white"
                     android:contentDescription="@string/separator"
                     android:visibility="gone"
-                    app:layout_constraintBottom_toTopOf="@id/rvHideApps"
+                    app:layout_constraintBottom_toTopOf="@id/rvAllApps"
                     app:layout_constraintTop_toBottomOf="@id/rvUnHideApps" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvHideApps"
+                    android:id="@+id/rvAllApps"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false"

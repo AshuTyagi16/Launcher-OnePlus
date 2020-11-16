@@ -28,11 +28,10 @@ class AppDrawerActivityViewModel @Inject constructor(
     }
 
     fun setDrawerStyle(style: String) {
-        var indicator = Constants.Drawer.STYLE_VERTICAL_INDICATOR
+        var indicator = Constants.DrawerStyle.VERTICAL
         when (style) {
-            Constants.Drawer.VERTICAL -> indicator = Constants.Drawer.STYLE_VERTICAL_INDICATOR
-            Constants.Drawer.HORIZONTAL -> indicator = Constants.Drawer.STYLE_HORIZONTAL_INDICATOR
-            Constants.Drawer.LIST -> indicator = Constants.Drawer.STYLE_LIST_INDICATOR
+            Constants.DrawerStyle.VERTICAL.name -> indicator = Constants.DrawerStyle.VERTICAL
+            Constants.DrawerStyle.LIST.name -> indicator = Constants.DrawerStyle.LIST
         }
         viewModelScope.launch {
             withContext(Dispatchers.IO) {

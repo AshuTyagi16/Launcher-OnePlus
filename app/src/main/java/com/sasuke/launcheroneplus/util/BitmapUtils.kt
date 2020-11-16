@@ -10,7 +10,7 @@ import androidx.annotation.WorkerThread
 class BitmapUtils {
 
     @WorkerThread
-    suspend fun drawableToBitmap(drawable: Drawable): Bitmap? {
+    fun drawableToBitmap(drawable: Drawable): Bitmap? {
         var bitmap: Bitmap? = null
         if (drawable is BitmapDrawable) {
             if (drawable.bitmap != null) {
