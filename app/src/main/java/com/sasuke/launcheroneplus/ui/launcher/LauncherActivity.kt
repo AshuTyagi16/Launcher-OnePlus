@@ -11,15 +11,19 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.biometric.BiometricPrompt
+import androidx.collection.LruCache
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.github.nisrulz.sensey.PinchScaleDetector
 import com.github.nisrulz.sensey.Sensey
 import com.github.nisrulz.sensey.TouchTypeDetector
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.huxq17.handygridview.HandyGridView
 import com.huxq17.handygridview.listener.OnItemCapturedListener
 import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
@@ -30,11 +34,14 @@ import com.sasuke.launcheroneplus.data.model.DragData
 import com.sasuke.launcheroneplus.data.model.SettingPreference
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.BaseEdgeEffectFactory
+import com.sasuke.launcheroneplus.ui.base.BaseViewHolder
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
 import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
 import com.sasuke.launcheroneplus.ui.hidden_apps.HiddenAppsActivity
-import com.sasuke.launcheroneplus.ui.launcher.apps.AppAdapter
-import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
+import com.sasuke.launcheroneplus.ui.launcher.all_apps.AppAdapter
+import com.sasuke.launcheroneplus.ui.launcher.all_apps.AppViewHolder
+import com.sasuke.launcheroneplus.ui.launcher.recent_apps.RecentAppAdapter
+import com.sasuke.launcheroneplus.ui.launcher.recent_apps.RecentAppSectionAdapter
 import com.sasuke.launcheroneplus.ui.settings.LauncherSettingsActivity
 import com.sasuke.launcheroneplus.ui.wallpaper.list.grid.WallpaperGridActivity
 import com.sasuke.launcheroneplus.util.*
@@ -53,7 +60,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     @Inject
-    lateinit var adapter: AppAdapter
+    lateinit var allAppadapter: AppAdapter
 
     @Inject
     lateinit var layoutManager: GridLayoutManager
@@ -72,6 +79,18 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     @Inject
     lateinit var sharedPreferencesSettingsLiveData: SharedPreferencesSettingsLiveData
+
+    @Inject
+    lateinit var recentAppSectionAdapter: RecentAppSectionAdapter
+
+    @Inject
+    lateinit var concatAdapter: ConcatAdapter
+
+    @Inject
+    lateinit var sharedPreferenceUtil: SharedPreferenceUtil
+
+    @Inject
+    lateinit var gson: Gson
 
     private lateinit var launcherActivityViewModel: LauncherActivityViewModel
 
@@ -130,9 +149,9 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     private fun setupRecyclerView() {
         rvAllApps.layoutManager = layoutManager
         rvAllApps.addItemDecoration(itemDecoration)
-        rvAllApps.adapter = adapter
-        adapter.updatePrimaryColor(primaryColor)
-        adapter.setOnClickListeners(this)
+        rvAllApps.adapter = concatAdapter
+        allAppadapter.updatePrimaryColor(primaryColor)
+        allAppadapter.setOnClickListeners(this)
         rvAllApps.edgeEffectFactory = baseEdgeEffectFactory
     }
 
@@ -166,6 +185,14 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     }
 
     private fun setupListeners() {
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return if (launcherActivityViewModel.lruCache.size() >= Constants.APP_LIST_SPAN_COUNT)
+                    if (position == 0) Constants.APP_LIST_SPAN_COUNT else 1
+                else 1
+            }
+        }
+
         keyboardTriggerBehavior = KeyboardTriggerBehavior(this).apply {
             observe(this@LauncherActivity, {
                 it?.let {
@@ -259,7 +286,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                         Sensey.getInstance().stopPinchScaleDetection()
                     }
                     SlidingUpPanelLayout.PanelState.DRAGGING -> {
-                        rvAllApps.forEachVisibleHolder { holder: AppViewHolder ->
+                        rvAllApps.forEachVisibleHolder { holder: BaseViewHolder ->
                             holder.itemView.setBackgroundColor(
                                 ContextCompat.getColor(
                                     this@LauncherActivity,
@@ -289,7 +316,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
         rvAllApps.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
+                recyclerView.forEachVisibleHolder { holder: BaseViewHolder ->
 
                     holder.itemView.setBackgroundColor(
                         ContextCompat.getColor(
@@ -348,32 +375,38 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         fastscroller.setHandleStateListener(object : RecyclerViewFastScroller.HandleStateListener {
             override fun onDragged(offset: Float, position: Int) {
                 super.onDragged(offset, position)
-                rvAllApps.forEachVisibleHolder { holder: AppViewHolder ->
-                    if (adapter.appList[position].label[0].toUpperCase() == adapter.appList[holder.bindingAdapterPosition].label[0].toUpperCase()) {
-                        AppCompatResources.getDrawable(
-                            this@LauncherActivity,
-                            R.drawable.bg_app_highlight
-                        )?.let {
-                            it.updateTint(ColorUtils.setAlphaComponent(primaryColor, 90))
-                            holder.itemView.background = it
-                        }
-                    } else
-                        holder.itemView.setBackgroundColor(Color.TRANSPARENT)
+                rvAllApps.forEachVisibleHolder { holder: BaseViewHolder ->
+                    if (holder is AppViewHolder) {
+                        if (allAppadapter.appList[position].label[0].toUpperCase() == allAppadapter.appList[holder.bindingAdapterPosition].label[0].toUpperCase()) {
+                            AppCompatResources.getDrawable(
+                                this@LauncherActivity,
+                                R.drawable.bg_app_highlight
+                            )?.let {
+                                it.updateTint(ColorUtils.setAlphaComponent(primaryColor, 90))
+                                holder.itemView.background = it
+                            }
+                        } else
+                            holder.itemView.setBackgroundColor(Color.TRANSPARENT)
+                    }
                 }
             }
         })
     }
 
     private fun observeLiveData() {
+        launcherActivityViewModel.recentAppsLiveData.observe(this, {
+            recentAppSectionAdapter.setRecentApps(it)
+        })
+
         launcherActivityViewModel.appList.observe(this, {
             it?.let {
-                adapter.setApps(it)
+                allAppadapter.setApps(it)
             }
         })
 
         launcherActivityViewModel.filterAppsLiveData.observe(this, {
             it?.let {
-                adapter.setApps(it)
+                allAppadapter.setApps(it)
             }
         })
 
@@ -427,6 +460,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     override fun onItemClick(position: Int, parent: View, appInfo: App) {
         openApp(parent, appInfo)
         dismissPopup()
+        launcherActivityViewModel.insertInRecentAppCache(appInfo)
     }
 
     override fun onItemLongClick(position: Int, parent: View, appInfo: App) {
@@ -446,16 +480,17 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     }
 
     override fun onBackPressed() {
-        if (clParent.panelState === SlidingUpPanelLayout.PanelState.EXPANDED) {
-            clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+        when {
+            isKeyboardOpen -> super.onBackPressed()
+            clParent.panelState === SlidingUpPanelLayout.PanelState.EXPANDED -> {
+                clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+            }
         }
-        if (isKeyboardOpen)
-            super.onBackPressed()
     }
 
     private fun updateUI(settingPreference: SettingPreference) {
         primaryColor = settingPreference.primaryColor
-        adapter.updatePrimaryColor(primaryColor)
+        allAppadapter.updatePrimaryColor(primaryColor)
 
         when (settingPreference.drawerStyle) {
             Constants.DrawerStyle.VERTICAL -> {

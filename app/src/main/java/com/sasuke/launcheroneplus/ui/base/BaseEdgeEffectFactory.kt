@@ -3,7 +3,6 @@ package com.sasuke.launcheroneplus.ui.base
 import android.graphics.Color
 import android.widget.EdgeEffect
 import androidx.recyclerview.widget.RecyclerView
-import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
 import com.sasuke.launcheroneplus.util.forEachVisibleHolder
 
 class BaseEdgeEffectFactory : RecyclerView.EdgeEffectFactory() {
@@ -40,7 +39,7 @@ class BaseEdgeEffectFactory : RecyclerView.EdgeEffectFactory() {
                 val rotationDelta = sign * deltaDistance * OVERSCROLL_ROTATION_MAGNITUDE
                 val translationYDelta =
                     sign * recyclerView.width * deltaDistance * OVERSCROLL_TRANSLATION_MAGNITUDE
-                recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
+                recyclerView.forEachVisibleHolder { holder: BaseViewHolder ->
                     holder.rotation.cancel()
                     holder.translationY.cancel()
                     holder.itemView.rotation += rotationDelta
@@ -52,7 +51,7 @@ class BaseEdgeEffectFactory : RecyclerView.EdgeEffectFactory() {
                 super.onRelease()
                 // The finger is lifted. This is when we should start the animations to bring
                 // the view property values back to their resting states.
-                recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
+                recyclerView.forEachVisibleHolder { holder: BaseViewHolder ->
                     holder.rotation.start()
                     holder.translationY.start()
                 }
@@ -63,7 +62,7 @@ class BaseEdgeEffectFactory : RecyclerView.EdgeEffectFactory() {
                 val sign = if (direction == DIRECTION_BOTTOM) -1 else 1
                 // The list has reached the edge on fling.
                 val translationVelocity = sign * velocity * FLING_TRANSLATION_MAGNITUDE
-                recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
+                recyclerView.forEachVisibleHolder { holder: BaseViewHolder ->
                     holder.translationY
                         .setStartVelocity(translationVelocity)
                         .start()

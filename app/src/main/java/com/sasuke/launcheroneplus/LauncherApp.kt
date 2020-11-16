@@ -96,7 +96,7 @@ class LauncherApp : Application(), HasAndroidInjector {
                     ContextCompat.getColor(this, R.color.black_transparent),
                     80
                 )
-            sharedPrefUtil.putStringSync(
+            sharedPrefUtil.putString(
                 Constants.Settings.PREFERENCES,
                 component.gson().toJson(defaultSettings)
             )

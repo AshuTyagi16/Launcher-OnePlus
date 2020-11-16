@@ -1,4 +1,4 @@
-package com.sasuke.launcheroneplus.ui.launcher.apps
+package com.sasuke.launcheroneplus.ui.launcher.all_apps
 
 import android.annotation.SuppressLint
 import android.os.Handler
@@ -11,6 +11,7 @@ import androidx.dynamicanimation.animation.SpringForce
 import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.data.model.DragData
+import com.sasuke.launcheroneplus.ui.base.BaseViewHolder
 import com.sasuke.launcheroneplus.ui.base.MyDragShadowBuilder
 import com.sasuke.launcheroneplus.util.getIconFolderPath
 import kotlinx.android.synthetic.main.cell_app_info.view.*
@@ -20,11 +21,9 @@ class AppViewHolder(
     itemView: View,
     private val glide: RequestManager
 ) :
-    RecyclerView.ViewHolder(itemView) {
+    BaseViewHolder(itemView) {
 
     private lateinit var onClickListeners: OnClickListeners
-
-    var currentVelocity = 0f
 
     private lateinit var app: App
 
@@ -48,35 +47,6 @@ class AppViewHolder(
     }
 
     private val handler = Handler()
-
-    /**
-     * A [SpringAnimation] for this RecyclerView item. This animation rotates the view with a bouncy
-     * spring configuration, resulting in the oscillation effect.
-     *
-     * The animation is started in [Recyclerview.onScrollListener].
-     */
-    val rotation: SpringAnimation = SpringAnimation(itemView, SpringAnimation.ROTATION)
-        .setSpring(
-            SpringForce()
-                .setFinalPosition(0f)
-                .setDampingRatio(SpringForce.DAMPING_RATIO_HIGH_BOUNCY)
-                .setStiffness(SpringForce.STIFFNESS_LOW)
-        )
-        .addUpdateListener { _, _, velocity ->
-            currentVelocity = velocity
-        }
-
-    /**
-     * A [SpringAnimation] for this RecyclerView item. This animation is used to bring the item back
-     * after the over-scroll effect.
-     */
-    val translationY: SpringAnimation = SpringAnimation(itemView, SpringAnimation.TRANSLATION_Y)
-        .setSpring(
-            SpringForce()
-                .setFinalPosition(0f)
-                .setDampingRatio(SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY)
-                .setStiffness(SpringForce.STIFFNESS_LOW)
-        )
 
     @SuppressLint("ClickableViewAccessibility")
     fun setAppInfo(appInfo: App) {

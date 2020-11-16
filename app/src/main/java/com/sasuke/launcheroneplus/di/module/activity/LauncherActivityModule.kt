@@ -2,6 +2,7 @@ package com.sasuke.launcheroneplus.di.module.activity
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
@@ -12,7 +13,9 @@ import com.sasuke.launcheroneplus.ui.base.ItemDecorator
 import com.sasuke.launcheroneplus.ui.base.SnapToBlock
 import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
 import com.sasuke.launcheroneplus.ui.launcher.LauncherActivityViewModel
-import com.sasuke.launcheroneplus.ui.launcher.apps.AppAdapter
+import com.sasuke.launcheroneplus.ui.launcher.all_apps.AppAdapter
+import com.sasuke.launcheroneplus.ui.launcher.recent_apps.RecentAppAdapter
+import com.sasuke.launcheroneplus.ui.launcher.recent_apps.RecentAppSectionAdapter
 import com.sasuke.launcheroneplus.util.Constants
 import dagger.Binds
 import dagger.Module
@@ -66,6 +69,18 @@ abstract class LauncherActivityModule {
         @PerActivityScope
         fun baseEdgeEffect(): BaseEdgeEffectFactory {
             return BaseEdgeEffectFactory()
+        }
+
+        @Provides
+        @PerActivityScope
+        fun recentAppAdapter(glide: RequestManager): RecentAppSectionAdapter {
+            return RecentAppSectionAdapter(glide)
+        }
+
+        @Provides
+        @PerActivityScope
+        fun concatAdapter(recentAppSectionAdapter: RecentAppSectionAdapter, appAdapter: AppAdapter): ConcatAdapter {
+            return ConcatAdapter(recentAppSectionAdapter, appAdapter)
         }
     }
 

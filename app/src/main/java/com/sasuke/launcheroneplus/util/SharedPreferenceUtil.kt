@@ -77,13 +77,7 @@ class SharedPreferenceUtil(
         editor.apply()
     }
 
-    @WorkerThread
-    suspend fun putString(key: String, value: String) {
-        editor.putString(key, value)
-        editor.commit()
-    }
-
-    fun putStringSync(key: String, value: String) {
+    fun putString(key: String, value: String) {
         editor.putString(key, value)
         editor.commit()
     }

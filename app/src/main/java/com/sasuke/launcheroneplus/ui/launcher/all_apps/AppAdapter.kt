@@ -1,4 +1,4 @@
-package com.sasuke.launcheroneplus.ui.launcher.apps
+package com.sasuke.launcheroneplus.ui.launcher.all_apps
 
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
@@ -34,6 +34,7 @@ class AppAdapter(private val glide: RequestManager) :
             // The rotation pivot should be at the center of the top edge.
             itemView.doOnLayout { v -> v.pivotX = v.width / 2f }
             itemView.pivotY = 0f
+            setOnClickListeners(this@AppAdapter)
         }
     }
 
@@ -44,7 +45,6 @@ class AppAdapter(private val glide: RequestManager) :
     override fun onBindViewHolder(holder: AppViewHolder, position: Int) {
         if (::appList.isInitialized) {
             holder.setAppInfo(appList[position])
-            holder.setOnClickListeners(this)
         }
     }
 

@@ -12,10 +12,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
+import com.sasuke.launcheroneplus.ui.base.BaseEdgeEffectFactory
+import com.sasuke.launcheroneplus.ui.base.BaseViewHolder
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
 import com.sasuke.launcheroneplus.ui.hidden_apps.app_selector.AppSelectionActivity
-import com.sasuke.launcheroneplus.ui.launcher.apps.AppAdapter
-import com.sasuke.launcheroneplus.ui.launcher.apps.AppViewHolder
+import com.sasuke.launcheroneplus.ui.launcher.all_apps.AppAdapter
+import com.sasuke.launcheroneplus.ui.launcher.all_apps.AppViewHolder
 import com.sasuke.launcheroneplus.util.*
 import kotlinx.android.synthetic.main.activity_hidden_apps.*
 import javax.inject.Inject
@@ -33,6 +35,9 @@ class HiddenAppsActivity : BaseActivity(), AppAdapter.OnClickListeners {
 
     @Inject
     lateinit var itemDecoration: ItemDecorator
+
+    @Inject
+    lateinit var baseEdgeEffectFactory: BaseEdgeEffectFactory
 
     private lateinit var hiddenAppsActivityViewModel: HiddenAppsActivityViewModel
 
@@ -72,59 +77,7 @@ class HiddenAppsActivity : BaseActivity(), AppAdapter.OnClickListeners {
         rvApps.adapter = adapter
         adapter.setOnClickListeners(this)
 
-        rvApps.edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
-            override fun createEdgeEffect(recyclerView: RecyclerView, direction: Int): EdgeEffect {
-                return object : EdgeEffect(recyclerView.context) {
-
-                    override fun onPull(deltaDistance: Float) {
-                        super.onPull(deltaDistance)
-                        handlePull(deltaDistance)
-                    }
-
-                    override fun onPull(deltaDistance: Float, displacement: Float) {
-                        super.onPull(deltaDistance, displacement)
-                        handlePull(deltaDistance)
-                    }
-
-                    private fun handlePull(deltaDistance: Float) {
-                        // This is called on every touch event while the list is scrolled with a finger.
-                        // We simply update the view properties without animation.
-                        val sign = if (direction == DIRECTION_BOTTOM) -1 else 1
-                        val rotationDelta = sign * deltaDistance * OVERSCROLL_ROTATION_MAGNITUDE
-                        val translationYDelta =
-                            sign * recyclerView.width * deltaDistance * OVERSCROLL_TRANSLATION_MAGNITUDE
-                        recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
-                            holder.rotation.cancel()
-                            holder.translationY.cancel()
-                            holder.itemView.rotation += rotationDelta
-                            holder.itemView.translationY += translationYDelta
-                        }
-                    }
-
-                    override fun onRelease() {
-                        super.onRelease()
-                        // The finger is lifted. This is when we should start the animations to bring
-                        // the view property values back to their resting states.
-                        recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
-                            holder.rotation.start()
-                            holder.translationY.start()
-                        }
-                    }
-
-                    override fun onAbsorb(velocity: Int) {
-                        super.onAbsorb(velocity)
-                        val sign = if (direction == DIRECTION_BOTTOM) -1 else 1
-                        // The list has reached the edge on fling.
-                        val translationVelocity = sign * velocity * FLING_TRANSLATION_MAGNITUDE
-                        recyclerView.forEachVisibleHolder { holder: AppViewHolder ->
-                            holder.translationY
-                                .setStartVelocity(translationVelocity)
-                                .start()
-                        }
-                    }
-                }
-            }
-        }
+        rvApps.edgeEffectFactory = baseEdgeEffectFactory
 
     }
 

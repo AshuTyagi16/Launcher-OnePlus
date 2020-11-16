@@ -15,6 +15,8 @@ object Constants {
 
     const val ICON_FOLDER_NAME = "app_icon"
 
+    const val RECENT_APPS = "RECENT_APPS"
+
     object Settings {
         const val HOME_SCREEN = 1
         const val APP_DRAWER = 2
