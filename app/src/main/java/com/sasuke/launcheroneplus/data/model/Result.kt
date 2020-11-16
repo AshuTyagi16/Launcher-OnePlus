@@ -16,7 +16,7 @@ data class Result(
     val sponsorship: Any,
     val tags: List<Tag>,
     val updated_at: String,
-    val urls: UrlsX,
-    val user: UserX,
+    val urls: Urls,
+    val user: User,
     val width: Int
 )

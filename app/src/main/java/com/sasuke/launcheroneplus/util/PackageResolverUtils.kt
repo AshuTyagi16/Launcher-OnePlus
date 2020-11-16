@@ -1,6 +1,5 @@
 package com.sasuke.launcheroneplus.util
 
-import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.annotation.WorkerThread

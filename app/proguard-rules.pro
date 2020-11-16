@@ -117,9 +117,6 @@
 # For using GSON @Expose annotation
 -keepattributes *Annotation*
 
-# exo player
--keep class com.google.android.exoplayer.** {*;}
-
 # Gson specific classes
 -dontwarn sun.misc.**
 

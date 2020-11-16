@@ -7,6 +7,7 @@ import android.view.DragEvent
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.biometric.BiometricPrompt
@@ -503,17 +504,39 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                 rvAllApps.suppressLayout(false)
             }
         }
-        popup.getContentView().findViewById<LinearLayout>(R.id.ivUninstall).setOnClickListener {
-            dismissPopup()
-            startUninstall(app.packageName)
+        popup.getContentView().findViewById<LinearLayout>(R.id.llUninstall).apply {
+            if (isSystemApp(this@LauncherActivity, app.packageName)) {
+                visibility = View.GONE
+            } else {
+                visibility = View.VISIBLE
+                setOnClickListener {
+                    dismissPopup()
+                    startUninstall(app.packageName)
+                }
+                AppCompatResources.getDrawable(this@LauncherActivity, R.drawable.ic_delete)?.let {
+                    it.updateTint(primaryColor)
+                    findViewById<ImageView>(R.id.ivUninstall).setImageDrawable(it)
+                }
+            }
         }
-        popup.getContentView().findViewById<LinearLayout>(R.id.ivEdit).setOnClickListener {
-            dismissPopup()
-
+        popup.getContentView().findViewById<LinearLayout>(R.id.llEdit).apply {
+            setOnClickListener {
+                dismissPopup()
+            }
+            AppCompatResources.getDrawable(this@LauncherActivity, R.drawable.ic_edit)?.let {
+                it.updateTint(primaryColor)
+                findViewById<ImageView>(R.id.ivEdit).setImageDrawable(it)
+            }
         }
-        popup.getContentView().findViewById<LinearLayout>(R.id.ivAppInfo).setOnClickListener {
-            dismissPopup()
-            openAppInfo(app.packageName)
+        popup.getContentView().findViewById<LinearLayout>(R.id.llAppInfo).apply {
+            setOnClickListener {
+                dismissPopup()
+                openAppInfo(app.packageName)
+            }
+            AppCompatResources.getDrawable(this@LauncherActivity, R.drawable.ic_info)?.let {
+                it.updateTint(primaryColor)
+                findViewById<ImageView>(R.id.ivAppInfo).setImageDrawable(it)
+            }
         }
         popup.showAlignTop(view, 0, 40)
     }

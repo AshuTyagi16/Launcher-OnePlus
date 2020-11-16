@@ -1,6 +1,7 @@
 package com.sasuke.launcheroneplus.util
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.view.View
@@ -28,6 +29,11 @@ fun Drawable.updateTint(color: Int) {
 
 fun Context.getIconFolderPath(label: String): String {
     return "${applicationContext.getExternalFilesDir(Constants.ICON_FOLDER_NAME)}${File.separator}${label.removeSpecialChars()}"
+}
+
+fun isSystemApp(context: Context, packageName: String): Boolean {
+    val appInfo = context.applicationContext.packageManager.getApplicationInfo(packageName, 0)
+    return (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
 }
 
 fun String.removeSpecialChars(): String {

@@ -31,7 +31,7 @@ class UtilsModule {
         storageUtils: StorageUtils,
         context: Context
     ): AppListUtil {
-        return AppListUtil(roomRepository, bitmapUtils, storageUtils, context.packageManager)
+        return AppListUtil(roomRepository, bitmapUtils, storageUtils, context.packageManager, context)
     }
 
     @Provides

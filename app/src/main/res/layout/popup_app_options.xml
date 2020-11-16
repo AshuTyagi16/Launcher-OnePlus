@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
-            android:id="@+id/ivUninstall"
+            android:id="@+id/llUninstall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
@@ -26,7 +26,8 @@
             android:focusable="true"
             android:orientation="vertical">
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivUninstall"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
@@ -52,7 +53,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/ivEdit"
+            android:id="@+id/llEdit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="40dp"
@@ -60,7 +61,8 @@
             android:focusable="true"
             android:orientation="vertical">
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivEdit"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
@@ -86,15 +88,16 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/ivAppInfo"
+            android:id="@+id/llAppInfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="40dp"
+            android:layout_marginEnd="20dp"
             android:clickable="true"
             android:focusable="true"
             android:orientation="vertical">
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivAppInfo"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
@@ -102,8 +105,7 @@
                 android:contentDescription="@string/button"
                 android:focusable="false"
                 android:padding="5dp"
-                android:src="@drawable/ic_info"
-                android:tint="@color/search_bar" />
+                android:src="@drawable/ic_info" />
 
             <TextView
                 style="@style/Text.Primary"
@@ -128,9 +130,9 @@
             android:clickable="true"
             android:focusable="true"
             android:orientation="vertical"
-            android:visibility="invisible">
+            android:visibility="gone">
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
@@ -138,8 +140,7 @@
                 android:contentDescription="@string/button"
                 android:focusable="false"
                 android:padding="5dp"
-                android:src="@drawable/ic_info"
-                android:tint="@color/search_bar" />
+                android:src="@drawable/ic_info" />
 
             <TextView
                 style="@style/Text.Primary"
