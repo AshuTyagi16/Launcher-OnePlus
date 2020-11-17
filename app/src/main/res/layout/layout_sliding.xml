@@ -32,36 +32,48 @@
         app:layout_constraintTop_toBottomOf="@id/ivDragIcon"
         tools:alpha="1">
 
-        <FrameLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/etContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="52dp"
             android:background="@drawable/bg_search"
+            android:minHeight="52dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivSearchState"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_search_white"
+                app:tint="@color/white" />
+
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/etSearch"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:background="@null"
-                android:drawableStart="@drawable/ic_search_white"
-                android:drawablePadding="10dp"
-                android:drawableTint="#9a9a9c"
-                android:gravity="start|center_horizontal"
+                android:gravity="start|center_vertical"
                 android:hint="@string/search_apps"
                 android:maxLines="1"
                 android:padding="10dp"
                 android:singleLine="true"
-                android:textColor="#9a9a9c"
-                android:textColorHint="#E69A9A9C"
+                android:textColor="@color/white"
+                android:textColorHint="#CC9A9A9C"
                 android:textCursorDrawable="@null"
-                android:textSize="@dimen/font_large"
+                android:textSize="@dimen/font_normal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/ivSearchState"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:gravity="start" />
-        </FrameLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller

@@ -1,6 +1,5 @@
 package com.sasuke.launcheroneplus.ui.launcher
 
-import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
@@ -9,10 +8,10 @@ import android.view.DragEvent
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -89,10 +88,6 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
 
     private val handler by lazy {
         Handler(Looper.getMainLooper())
-    }
-
-    private val inputMethodManager by lazy {
-        getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     }
 
     private lateinit var recentApps: List<App>
@@ -185,7 +180,7 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
     private fun setupListeners() {
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return if (::recentApps.isInitialized && recentApps.size >= Constants.APP_LIST_SPAN_COUNT)
+                return if (::recentApps.isInitialized && recentApps.isNotEmpty())
                     if (position == 0) Constants.APP_LIST_SPAN_COUNT else 1
                 else 1
             }
@@ -196,8 +191,18 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
                 startActivity(LauncherSettingsActivity.newIntent(this@LauncherActivity))
             }
 
-            override fun onSwipe(p0: Int) {
-
+            override fun onSwipe(swipeDirection: Int) {
+                when (swipeDirection) {
+                    TouchTypeDetector.SWIPE_DIR_UP -> {
+                        handler.postDelayed({
+                            clParent.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
+                        }, 50)
+                    }
+                    TouchTypeDetector.SWIPE_DIR_DOWN -> {
+                        if (clParent.panelState == SlidingUpPanelLayout.PanelState.COLLAPSED)
+                            openStatusBar()
+                    }
+                }
             }
 
             override fun onSingleTap() {
@@ -205,17 +210,7 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
             }
 
             override fun onScroll(scrollDirection: Int) {
-                when (scrollDirection) {
-                    TouchTypeDetector.SCROLL_DIR_UP -> {
-                        handler.postDelayed({
-                            clParent.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
-                        }, 50)
-                    }
-                    TouchTypeDetector.SCROLL_DIR_DOWN -> {
-                        if (clParent.panelState == SlidingUpPanelLayout.PanelState.COLLAPSED)
-                            openStatusBar()
-                    }
-                }
+
             }
 
             override fun onLongPress() {
@@ -241,7 +236,12 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
 
             override fun onScale(p0: ScaleGestureDetector?, isScalingOut: Boolean) {
                 if (!isScalingOut) {
-                    biometricPrompt.authenticate(promptInfo)
+                    if (BiometricManager.from(this@LauncherActivity)
+                            .canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS
+                    )
+                        biometricPrompt.authenticate(promptInfo)
+                    else
+                        startActivity(HiddenAppsActivity.newIntent(this@LauncherActivity))
                 }
             }
 
@@ -325,6 +325,21 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
             launcherActivityViewModel.filterApps(it)
         })
 
+        etSearch.setOnFocusChangeListener { _, b ->
+            if (b)
+                ivSearchState.setImageResource(R.drawable.ic_back_white)
+            else
+                ivSearchState.setImageResource(R.drawable.ic_search_white)
+        }
+
+        ivSearchState.setOnClickListener {
+            if (etSearch.hasFocus()) {
+                hideKeyboard()
+                etSearch.clearFocus()
+                etSearch.text?.clear()
+            }
+        }
+
         dragView.setOnDragListener { _, dragEvent ->
             when (dragEvent.action) {
                 DragEvent.ACTION_DRAG_STARTED -> {
@@ -391,8 +406,7 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
     private fun observeLiveData() {
         launcherActivityViewModel.recentAppsLiveData.observe(this, {
             recentApps = it
-            if (it.size >= Constants.APP_LIST_SPAN_COUNT)
-                recentAppSectionAdapter.setRecentApps(it)
+            recentAppSectionAdapter.setRecentApps(it)
         })
 
         launcherActivityViewModel.appList.observe(this, {
@@ -480,7 +494,7 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
     override fun onBackPressed() {
         if (etSearch.keyboardIsVisible)
             super.onBackPressed()
-        else if (clParent.panelState === SlidingUpPanelLayout.PanelState.EXPANDED)
+        else if (clParent.panelState == SlidingUpPanelLayout.PanelState.EXPANDED)
             clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
     }
 

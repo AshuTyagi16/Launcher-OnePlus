@@ -28,6 +28,14 @@ class LauncherActivityViewModel @Inject constructor(
     val appList: LiveData<MutableList<App>>
         get() = _appList
 
+    private val _filterAppsLiveData = MutableLiveData<MutableList<App>>()
+    val filterAppsLiveData: LiveData<MutableList<App>>
+        get() = _filterAppsLiveData
+
+    private val _recentAppsLiveData = MutableLiveData<List<App>>()
+    val recentAppsLiveData: LiveData<List<App>>
+        get() = _recentAppsLiveData
+
     private lateinit var list: MutableList<App>
 
     private val lruCache: LruCache<String, App> = LruCache(Constants.APP_LIST_SPAN_COUNT)
@@ -43,7 +51,6 @@ class LauncherActivityViewModel @Inject constructor(
                 sharedPreferenceUtil.getString(Constants.RECENT_APPS).let {
                     if (!it.isBlank()) {
                         gson.fromJson<List<App>>(it, object : TypeToken<List<App>>() {}.type)?.let {
-                            _recentAppsLiveData.postValue(it)
                             it.forEach {
                                 insertInRecentAppCache(it)
                             }
@@ -54,18 +61,9 @@ class LauncherActivityViewModel @Inject constructor(
         }
     }
 
-    private val _filterAppsLiveData = MutableLiveData<MutableList<App>>()
-    val filterAppsLiveData: LiveData<MutableList<App>>
-        get() = _filterAppsLiveData
-
-    private val _recentAppsLiveData = MutableLiveData<List<App>>()
-    val recentAppsLiveData: LiveData<List<App>>
-        get() = _recentAppsLiveData
-
     fun filterApps(query: CharSequence?) {
         if (query.isNullOrBlank())
-            _recentAppsLiveData.postValue(lruCache.snapshot().toList().map { it.second }
-                .asReversed())
+            postRecentApps()
         else
             _recentAppsLiveData.postValue(Collections.emptyList())
 
@@ -93,9 +91,14 @@ class LauncherActivityViewModel @Inject constructor(
 
     fun insertInRecentAppCache(app: App) {
         lruCache.put(app.packageName, app)
-        if (lruCache.size() >= Constants.APP_LIST_SPAN_COUNT)
+        postRecentApps()
+    }
+
+    private fun postRecentApps() {
+        if (lruCache.size() >= Constants.APP_LIST_SPAN_COUNT) {
             _recentAppsLiveData.postValue(lruCache.snapshot().toList().map { it.second }
                 .asReversed())
+        }
     }
 
     fun saveRecentApps() {
