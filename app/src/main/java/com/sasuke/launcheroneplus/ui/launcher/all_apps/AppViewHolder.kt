@@ -5,14 +5,12 @@ import android.os.Handler
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.view.ViewCompat
-import androidx.recyclerview.widget.RecyclerView
-import androidx.dynamicanimation.animation.SpringAnimation
-import androidx.dynamicanimation.animation.SpringForce
 import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.data.model.DragData
 import com.sasuke.launcheroneplus.ui.base.BaseViewHolder
 import com.sasuke.launcheroneplus.ui.base.MyDragShadowBuilder
+import com.sasuke.launcheroneplus.util.OnCustomEventListeners
 import com.sasuke.launcheroneplus.util.getIconFolderPath
 import kotlinx.android.synthetic.main.cell_app_info.view.*
 import java.io.File
@@ -23,7 +21,7 @@ class AppViewHolder(
 ) :
     BaseViewHolder(itemView) {
 
-    private lateinit var onClickListeners: OnClickListeners
+    private lateinit var onCustomEventListeners: OnCustomEventListeners
 
     private lateinit var app: App
 
@@ -39,11 +37,9 @@ class AppViewHolder(
             .scaleX(1.2f)
             .scaleY(1.2f)
             .translationY(-itemView.height / 6f)
-            .withEndAction {
-                if (::onClickListeners.isInitialized)
-                    onClickListeners.onItemLongClick(bindingAdapterPosition, itemView, app)
-            }
             .start()
+        if (::onCustomEventListeners.isInitialized)
+            onCustomEventListeners.onItemLongClick(bindingAdapterPosition, itemView, app)
     }
 
     private val handler = Handler()
@@ -65,8 +61,8 @@ class AppViewHolder(
                         itemView.animate().scaleX(1f).scaleY(1f)
                             .translationY(0f)
                             .start()
-                        if (::onClickListeners.isInitialized)
-                            onClickListeners.onDragStart(bindingAdapterPosition, itemView, app)
+                        if (::onCustomEventListeners.isInitialized)
+                            onCustomEventListeners.onDragStart(bindingAdapterPosition, itemView, app)
                         val icon = itemView.ivAppIcon
                         val state =
                             DragData(
@@ -83,8 +79,8 @@ class AppViewHolder(
                     handler.removeCallbacks(longPressRunnable)
                     if (!isDragAllowed) {
                         if (event.eventTime - event.downTime < LONG_PRESS_DURATION) {
-                            if (::onClickListeners.isInitialized)
-                                onClickListeners.onItemClick(
+                            if (::onCustomEventListeners.isInitialized)
+                                onCustomEventListeners.onItemClick(
                                     bindingAdapterPosition,
                                     itemView,
                                     appInfo
@@ -100,6 +96,8 @@ class AppViewHolder(
                     itemView.animate().scaleX(1f).scaleY(1f)
                         .translationY(0f)
                         .start()
+                    if (::onCustomEventListeners.isInitialized)
+                        onCustomEventListeners.onEventCancel(bindingAdapterPosition, app)
                     handler.removeCallbacks(longPressRunnable)
                     isDragAllowed = false
                 }
@@ -108,14 +106,7 @@ class AppViewHolder(
         }
     }
 
-    interface OnClickListeners {
-        fun onItemClick(position: Int, parent: View, appInfo: App)
-        fun onItemLongClick(position: Int, parent: View, appInfo: App)
-        fun onDragStart(position: Int, parent: View, appInfo: App)
-        fun onEventCancel(position: Int, appInfo: App)
-    }
-
-    fun setOnClickListeners(onClickListeners: OnClickListeners) {
-        this.onClickListeners = onClickListeners
+    fun setOnCustomEventListeners(onCustomEventListeners: OnCustomEventListeners) {
+        this.onCustomEventListeners = onCustomEventListeners
     }
 }

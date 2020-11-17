@@ -11,7 +11,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.biometric.BiometricPrompt
-import androidx.collection.LruCache
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.ViewModelProvider
@@ -23,7 +22,6 @@ import com.github.nisrulz.sensey.PinchScaleDetector
 import com.github.nisrulz.sensey.Sensey
 import com.github.nisrulz.sensey.TouchTypeDetector
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.huxq17.handygridview.HandyGridView
 import com.huxq17.handygridview.listener.OnItemCapturedListener
 import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
@@ -40,7 +38,6 @@ import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
 import com.sasuke.launcheroneplus.ui.hidden_apps.HiddenAppsActivity
 import com.sasuke.launcheroneplus.ui.launcher.all_apps.AppAdapter
 import com.sasuke.launcheroneplus.ui.launcher.all_apps.AppViewHolder
-import com.sasuke.launcheroneplus.ui.launcher.recent_apps.RecentAppAdapter
 import com.sasuke.launcheroneplus.ui.launcher.recent_apps.RecentAppSectionAdapter
 import com.sasuke.launcheroneplus.ui.settings.LauncherSettingsActivity
 import com.sasuke.launcheroneplus.ui.wallpaper.list.grid.WallpaperGridActivity
@@ -53,7 +50,7 @@ import kotlinx.android.synthetic.main.layout_sliding.*
 import java.util.concurrent.Executor
 import javax.inject.Inject
 
-class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
+class LauncherActivity : BaseActivity(), OnCustomEventListeners,
     GridViewAdapter.OnClickListeners {
 
     @Inject
@@ -98,6 +95,8 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         Handler()
     }
 
+    private lateinit var recentApps: List<App>
+
     private lateinit var keyboardTriggerBehavior: KeyboardTriggerBehavior
 
     private lateinit var pinchScaleListener: PinchScaleDetector.PinchScaleListener
@@ -137,6 +136,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             ViewModelProvider(this, viewModelFactory).get(LauncherActivityViewModel::class.java)
         Sensey.getInstance().init(this)
         primaryColor = LauncherApp.color
+        createPopup()
     }
 
     private fun setWindowInsets() {
@@ -151,7 +151,8 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         rvAllApps.addItemDecoration(itemDecoration)
         rvAllApps.adapter = concatAdapter
         allAppadapter.updatePrimaryColor(primaryColor)
-        allAppadapter.setOnClickListeners(this)
+        allAppadapter.setOnCustomEventListeners(this)
+        recentAppSectionAdapter.setOnCustomEventListener(this)
         rvAllApps.edgeEffectFactory = baseEdgeEffectFactory
     }
 
@@ -187,7 +188,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     private fun setupListeners() {
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return if (launcherActivityViewModel.lruCache.size() >= Constants.APP_LIST_SPAN_COUNT)
+                return if (::recentApps.isInitialized && recentApps.size >= Constants.APP_LIST_SPAN_COUNT)
                     if (position == 0) Constants.APP_LIST_SPAN_COUNT else 1
                 else 1
             }
@@ -341,19 +342,27 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         dragView.setOnDragListener { _, dragEvent ->
             when (dragEvent.action) {
                 DragEvent.ACTION_DRAG_STARTED -> {
-                    clInnerParent.animate().scaleX(0.7f).scaleY(0.7f).start()
+                    clInnerParent.animate().scaleX(0.75f).scaleY(0.75f)
+                        .withEndAction {
+                            ivDelete.show()
+                        }
+                        .start()
                     clInnerParent.background = ContextCompat.getDrawable(this, R.drawable.shadow)
                     clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
                 }
                 DragEvent.ACTION_DRAG_ENTERED -> {
+                    clInnerParent.alpha = 1f
                     clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
                 }
                 DragEvent.ACTION_DRAG_EXITED -> {
-
+                    clInnerParent.alpha = 0.7f
                 }
                 DragEvent.ACTION_DRAG_ENDED -> {
                     clInnerParent.background = null
                     clInnerParent.animate().scaleX(1f).scaleY(1f).start()
+                    ivDelete.hide()
+                    clInnerParent.alpha = 1f
+                    dismissPopup()
                 }
                 DragEvent.ACTION_DROP -> {
                     val item = dragEvent.localState as DragData
@@ -395,6 +404,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     private fun observeLiveData() {
         launcherActivityViewModel.recentAppsLiveData.observe(this, {
+            recentApps = it
             recentAppSectionAdapter.setRecentApps(it)
         })
 
@@ -454,6 +464,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
 
     override fun onDestroy() {
         Sensey.getInstance().stop()
+        launcherActivityViewModel.saveRecentApps()
         super.onDestroy()
     }
 
@@ -469,7 +480,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
         rvAllApps.suppressLayout(true)
     }
 
-    override fun onDragStarted(position: Int, parent: View, appInfo: App) {
+    override fun onDragStart(position: Int, parent: View, appInfo: App) {
         dragView.visibility = View.VISIBLE
         clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
         dismissPopup()
@@ -491,6 +502,11 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
     private fun updateUI(settingPreference: SettingPreference) {
         primaryColor = settingPreference.primaryColor
         allAppadapter.updatePrimaryColor(primaryColor)
+
+        ContextCompat.getDrawable(this, R.drawable.ic_delete)?.let {
+            it.updateTint(primaryColor)
+            ivDelete.setImageDrawable(it)
+        }
 
         when (settingPreference.drawerStyle) {
             Constants.DrawerStyle.VERTICAL -> {
@@ -521,7 +537,7 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
             )
     }
 
-    private fun showPopup(view: View, app: App) {
+    private fun createPopup() {
         popup = createBalloon(this) {
             setArrowVisible(true)
             setArrowSize(10)
@@ -539,41 +555,47 @@ class LauncherActivity : BaseActivity(), AppAdapter.OnClickListeners,
                 rvAllApps.suppressLayout(false)
             }
         }
-        popup.getContentView().findViewById<LinearLayout>(R.id.llUninstall).apply {
-            if (isSystemApp(this@LauncherActivity, app.packageName)) {
-                visibility = View.GONE
-            } else {
-                visibility = View.VISIBLE
+    }
+
+    private fun showPopup(view: View, app: App) {
+        if (::popup.isInitialized) {
+            popup.getContentView().findViewById<LinearLayout>(R.id.llUninstall).apply {
+                if (isSystemApp(this@LauncherActivity, app.packageName)) {
+                    visibility = View.GONE
+                } else {
+                    visibility = View.VISIBLE
+                    setOnClickListener {
+                        dismissPopup()
+                        startUninstall(app.packageName)
+                    }
+                    AppCompatResources.getDrawable(this@LauncherActivity, R.drawable.ic_delete)
+                        ?.let {
+                            it.updateTint(primaryColor)
+                            findViewById<ImageView>(R.id.ivUninstall).setImageDrawable(it)
+                        }
+                }
+            }
+            popup.getContentView().findViewById<LinearLayout>(R.id.llEdit).apply {
                 setOnClickListener {
                     dismissPopup()
-                    startUninstall(app.packageName)
                 }
-                AppCompatResources.getDrawable(this@LauncherActivity, R.drawable.ic_delete)?.let {
+                AppCompatResources.getDrawable(this@LauncherActivity, R.drawable.ic_edit)?.let {
                     it.updateTint(primaryColor)
-                    findViewById<ImageView>(R.id.ivUninstall).setImageDrawable(it)
+                    findViewById<ImageView>(R.id.ivEdit).setImageDrawable(it)
                 }
             }
+            popup.getContentView().findViewById<LinearLayout>(R.id.llAppInfo).apply {
+                setOnClickListener {
+                    dismissPopup()
+                    openAppInfo(app.packageName)
+                }
+                AppCompatResources.getDrawable(this@LauncherActivity, R.drawable.ic_info)?.let {
+                    it.updateTint(primaryColor)
+                    findViewById<ImageView>(R.id.ivAppInfo).setImageDrawable(it)
+                }
+            }
+            popup.showAlignTop(view, 0, 40)
         }
-        popup.getContentView().findViewById<LinearLayout>(R.id.llEdit).apply {
-            setOnClickListener {
-                dismissPopup()
-            }
-            AppCompatResources.getDrawable(this@LauncherActivity, R.drawable.ic_edit)?.let {
-                it.updateTint(primaryColor)
-                findViewById<ImageView>(R.id.ivEdit).setImageDrawable(it)
-            }
-        }
-        popup.getContentView().findViewById<LinearLayout>(R.id.llAppInfo).apply {
-            setOnClickListener {
-                dismissPopup()
-                openAppInfo(app.packageName)
-            }
-            AppCompatResources.getDrawable(this@LauncherActivity, R.drawable.ic_info)?.let {
-                it.updateTint(primaryColor)
-                findViewById<ImageView>(R.id.ivAppInfo).setImageDrawable(it)
-            }
-        }
-        popup.showAlignTop(view, 0, 40)
     }
 
     private fun dismissPopup() {

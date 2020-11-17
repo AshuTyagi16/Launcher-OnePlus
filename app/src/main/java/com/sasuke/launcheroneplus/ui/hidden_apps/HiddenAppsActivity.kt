@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.EdgeEffect
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
@@ -13,7 +12,6 @@ import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.BaseEdgeEffectFactory
-import com.sasuke.launcheroneplus.ui.base.BaseViewHolder
 import com.sasuke.launcheroneplus.ui.base.ItemDecorator
 import com.sasuke.launcheroneplus.ui.hidden_apps.app_selector.AppSelectionActivity
 import com.sasuke.launcheroneplus.ui.launcher.all_apps.AppAdapter
@@ -22,7 +20,7 @@ import com.sasuke.launcheroneplus.util.*
 import kotlinx.android.synthetic.main.activity_hidden_apps.*
 import javax.inject.Inject
 
-class HiddenAppsActivity : BaseActivity(), AppAdapter.OnClickListeners {
+class HiddenAppsActivity : BaseActivity(), OnCustomEventListeners {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -75,7 +73,7 @@ class HiddenAppsActivity : BaseActivity(), AppAdapter.OnClickListeners {
         rvApps.layoutManager = layoutManager
         rvApps.addItemDecoration(itemDecoration)
         rvApps.adapter = adapter
-        adapter.setOnClickListeners(this)
+        adapter.setOnCustomEventListeners(this)
 
         rvApps.edgeEffectFactory = baseEdgeEffectFactory
 
@@ -135,7 +133,7 @@ class HiddenAppsActivity : BaseActivity(), AppAdapter.OnClickListeners {
 
     }
 
-    override fun onDragStarted(position: Int, parent: View, appInfo: App) {
+    override fun onDragStart(position: Int, parent: View, appInfo: App) {
 
     }
 

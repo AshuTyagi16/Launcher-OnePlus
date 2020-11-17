@@ -13,6 +13,7 @@ import com.sasuke.launcheroneplus.util.toLowerCased
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
@@ -29,7 +30,7 @@ class LauncherActivityViewModel @Inject constructor(
 
     private lateinit var list: MutableList<App>
 
-    val lruCache: LruCache<String, App> = LruCache(Constants.APP_LIST_SPAN_COUNT)
+    private val lruCache: LruCache<String, App> = LruCache(Constants.APP_LIST_SPAN_COUNT)
 
     init {
         _appList.addSource(roomRepository.getApps()) {
@@ -62,6 +63,12 @@ class LauncherActivityViewModel @Inject constructor(
         get() = _recentAppsLiveData
 
     fun filterApps(query: CharSequence?) {
+        if (query.isNullOrBlank())
+            _recentAppsLiveData.postValue(lruCache.snapshot().toList().map { it.second }
+                .asReversed())
+        else
+            _recentAppsLiveData.postValue(Collections.emptyList())
+
         if (::list.isInitialized) {
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
@@ -89,13 +96,12 @@ class LauncherActivityViewModel @Inject constructor(
         if (lruCache.size() >= Constants.APP_LIST_SPAN_COUNT)
             _recentAppsLiveData.postValue(lruCache.snapshot().toList().map { it.second }
                 .asReversed())
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                sharedPreferenceUtil.putString(
-                    Constants.RECENT_APPS,
-                    gson.toJson(lruCache.snapshot().toList().map { it.second })
-                )
-            }
-        }
+    }
+
+    fun saveRecentApps() {
+        sharedPreferenceUtil.putString(
+            Constants.RECENT_APPS,
+            gson.toJson(lruCache.snapshot().toList().map { it.second })
+        )
     }
 }

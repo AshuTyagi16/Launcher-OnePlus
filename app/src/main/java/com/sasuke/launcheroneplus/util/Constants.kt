@@ -3,8 +3,8 @@ package com.sasuke.launcheroneplus.util
 object Constants {
 
     const val APP_LIST_SPAN_COUNT = 5
-    const val APP_LIST_HORIZONTAL_SPACING = 10
-    const val APP_LIST_VERTICAL_SPACING = 60
+    val APP_LIST_HORIZONTAL_SPACING = 10.dpToPx()
+    val APP_LIST_VERTICAL_SPACING = 20.dpToPx()
 
     const val EXTRA_API_VERSION_HEADER = "Accept-Version"
     const val EXTRA_API_VERSION = "v1"
@@ -36,8 +36,4 @@ object Constants {
     enum class DrawerStyle {
         VERTICAL, LIST
     }
-
-    const val MOVE_THRESHOLD_HORIZONTAL = 10f
-    const val MOVE_THRESHOLD_VERTICAL = 8f
-
 }

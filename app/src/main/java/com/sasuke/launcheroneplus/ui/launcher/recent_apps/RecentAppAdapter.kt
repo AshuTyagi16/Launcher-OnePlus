@@ -10,11 +10,12 @@ import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.ui.launcher.all_apps.AppViewHolder
+import com.sasuke.launcheroneplus.util.OnCustomEventListeners
 
 class RecentAppAdapter(private val glide: RequestManager) :
-    ListAdapter<App, AppViewHolder>(appItemDiffCallback), AppViewHolder.OnClickListeners {
+    ListAdapter<App, AppViewHolder>(appItemDiffCallback), OnCustomEventListeners {
 
-    private lateinit var onClickListeners: OnClickListeners
+    private lateinit var onClickListeners: OnCustomEventListeners
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
         val view =
@@ -23,7 +24,7 @@ class RecentAppAdapter(private val glide: RequestManager) :
             // The rotation pivot should be at the center of the top edge.
             itemView.doOnLayout { v -> v.pivotX = v.width / 2f }
             itemView.pivotY = 0f
-            setOnClickListeners(this@RecentAppAdapter)
+            setOnCustomEventListeners(this@RecentAppAdapter)
         }
     }
 
@@ -33,14 +34,7 @@ class RecentAppAdapter(private val glide: RequestManager) :
         }
     }
 
-    interface OnClickListeners {
-        fun onItemClick(position: Int, parent: View, appInfo: App)
-        fun onItemLongClick(position: Int, parent: View, appInfo: App)
-        fun onDragStarted(position: Int, parent: View, appInfo: App)
-        fun onEventCancel(position: Int, appInfo: App)
-    }
-
-    fun setOnClickListeners(onClickListeners: OnClickListeners) {
+    fun setOnClickListeners(onClickListeners: OnCustomEventListeners) {
         this.onClickListeners = onClickListeners
     }
 
@@ -56,14 +50,13 @@ class RecentAppAdapter(private val glide: RequestManager) :
 
     override fun onDragStart(position: Int, parent: View, appInfo: App) {
         if (::onClickListeners.isInitialized)
-            onClickListeners.onDragStarted(position, parent, appInfo)
+            onClickListeners.onDragStart(position, parent, appInfo)
     }
 
     override fun onEventCancel(position: Int, appInfo: App) {
         if (::onClickListeners.isInitialized)
             onClickListeners.onEventCancel(position, appInfo)
     }
-
 }
 
 private val appItemDiffCallback = object : DiffUtil.ItemCallback<App>() {

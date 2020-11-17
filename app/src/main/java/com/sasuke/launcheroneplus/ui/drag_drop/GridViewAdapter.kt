@@ -16,6 +16,10 @@ class GridViewAdapter(private val glide: RequestManager) : BaseAdapter(), OnItem
     private val list: MutableList<App> = ArrayList()
     private var inEditMode = false
 
+    companion object {
+        private const val MAX_ALLOWED_SHORTCUTS = 19
+    }
+
     override fun getView(position: Int, convertview: View?, parent: ViewGroup): View {
         val appViewHolder: GridAppViewHolder
         val myView: View =
@@ -53,6 +57,8 @@ class GridViewAdapter(private val glide: RequestManager) : BaseAdapter(), OnItem
     }
 
     fun addItem(appInfo: App) {
+        if (list.size > MAX_ALLOWED_SHORTCUTS)
+            list.removeAt(0)
         list.add(appInfo)
         notifyDataSetChanged()
     }
