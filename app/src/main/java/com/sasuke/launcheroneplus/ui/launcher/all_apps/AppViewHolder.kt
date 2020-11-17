@@ -14,11 +14,16 @@ import com.sasuke.launcheroneplus.util.getIconFolderPath
 import kotlinx.android.synthetic.main.cell_app_info.view.*
 import java.io.File
 
+@SuppressLint("ClickableViewAccessibility")
 class AppViewHolder(
     itemView: View,
     private val glide: RequestManager
 ) :
     BaseViewHolder(itemView) {
+
+    companion object {
+        private const val LONG_PRESS_DURATION = 200L
+    }
 
     private lateinit var onCustomEventListeners: OnCustomEventListeners
 
@@ -26,10 +31,6 @@ class AppViewHolder(
 
     private val generator = ColorGenerator.MATERIAL
     private val textDrawableBuilder = TextDrawable.builder().beginConfig().bold().endConfig()
-
-    companion object {
-        private const val LONG_PRESS_DURATION = 200L
-    }
 
     private var isDragAllowed = false
 
@@ -46,18 +47,7 @@ class AppViewHolder(
 
     private val handler = Handler()
 
-    @SuppressLint("ClickableViewAccessibility")
-    fun setAppInfo(appInfo: App) {
-        this.app = appInfo
-        glide.load(File(itemView.context.getIconFolderPath(appInfo.label)))
-            .placeholder(
-                textDrawableBuilder.buildRound(
-                    appInfo.label[0].toString(),
-                    generator.getColor(appInfo.label)
-                )
-            )
-            .into(itemView.ivAppIcon)
-        itemView.tvAppLabel.text = appInfo.label
+    init {
 
         itemView.setOnTouchListener { _, event ->
             when (event.actionMasked) {
@@ -95,7 +85,7 @@ class AppViewHolder(
                                 onCustomEventListeners.onItemClick(
                                     bindingAdapterPosition,
                                     itemView,
-                                    appInfo
+                                    app
                                 )
                         }
                     }
@@ -116,6 +106,19 @@ class AppViewHolder(
             }
             return@setOnTouchListener true
         }
+    }
+
+    fun setAppInfo(appInfo: App) {
+        this.app = appInfo
+        glide.load(File(itemView.context.getIconFolderPath(appInfo.label)))
+            .placeholder(
+                textDrawableBuilder.buildRound(
+                    appInfo.label[0].toString(),
+                    generator.getColor(appInfo.label)
+                )
+            )
+            .into(itemView.ivAppIcon)
+        itemView.tvAppLabel.text = appInfo.label
     }
 
     fun setOnCustomEventListeners(onCustomEventListeners: OnCustomEventListeners) {
