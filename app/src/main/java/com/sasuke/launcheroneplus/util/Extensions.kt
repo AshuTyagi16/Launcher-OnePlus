@@ -6,6 +6,7 @@ import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 import java.util.*
@@ -58,3 +59,8 @@ fun Int.dpToPx(): Int {
 fun Int.alphaPercentage(): Int {
     return ((this.toDouble() / 100.0) * 255.0).toInt()
 }
+
+val View.keyboardIsVisible: Boolean
+    get() = WindowInsetsCompat
+        .toWindowInsetsCompat(rootWindowInsets)
+        .isVisible(WindowInsetsCompat.Type.ime())

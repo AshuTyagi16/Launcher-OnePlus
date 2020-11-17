@@ -1,12 +1,15 @@
 package com.sasuke.launcheroneplus.ui.launcher
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.DragEvent
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.content.res.AppCompatResources
@@ -84,13 +87,15 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
 
     private lateinit var launcherActivityViewModel: LauncherActivityViewModel
 
-    private val handler: Handler by lazy {
-        Handler()
+    private val handler by lazy {
+        Handler(Looper.getMainLooper())
+    }
+
+    private val inputMethodManager by lazy {
+        getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     }
 
     private lateinit var recentApps: List<App>
-
-    private lateinit var keyboardTriggerBehavior: KeyboardTriggerBehavior
 
     private lateinit var pinchScaleListener: PinchScaleDetector.PinchScaleListener
     private lateinit var touchTypeListener: TouchTypeDetector.TouchTypListener
@@ -104,8 +109,6 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
     private var primaryColor = 0
 
     private lateinit var popup: Balloon
-
-    private var isKeyboardOpen = false
 
     companion object {
         /** The magnitude of rotation while the list is scrolled. */
@@ -188,17 +191,6 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
             }
         }
 
-        keyboardTriggerBehavior = KeyboardTriggerBehavior(this).apply {
-            observe(this@LauncherActivity, {
-                it?.let {
-                    isKeyboardOpen = when (it) {
-                        KeyboardTriggerBehavior.Status.OPEN -> true
-                        KeyboardTriggerBehavior.Status.CLOSED -> false
-                    }
-                }
-            })
-        }
-
         touchTypeListener = object : TouchTypeDetector.TouchTypListener {
             override fun onDoubleTap() {
                 startActivity(LauncherSettingsActivity.newIntent(this@LauncherActivity))
@@ -242,7 +234,8 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
         pinchScaleListener = object : PinchScaleDetector.PinchScaleListener {
             override fun onScaleEnd(p0: ScaleGestureDetector?) {
                 if (::touchTypeListener.isInitialized) {
-                    Sensey.getInstance().startTouchTypeDetection(this@LauncherActivity, touchTypeListener)
+                    Sensey.getInstance()
+                        .startTouchTypeDetection(this@LauncherActivity, touchTypeListener)
                 }
             }
 
@@ -294,7 +287,8 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
                             this@LauncherActivity,
                             touchTypeListener
                         )
-                        Sensey.getInstance().startPinchScaleDetection(this@LauncherActivity, pinchScaleListener)
+                        Sensey.getInstance()
+                            .startPinchScaleDetection(this@LauncherActivity, pinchScaleListener)
                         hideKeyboard()
                         etSearch.clearFocus()
                         etSearch.text?.clear()
@@ -397,7 +391,8 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
     private fun observeLiveData() {
         launcherActivityViewModel.recentAppsLiveData.observe(this, {
             recentApps = it
-            recentAppSectionAdapter.setRecentApps(it)
+            if (it.size >= Constants.APP_LIST_SPAN_COUNT)
+                recentAppSectionAdapter.setRecentApps(it)
         })
 
         launcherActivityViewModel.appList.observe(this, {
@@ -483,12 +478,10 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
     }
 
     override fun onBackPressed() {
-        when {
-            isKeyboardOpen -> super.onBackPressed()
-            clParent.panelState === SlidingUpPanelLayout.PanelState.EXPANDED -> {
-                clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
-            }
-        }
+        if (etSearch.keyboardIsVisible)
+            super.onBackPressed()
+        else if (clParent.panelState === SlidingUpPanelLayout.PanelState.EXPANDED)
+            clParent.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
     }
 
     private fun updateUI(settingPreference: SettingPreference) {

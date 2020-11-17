@@ -2,6 +2,7 @@ package com.sasuke.launcheroneplus.ui.launcher.all_apps
 
 import android.annotation.SuppressLint
 import android.os.Handler
+import android.os.Looper
 import android.view.MotionEvent
 import android.view.View
 import com.amulyakhare.textdrawable.TextDrawable
@@ -45,7 +46,7 @@ class AppViewHolder(
             onCustomEventListeners.onItemLongClick(bindingAdapterPosition, itemView, app)
     }
 
-    private val handler = Handler()
+    private val handler = Handler(Looper.getMainLooper())
 
     init {
 
