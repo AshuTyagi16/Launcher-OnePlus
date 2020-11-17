@@ -4,12 +4,11 @@ import android.annotation.SuppressLint
 import android.os.Handler
 import android.view.MotionEvent
 import android.view.View
-import androidx.core.view.ViewCompat
+import com.amulyakhare.textdrawable.TextDrawable
+import com.amulyakhare.textdrawable.util.ColorGenerator
 import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.data.model.App
-import com.sasuke.launcheroneplus.data.model.DragData
 import com.sasuke.launcheroneplus.ui.base.BaseViewHolder
-import com.sasuke.launcheroneplus.ui.base.MyDragShadowBuilder
 import com.sasuke.launcheroneplus.util.OnCustomEventListeners
 import com.sasuke.launcheroneplus.util.getIconFolderPath
 import kotlinx.android.synthetic.main.cell_app_info.view.*
@@ -24,6 +23,9 @@ class AppViewHolder(
     private lateinit var onCustomEventListeners: OnCustomEventListeners
 
     private lateinit var app: App
+
+    private val generator = ColorGenerator.MATERIAL
+    private val textDrawableBuilder = TextDrawable.builder().beginConfig().bold().endConfig()
 
     companion object {
         private const val LONG_PRESS_DURATION = 200L
@@ -48,6 +50,12 @@ class AppViewHolder(
     fun setAppInfo(appInfo: App) {
         this.app = appInfo
         glide.load(File(itemView.context.getIconFolderPath(appInfo.label)))
+            .placeholder(
+                textDrawableBuilder.buildRound(
+                    appInfo.label[0].toString(),
+                    generator.getColor(appInfo.label)
+                )
+            )
             .into(itemView.ivAppIcon)
         itemView.tvAppLabel.text = appInfo.label
 
@@ -62,16 +70,20 @@ class AppViewHolder(
                             .translationY(0f)
                             .start()
                         if (::onCustomEventListeners.isInitialized)
-                            onCustomEventListeners.onDragStart(bindingAdapterPosition, itemView, app)
-                        val icon = itemView.ivAppIcon
-                        val state =
-                            DragData(
-                                app,
-                                icon.width,
-                                icon.height
+                            onCustomEventListeners.onDragStart(
+                                bindingAdapterPosition,
+                                itemView,
+                                app
                             )
-                        val shadow = MyDragShadowBuilder(icon)
-                        ViewCompat.startDragAndDrop(icon, null, shadow, state, 0)
+//                        val icon = itemView.ivAppIcon
+//                        val state =
+//                            DragData(
+//                                app,
+//                                icon.width,
+//                                icon.height
+//                            )
+//                        val shadow = MyDragShadowBuilder(icon)
+//                        ViewCompat.startDragAndDrop(icon, null, shadow, state, 0)
                     }
                     isDragAllowed = false
                 }

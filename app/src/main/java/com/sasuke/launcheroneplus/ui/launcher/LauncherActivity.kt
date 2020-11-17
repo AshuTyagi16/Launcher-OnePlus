@@ -21,7 +21,6 @@ import com.bumptech.glide.RequestManager
 import com.github.nisrulz.sensey.PinchScaleDetector
 import com.github.nisrulz.sensey.Sensey
 import com.github.nisrulz.sensey.TouchTypeDetector
-import com.google.gson.Gson
 import com.huxq17.handygridview.HandyGridView
 import com.huxq17.handygridview.listener.OnItemCapturedListener
 import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
@@ -83,12 +82,6 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
     @Inject
     lateinit var concatAdapter: ConcatAdapter
 
-    @Inject
-    lateinit var sharedPreferenceUtil: SharedPreferenceUtil
-
-    @Inject
-    lateinit var gson: Gson
-
     private lateinit var launcherActivityViewModel: LauncherActivityViewModel
 
     private val handler: Handler by lazy {
@@ -149,6 +142,7 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
     private fun setupRecyclerView() {
         rvAllApps.layoutManager = layoutManager
         rvAllApps.addItemDecoration(itemDecoration)
+        rvAllApps.setHasFixedSize(true)
         rvAllApps.adapter = concatAdapter
         allAppadapter.updatePrimaryColor(primaryColor)
         allAppadapter.setOnCustomEventListeners(this)
@@ -197,9 +191,9 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
         keyboardTriggerBehavior = KeyboardTriggerBehavior(this).apply {
             observe(this@LauncherActivity, {
                 it?.let {
-                    when (it) {
-                        KeyboardTriggerBehavior.Status.OPEN -> isKeyboardOpen = true
-                        KeyboardTriggerBehavior.Status.CLOSED -> isKeyboardOpen = false
+                    isKeyboardOpen = when (it) {
+                        KeyboardTriggerBehavior.Status.OPEN -> true
+                        KeyboardTriggerBehavior.Status.CLOSED -> false
                     }
                 }
             })
@@ -248,8 +242,7 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
         pinchScaleListener = object : PinchScaleDetector.PinchScaleListener {
             override fun onScaleEnd(p0: ScaleGestureDetector?) {
                 if (::touchTypeListener.isInitialized) {
-                    Sensey.getInstance()
-                        .startTouchTypeDetection(this@LauncherActivity, touchTypeListener)
+                    Sensey.getInstance().startTouchTypeDetection(this@LauncherActivity, touchTypeListener)
                 }
             }
 
@@ -301,8 +294,7 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
                             this@LauncherActivity,
                             touchTypeListener
                         )
-                        Sensey.getInstance()
-                            .startPinchScaleDetection(this@LauncherActivity, pinchScaleListener)
+                        Sensey.getInstance().startPinchScaleDetection(this@LauncherActivity, pinchScaleListener)
                         hideKeyboard()
                         etSearch.clearFocus()
                         etSearch.text?.clear()
@@ -599,7 +591,7 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
     }
 
     private fun dismissPopup() {
-        if (::popup.isInitialized && popup.isShowing)
+        if (::popup.isInitialized)
             popup.dismiss()
     }
 }

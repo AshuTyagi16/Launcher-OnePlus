@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "756468755900",
+    "firebase_url": "https://launcheroneplus.firebaseio.com",
+    "project_id": "launcheroneplus",
+    "storage_bucket": "launcheroneplus.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756468755900:android:6178da189526f9ba6ccfb9",
+        "android_client_info": {
+          "package_name": "com.sasuke.launcheroneplus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756468755900-mgj0ofvb17pduactdahj177l22mtqab5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sasuke.launcheroneplus",
+            "certificate_hash": "9cfe111655147f35bf664b3f76f892d77cf26473"
+          }
+        },
+        {
+          "client_id": "756468755900-fhr0gbeqpr8r5voju06tsn8m8d6pd7hu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIRBkQ9EETrQSxmDSKRs265WutFApBPHc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756468755900-fhr0gbeqpr8r5voju06tsn8m8d6pd7hu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

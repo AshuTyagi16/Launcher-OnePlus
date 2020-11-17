@@ -17,7 +17,7 @@ import com.sasuke.launcheroneplus.util.OnCustomEventListeners
 class AppAdapter(private val glide: RequestManager) :
     RecyclerView.Adapter<AppViewHolder>(),
     RecyclerViewFastScroller.OnPopupViewUpdate,
-    OnCustomEventListeners {
+    OnCustomEventListeners{
 
     init {
         setHasStableIds(true)

@@ -30,7 +30,7 @@ abstract class LauncherActivityModule {
         @Provides
         @PerActivityScope
         fun adapter(glide: RequestManager): AppAdapter {
-            return AppAdapter(glide)
+            return AppAdapter(glide,)
         }
 
         @Provides
@@ -41,7 +41,10 @@ abstract class LauncherActivityModule {
                 Constants.APP_LIST_SPAN_COUNT,
                 RecyclerView.VERTICAL,
                 false
-            )
+            ).apply {
+                isItemPrefetchEnabled = true
+                initialPrefetchItemCount = 50
+            }
         }
 
         @Provides
