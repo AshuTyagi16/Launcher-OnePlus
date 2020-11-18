@@ -13,7 +13,6 @@ import java.util.*
 
 fun String.toLowerCased(): String = this.toLowerCase(Locale.getDefault())
 
-
 inline fun <reified T : RecyclerView.ViewHolder> RecyclerView.forEachVisibleHolder(
     action: (T) -> Unit
 ) {

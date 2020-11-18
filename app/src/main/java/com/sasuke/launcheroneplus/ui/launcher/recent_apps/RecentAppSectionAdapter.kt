@@ -7,18 +7,23 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
+import com.sasuke.launcheroneplus.data.model.DrawerStyle
+import com.sasuke.launcheroneplus.ui.widget.recyclerview_fastscroll.views.FastScrollRecyclerView
 import com.sasuke.launcheroneplus.util.OnCustomEventListeners
 
 class RecentAppSectionAdapter(private val glide: RequestManager) :
-    RecyclerView.Adapter<RecentAppSectionViewHolder>(), OnCustomEventListeners {
+    RecyclerView.Adapter<RecentAppSectionViewHolder>(),
+    OnCustomEventListeners,
+    FastScrollRecyclerView.SectionedAdapter {
 
     private lateinit var list: List<App>
+    private var drawerStyle = DrawerStyle.VERTICAL
     private lateinit var onCustomEventListeners: OnCustomEventListeners
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecentAppSectionViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.cell_recent_app_section, parent, false)
-        return RecentAppSectionViewHolder(view, glide).apply {
+        return RecentAppSectionViewHolder(view, glide, drawerStyle).apply {
             setOnCustomEventListener(this@RecentAppSectionAdapter)
         }
     }
@@ -61,5 +66,13 @@ class RecentAppSectionAdapter(private val glide: RequestManager) :
     override fun onEventCancel(position: Int, appInfo: App) {
         if (::onCustomEventListeners.isInitialized)
             onCustomEventListeners.onEventCancel(position, appInfo)
+    }
+
+    override fun getSectionName(position: Int): String {
+        return "..."
+    }
+
+    fun updateDrawerStyle(drawerStyle: DrawerStyle) {
+        this.drawerStyle = drawerStyle
     }
 }

@@ -23,7 +23,6 @@ import com.github.nisrulz.sensey.Sensey
 import com.github.nisrulz.sensey.TouchTypeDetector
 import com.huxq17.handygridview.HandyGridView
 import com.huxq17.handygridview.listener.OnItemCapturedListener
-import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
 import com.sasuke.launcheroneplus.LauncherApp
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
@@ -40,7 +39,6 @@ import com.sasuke.launcheroneplus.ui.base.SpaceItemDecoration
 import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
 import com.sasuke.launcheroneplus.ui.hidden_apps.HiddenAppsActivity
 import com.sasuke.launcheroneplus.ui.launcher.all_apps.AppAdapter
-import com.sasuke.launcheroneplus.ui.launcher.all_apps.AppViewHolder
 import com.sasuke.launcheroneplus.ui.launcher.recent_apps.RecentAppSectionAdapter
 import com.sasuke.launcheroneplus.ui.settings.LauncherSettingsActivity
 import com.sasuke.launcheroneplus.ui.wallpaper.list.grid.WallpaperGridActivity
@@ -52,6 +50,9 @@ import kotlinx.android.synthetic.main.layout_non_sliding.*
 import kotlinx.android.synthetic.main.layout_sliding.*
 import java.util.concurrent.Executor
 import javax.inject.Inject
+import androidx.recyclerview.widget.ConcatAdapter
+import com.sasuke.launcheroneplus.ui.launcher.all_apps.AppViewHolder
+import com.sasuke.launcheroneplus.ui.widget.recyclerview_fastscroll.interfaces.OnFastScrollStateChangeListener
 
 class LauncherActivity : BaseActivity(), OnCustomEventListeners,
     GridViewAdapter.OnClickListeners {
@@ -104,6 +105,36 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
         Handler(Looper.getMainLooper())
     }
 
+    private val unhighlightItemRunnable = Runnable {
+        rvAllApps.forEachVisibleHolder { holder: BaseViewHolder ->
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT)
+        }
+    }
+
+    private val highlightItemRunnable = Runnable {
+        rvAllApps.forEachVisibleHolder { holder: BaseViewHolder ->
+            if (holder is AppViewHolder && ::currentHeader.isInitialized) {
+                if (currentHeader[0].toUpperCase() == allAppAdapter.appList[holder.bindingAdapterPosition].label[0].toUpperCase()) {
+                    highlightDrawable.updateTint(
+                        ColorUtils.setAlphaComponent(
+                            primaryColor,
+                            90
+                        )
+                    )
+                    holder.itemView.background = highlightDrawable
+                } else
+                    holder.itemView.setBackgroundColor(Color.TRANSPARENT)
+            }
+        }
+    }
+
+    private val highlightDrawable by lazy {
+        AppCompatResources.getDrawable(
+            this@LauncherActivity,
+            R.drawable.bg_app_highlight
+        )!!
+    }
+
     private lateinit var recentApps: List<App>
 
     private lateinit var pinchScaleListener: PinchScaleDetector.PinchScaleListener
@@ -116,6 +147,8 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
     private var primaryColor = 0
+
+    private lateinit var currentHeader: String
 
     private lateinit var popup: Balloon
 
@@ -292,14 +325,7 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
                         Sensey.getInstance().stopPinchScaleDetection()
                     }
                     SlidingUpPanelLayout.PanelState.DRAGGING -> {
-                        rvAllApps.forEachVisibleHolder { holder: BaseViewHolder ->
-                            holder.itemView.setBackgroundColor(
-                                ContextCompat.getColor(
-                                    this@LauncherActivity,
-                                    R.color.app_un_highlight
-                                )
-                            )
-                        }
+                        dismissPopup()
                     }
                     SlidingUpPanelLayout.PanelState.COLLAPSED -> {
                         Sensey.getInstance().startTouchTypeDetection(
@@ -314,7 +340,7 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
                         dismissPopup()
                     }
                     else -> {
-
+                        dismissPopup()
                     }
                 }
             }
@@ -322,14 +348,8 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
 
         rvAllApps.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                handler.post(unhighlightItemRunnable)
                 recyclerView.forEachVisibleHolder { holder: BaseViewHolder ->
-
-                    holder.itemView.setBackgroundColor(
-                        ContextCompat.getColor(
-                            this@LauncherActivity,
-                            R.color.app_un_highlight
-                        )
-                    )
                     holder.rotation
                         // Update the velocity.
                         // The velocity is calculated by the horizontal scroll offset.
@@ -401,26 +421,22 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
             startActivity(WallpaperGridActivity.newIntent(this@LauncherActivity))
         }
 
-        fastscroller.setHandleStateListener(object : RecyclerViewFastScroller.HandleStateListener {
-            override fun onDragged(offset: Float, position: Int) {
-                super.onDragged(offset, position)
+        rvAllApps.setOnFastScrollStateChangeListener(object : OnFastScrollStateChangeListener {
+            override fun onFastScrollStart() {
+
+            }
+
+            override fun onFastScrollDragged(currentHeader: String) {
+                this@LauncherActivity.currentHeader = currentHeader
                 if (rvAllApps.layoutManager is GridLayoutManager) {
-                    rvAllApps.forEachVisibleHolder { holder: BaseViewHolder ->
-                        if (holder is AppViewHolder) {
-                            if (allAppAdapter.appList[position].label[0].toUpperCase() == allAppAdapter.appList[holder.bindingAdapterPosition].label[0].toUpperCase()) {
-                                AppCompatResources.getDrawable(
-                                    this@LauncherActivity,
-                                    R.drawable.bg_app_highlight
-                                )?.let {
-                                    it.updateTint(ColorUtils.setAlphaComponent(primaryColor, 90))
-                                    holder.itemView.background = it
-                                }
-                            } else
-                                holder.itemView.setBackgroundColor(Color.TRANSPARENT)
-                        }
-                    }
+                    handler.post(highlightItemRunnable)
                 }
             }
+
+            override fun onFastScrollStop() {
+                handler.post(unhighlightItemRunnable)
+            }
+
         })
     }
 
@@ -533,33 +549,28 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
                 rvAllApps.removeItemDecorations()
                 rvAllApps.addItemDecoration(gridItemDecoration)
                 rvAllApps.layoutManager = gridLayoutManager
-                allAppAdapter.updateLayoutType(DrawerStyle.VERTICAL)
-                rvAllApps.adapter = allAppAdapter
+                rvAllApps.adapter = concatAdapter
             }
             DrawerStyle.LIST -> {
                 rvAllApps.removeItemDecorations()
                 rvAllApps.addItemDecoration(listItemDecoration)
                 rvAllApps.addItemDecoration(listDividerItemDecoration)
                 rvAllApps.layoutManager = linearLayoutManager
-                allAppAdapter.updateLayoutType(DrawerStyle.LIST)
-                rvAllApps.adapter = allAppAdapter
+                rvAllApps.adapter = concatAdapter
             }
         }
 
+        allAppAdapter.updateDrawerStyle(settingPreference.drawerStyle)
+        recentAppSectionAdapter.updateDrawerStyle(settingPreference.drawerStyle)
+
         if (settingPreference.isFastScrollEnabled) {
-            fastscroller.handleDrawable?.let {
-                AppCompatResources.getDrawable(this, R.drawable.fast_scroll_handle)?.let {
-                    it.updateTint(primaryColor)
-                    fastscroller.handleDrawable = it
-                }
-            }
+            rvAllApps.setPopupBgColor(primaryColor)
+            rvAllApps.setThumbColor(primaryColor)
+            rvAllApps.setThumbInactiveColor(primaryColor)
         } else {
-            fastscroller.handleDrawable?.let {
-                AppCompatResources.getDrawable(this, R.drawable.fast_scroll_handle)?.let {
-                    it.updateTint(Color.TRANSPARENT)
-                    fastscroller.handleDrawable = it
-                }
-            }
+            rvAllApps.setPopupBgColor(Color.TRANSPARENT)
+            rvAllApps.setThumbColor(Color.TRANSPARENT)
+            rvAllApps.setThumbInactiveColor(Color.TRANSPARENT)
         }
 
         clParent.coveredFadeColor =

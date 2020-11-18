@@ -6,18 +6,33 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.data.model.App
+import com.sasuke.launcheroneplus.data.model.DrawerStyle
 import com.sasuke.launcheroneplus.ui.base.BaseViewHolder
 import com.sasuke.launcheroneplus.util.Constants
 import com.sasuke.launcheroneplus.util.OnCustomEventListeners
+import com.sasuke.launcheroneplus.util.hide
+import com.sasuke.launcheroneplus.util.show
 import kotlinx.android.synthetic.main.cell_recent_app_section.view.*
 
-class RecentAppSectionViewHolder(itemView: View, private val glide: RequestManager) :
+class RecentAppSectionViewHolder(
+    itemView: View,
+    private val glide: RequestManager,
+    private val drawerStyle: DrawerStyle
+) :
     BaseViewHolder(itemView), OnCustomEventListeners {
 
     private lateinit var recentAppAdapter: RecentAppAdapter
     private lateinit var onCustomEventListeners: OnCustomEventListeners
 
     fun setRecentApps(list: List<App>) {
+        when (drawerStyle) {
+            DrawerStyle.VERTICAL -> {
+                itemView.separator.show()
+            }
+            DrawerStyle.LIST -> {
+                itemView.separator.hide()
+            }
+        }
         itemView.rvRecentApps.layoutManager =
             GridLayoutManager(
                 itemView.context,

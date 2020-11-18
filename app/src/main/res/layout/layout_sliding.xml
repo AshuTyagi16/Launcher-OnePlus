@@ -28,7 +28,7 @@
         android:paddingStart="20dp"
         android:paddingTop="20dp"
         android:paddingEnd="20dp"
-        app:layout_constraintBottom_toTopOf="@id/fastscroller"
+        app:layout_constraintBottom_toTopOf="@id/rvAllApps"
         app:layout_constraintTop_toBottomOf="@id/ivDragIcon"
         tools:alpha="1">
 
@@ -76,23 +76,18 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
-        android:id="@+id/fastscroller"
+    <com.sasuke.launcheroneplus.ui.widget.recyclerview_fastscroll.views.FastScrollRecyclerView
+        android:id="@+id/rvAllApps"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:handleDrawable="@drawable/fast_scroll_handle"
-        app:handleHeight="40dp"
-        app:handleWidth="15dp"
+        app:fastScrollPopupBgColor="@color/search_bar"
+        app:fastScrollPopupTextColor="@color/white"
+        app:fastScrollThumbColor="@color/search_bar"
+        app:fastScrollTrackColor="@color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/clSearchBar">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvAllApps"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:itemCount="25"
-            tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            tools:listitem="@layout/cell_app_info"
-            tools:spanCount="5" />
-    </com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller>
+        app:layout_constraintTop_toBottomOf="@id/clSearchBar"
+        tools:itemCount="30"
+        tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        tools:listitem="@layout/cell_app_info"
+        tools:spanCount="5" />
 </androidx.constraintlayout.widget.ConstraintLayout>

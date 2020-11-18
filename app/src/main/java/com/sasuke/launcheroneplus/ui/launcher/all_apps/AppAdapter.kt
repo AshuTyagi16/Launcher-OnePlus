@@ -1,23 +1,20 @@
 package com.sasuke.launcheroneplus.ui.launcher.all_apps
 
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.view.doOnLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
-import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.data.model.DrawerStyle
+import com.sasuke.launcheroneplus.ui.widget.recyclerview_fastscroll.views.FastScrollRecyclerView
 import com.sasuke.launcheroneplus.util.OnCustomEventListeners
 
 class AppAdapter(private val glide: RequestManager) :
     RecyclerView.Adapter<AppViewHolder>(),
-    RecyclerViewFastScroller.OnPopupViewUpdate,
+    FastScrollRecyclerView.SectionedAdapter,
     OnCustomEventListeners {
 
     init {
@@ -88,19 +85,15 @@ class AppAdapter(private val glide: RequestManager) :
             onClickListeners.onEventCancel(position, appInfo)
     }
 
-    override fun onUpdate(position: Int, popupTextView: TextView) {
-        popupTextView.background.colorFilter = PorterDuffColorFilter(
-            primaryColor,
-            PorterDuff.Mode.SRC_IN
-        )
-        popupTextView.text = appList[position].label[0].toUpperCase().toString()
-    }
-
     fun updatePrimaryColor(color: Int) {
         this.primaryColor = color
     }
 
-    fun updateLayoutType(drawerStyle: DrawerStyle) {
+    fun updateDrawerStyle(drawerStyle: DrawerStyle) {
         this.drawerStyle = drawerStyle
+    }
+
+    override fun getSectionName(position: Int): String {
+        return appList[position].label[0].toUpperCase().toString()
     }
 }
