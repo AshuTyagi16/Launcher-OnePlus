@@ -146,3 +146,4 @@
 
 #---------------Model classes----------------------------#
 -keep class com.sasuke.launcheroneplus.data.model.** {*;}
+-keepclassmembers enum com.sasuke.launcheroneplus.** { *; }

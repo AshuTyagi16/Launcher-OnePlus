@@ -6,6 +6,14 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
 android {
+    signingConfigs {
+        launcher {
+            storeFile file('/Users/ashutyagi/Desktop/launcher1p')
+            storePassword 'launcher1p'
+            keyAlias 'launcher1p'
+            keyPassword 'launcher1p'
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion '30.0.0'
 
@@ -17,6 +25,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.launcher
     }
 
     buildTypes {
