@@ -3,6 +3,7 @@ package com.sasuke.launcheroneplus.ui.settings.app_drawer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
+import com.sasuke.launcheroneplus.data.model.DrawerStyle
 import com.sasuke.launcheroneplus.util.Constants
 import com.sasuke.launcheroneplus.util.SharedPreferenceUtil
 import kotlinx.coroutines.Dispatchers
@@ -21,23 +22,23 @@ class AppDrawerActivityViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 sharedPreferenceUtil.getSettingPreference()?.let {
                     it.isFastScrollEnabled = isEnabled
-                    sharedPreferenceUtil.putString(Constants.Settings.PREFERENCES, gson.toJson(it))
+                    sharedPreferenceUtil.putString(Constants.PREFERENCES, gson.toJson(it))
                 }
             }
         }
     }
 
     fun setDrawerStyle(style: String) {
-        var indicator = Constants.DrawerStyle.VERTICAL
+        var indicator = DrawerStyle.VERTICAL
         when (style) {
-            Constants.DrawerStyle.VERTICAL.name -> indicator = Constants.DrawerStyle.VERTICAL
-            Constants.DrawerStyle.LIST.name -> indicator = Constants.DrawerStyle.LIST
+            DrawerStyle.VERTICAL.name -> indicator = DrawerStyle.VERTICAL
+            DrawerStyle.LIST.name -> indicator = DrawerStyle.LIST
         }
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 sharedPreferenceUtil.getSettingPreference()?.let {
                     it.drawerStyle = indicator
-                    sharedPreferenceUtil.putString(Constants.Settings.PREFERENCES, gson.toJson(it))
+                    sharedPreferenceUtil.putString(Constants.PREFERENCES, gson.toJson(it))
                 }
             }
         }
@@ -48,7 +49,7 @@ class AppDrawerActivityViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 sharedPreferenceUtil.getSettingPreference()?.let {
                     it.primaryColor = color
-                    sharedPreferenceUtil.putString(Constants.Settings.PREFERENCES, gson.toJson(it))
+                    sharedPreferenceUtil.putString(Constants.PREFERENCES, gson.toJson(it))
                 }
             }
         }
@@ -59,7 +60,7 @@ class AppDrawerActivityViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 sharedPreferenceUtil.getSettingPreference()?.let {
                     it.backgroundColor = color
-                    sharedPreferenceUtil.putString(Constants.Settings.PREFERENCES, gson.toJson(it))
+                    sharedPreferenceUtil.putString(Constants.PREFERENCES, gson.toJson(it))
                 }
             }
         }
@@ -70,7 +71,7 @@ class AppDrawerActivityViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 sharedPreferenceUtil.getSettingPreference()?.let {
                     it.backgroundColorAlpha = 100 - transparency
-                    sharedPreferenceUtil.putString(Constants.Settings.PREFERENCES, gson.toJson(it))
+                    sharedPreferenceUtil.putString(Constants.PREFERENCES, gson.toJson(it))
                 }
             }
         }

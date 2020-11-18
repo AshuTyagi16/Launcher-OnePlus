@@ -30,6 +30,7 @@ import com.sasuke.launcheroneplus.LauncherApp
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.data.model.DragData
+import com.sasuke.launcheroneplus.data.model.DrawerStyle
 import com.sasuke.launcheroneplus.data.model.SettingPreference
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.BaseEdgeEffectFactory
@@ -508,7 +509,7 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
         }
 
         when (settingPreference.drawerStyle) {
-            Constants.DrawerStyle.VERTICAL -> {
+            DrawerStyle.VERTICAL -> {
                 rvAllApps.layoutManager = layoutManager
                 if (settingPreference.isFastScrollEnabled) {
                     fastscroller.handleDrawable?.let {
@@ -526,7 +527,7 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
                     }
                 }
             }
-            Constants.DrawerStyle.LIST -> {
+            DrawerStyle.LIST -> {
             }
         }
         clParent.coveredFadeColor =

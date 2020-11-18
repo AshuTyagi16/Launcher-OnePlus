@@ -95,9 +95,9 @@ class SharedPreferenceUtil(
     }
 
     @WorkerThread
-    suspend fun getSettingPreference(): SettingPreference? {
+    fun getSettingPreference(): SettingPreference? {
         var settingPreferences: SettingPreference? = null
-        val userString = getString(Constants.Settings.PREFERENCES)
+        val userString = getString(Constants.PREFERENCES)
         if (!TextUtils.isEmpty(userString)) {
             settingPreferences = gson.fromJson(userString, SettingPreference::class.java)
         }

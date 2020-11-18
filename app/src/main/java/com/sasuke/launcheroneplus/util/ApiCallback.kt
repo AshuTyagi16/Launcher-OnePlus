@@ -30,10 +30,10 @@ abstract class ApiCallback<T> : retrofit2.Callback<T> {
             error = Error(true, t.message!!)
             failure(error)
         } else if (t is SSLHandshakeException) {
-            error = Error(true, "Internet not working properly")
+            error = Error(true, Constants.INTERNET_NOT_WORKING_MESSAGE)
             failure(error)
         } else if (t is UnknownHostException) {
-            error = Error(true, "Internet not working properly")
+            error = Error(true, Constants.INTERNET_NOT_WORKING_MESSAGE)
             failure(error)
         } else
             failure(error)
@@ -42,7 +42,7 @@ abstract class ApiCallback<T> : retrofit2.Callback<T> {
     private fun createError(response: Response<T>) {
         response.errorBody()?.let { errorBody ->
             try {
-                val error = Gson().fromJson<Error>(errorBody.string(), Error::class.java)
+                val error = Gson().fromJson(errorBody.string(), Error::class.java)
                 failure(error)
             } catch (e: Exception) {
                 failure(Error(true, e.localizedMessage))

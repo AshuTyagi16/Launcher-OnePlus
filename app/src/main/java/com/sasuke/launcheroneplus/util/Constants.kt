@@ -17,23 +17,9 @@ object Constants {
 
     const val RECENT_APPS = "RECENT_APPS"
 
-    object Settings {
-        const val HOME_SCREEN = 1
-        const val APP_DRAWER = 2
-        const val FOLDERS = 3
-        const val LOOK_FEEL = 4
-        const val NIGHT_MODE = 5
-        const val GESTURE_INPUT = 6
-        const val NOTIFICATION_BADGE = 7
-        const val DEFAULT_LAUNCHER = 8
-        const val SAY_THANKS = 9
-        const val ABOUT = 10
-        const val CONTACT_SUPPORT = 11
-        const val PREFERENCES = "SETTINGS_PREFERENCES"
-        const val IS_PREFERENCES_SET = "IS_PREFERENCES_SET"
-    }
+    const val INTERNET_NOT_WORKING_MESSAGE = "Internet not working properly"
+    const val INTERNET_NOT_CONNECTED = "Internet not connected"
 
-    enum class DrawerStyle {
-        VERTICAL, LIST
-    }
+    const val PREFERENCES = "SETTINGS_PREFERENCES"
+    const val IS_PREFERENCES_SET = "IS_PREFERENCES_SET"
 }

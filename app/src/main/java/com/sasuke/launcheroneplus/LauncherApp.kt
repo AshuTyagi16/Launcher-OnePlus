@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import com.sasuke.launcheroneplus.data.model.DrawerStyle
 import com.sasuke.launcheroneplus.data.model.SettingPreference
 import com.sasuke.launcheroneplus.di.component.DaggerLauncherAppComponent
 import com.sasuke.launcheroneplus.di.component.LauncherAppComponent
@@ -87,29 +88,29 @@ class LauncherApp : Application(), HasAndroidInjector {
 
     private fun setDefaultPreferences() {
         val sharedPrefUtil = component.getSharedPreferenceUtil()
-        if (!sharedPrefUtil.getBoolean(Constants.Settings.IS_PREFERENCES_SET, false)) {
+        if (!sharedPrefUtil.getBoolean(Constants.IS_PREFERENCES_SET, false)) {
             val defaultSettings =
                 SettingPreference(
                     ContextCompat.getColor(this, R.color.search_bar),
                     true,
-                    Constants.DrawerStyle.VERTICAL,
+                    DrawerStyle.VERTICAL,
                     ContextCompat.getColor(this, R.color.black_transparent),
                     80
                 )
             sharedPrefUtil.putString(
-                Constants.Settings.PREFERENCES,
+                Constants.PREFERENCES,
                 component.gson().toJson(defaultSettings)
             )
-            sharedPrefUtil.putBoolean(Constants.Settings.IS_PREFERENCES_SET, true)
+            sharedPrefUtil.putBoolean(Constants.IS_PREFERENCES_SET, true)
         }
     }
 
     private fun observeLiveData() {
-        component.getSharedPreferencesSettingsLiveData().observeForever(Observer {
+        component.getSharedPreferencesSettingsLiveData().observeForever {
             it?.let {
                 color = it.primaryColor
             }
-        })
+        }
     }
 
     override fun androidInjector(): AndroidInjector<Any> {

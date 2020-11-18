@@ -9,14 +9,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.Setting
+import com.sasuke.launcheroneplus.data.model.SettingsType
 import com.sasuke.launcheroneplus.data.model.Status
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.settings.app_drawer.AppDrawerActivity
+import com.sasuke.launcheroneplus.ui.settings.set_as_default.DefaultLauncherHandler
 import com.sasuke.launcheroneplus.util.SharedPreferencesSettingsLiveData
 import kotlinx.android.synthetic.main.activity_launcher_settings.*
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 import javax.inject.Inject
 
 class LauncherSettingsActivity : BaseActivity(), LauncherSettingAdapter.OnItemClickListener {
@@ -34,6 +33,8 @@ class LauncherSettingsActivity : BaseActivity(), LauncherSettingAdapter.OnItemCl
     lateinit var sharedPreferencesSettingsLiveData: SharedPreferencesSettingsLiveData
 
     private lateinit var launcherSettingsActivityViewModel: LauncherSettingsActivityViewModel
+
+    private lateinit var defaultLauncherHandler: DefaultLauncherHandler
 
     companion object {
         fun newIntent(context: Context) = Intent(context, LauncherSettingsActivity::class.java)
@@ -54,6 +55,7 @@ class LauncherSettingsActivity : BaseActivity(), LauncherSettingAdapter.OnItemCl
             this,
             viewModelFactory
         ).get(LauncherSettingsActivityViewModel::class.java)
+        defaultLauncherHandler = DefaultLauncherHandler.create(this)
     }
 
     private fun setupToolbar() {
@@ -104,7 +106,14 @@ class LauncherSettingsActivity : BaseActivity(), LauncherSettingAdapter.OnItemCl
     }
 
     override fun onItemClick(setting: Setting) {
-        startActivity(AppDrawerActivity.newIntent(this))
+        when (setting.type) {
+            SettingsType.DEFAULT_LAUNCHER -> {
+                defaultLauncherHandler.requestDefaultHome()
+            }
+            else -> {
+                startActivity(AppDrawerActivity.newIntent(this))
+            }
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

@@ -27,7 +27,7 @@ class SharedPreferencesSettingsLiveData(
     override fun getValueFromPreferences(key: String): SettingPreference? {
         var user: SettingPreference? = null
         try {
-            val userString = getString(Constants.Settings.PREFERENCES)
+            val userString = getString(Constants.PREFERENCES)
             if (!TextUtils.isEmpty(userString)) {
                 user = gson.fromJson(userString, SettingPreference::class.java)
             }
@@ -42,7 +42,7 @@ class SharedPreferencesSettingsLiveData(
 abstract class SharedPreferencesLiveData<T>(val sharedPrefs: SharedPreferences) : LiveData<T>() {
     private val preferenceChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key == Constants.Settings.PREFERENCES) {
+            if (key == Constants.PREFERENCES) {
                 value = getValueFromPreferences(key)
             }
         }
@@ -51,7 +51,7 @@ abstract class SharedPreferencesLiveData<T>(val sharedPrefs: SharedPreferences) 
 
     override fun onActive() {
         super.onActive()
-        value = getValueFromPreferences(Constants.Settings.PREFERENCES)
+        value = getValueFromPreferences(Constants.PREFERENCES)
         sharedPrefs.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
     }
 
