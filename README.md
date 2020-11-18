@@ -60,7 +60,7 @@ This app uses [***MVVM (Model View View-Model)***](https://developer.android.com
   * Icon packs
   
 ### Misc
-  * You can download the apk from [*here.*](https://github.com/AshuTyagi16/Launcher-OnePlus/blob/master/app/release/app-release.apk)<br>
+  * You can download the apk from [*here.*](https://github.com/AshuTyagi16/Launcher-OnePlus/releases)<br>
   * Hidden space can be opened using [*pinch in*](https://www.iconspng.com/images/multitouchinterface-pinch-in-animation/multitouchinterface-pinch-in-animation.jpg) gesture on home screen.
   
 ### Contributions
