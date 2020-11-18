@@ -3,8 +3,12 @@ package com.sasuke.launcheroneplus.util
 object Constants {
 
     const val APP_LIST_SPAN_COUNT = 5
-    val APP_LIST_HORIZONTAL_SPACING = 5.dpToPx()
-    val APP_LIST_VERTICAL_SPACING = 20.dpToPx()
+
+    val GRID_HORIZONTAL_SPACING = 5.dpToPx()
+    val GRID_VERTICAL_SPACING = 20.dpToPx()
+
+    val LIST_HORIZONTAL_SPACING = 5.dpToPx()
+    val LIST_VERTICAL_SPACING = 10.dpToPx()
 
     const val EXTRA_API_VERSION_HEADER = "Accept-Version"
     const val EXTRA_API_VERSION = "v1"

@@ -26,7 +26,7 @@ import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.Result
 import com.sasuke.launcheroneplus.data.model.Status
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
-import com.sasuke.launcheroneplus.ui.base.ItemDecorator
+import com.sasuke.launcheroneplus.ui.base.SpaceItemDecoration
 import com.sasuke.launcheroneplus.ui.wallpaper.WallpaperPreviewActivity
 import com.sasuke.launcheroneplus.util.Constants
 import kotlinx.android.synthetic.main.activity_wallpaper_pager.*
@@ -44,7 +44,7 @@ class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListe
     lateinit var layoutManager: LinearLayoutManager
 
     @Inject
-    lateinit var itemDecoration: ItemDecorator
+    lateinit var spaceItemDecoration: SpaceItemDecoration
 
     @Inject
     lateinit var pagerSnapHelper: PagerSnapHelper
@@ -123,7 +123,7 @@ class WallpaperPagerActivity : BaseActivity(), WallpaperPagerAdapter.OnItemListe
         rvWallpaperPager.layoutManager = layoutManager
         rvWallpaperPager.adapter = adapter
         adapter.setOnItemListener(this)
-        rvWallpaperPager.addItemDecoration(itemDecoration)
+        rvWallpaperPager.addItemDecoration(spaceItemDecoration)
         pagerSnapHelper.attachToRecyclerView(rvWallpaperPager)
 
         rvWallpaperPager.addOnScrollListener(object : RecyclerView.OnScrollListener() {

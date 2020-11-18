@@ -24,7 +24,8 @@ class SettingUtils(private val context: Context) {
                     R.drawable.ic_settings_white,
                     context.getString(R.string.app_drawer),
                     context.getString(R.string.app_drawer_description),
-                    SettingsType.APP_DRAWER
+                    SettingsType.APP_DRAWER,
+                    true
                 )
             )
             add(
@@ -72,7 +73,8 @@ class SettingUtils(private val context: Context) {
                     R.drawable.ic_settings_white,
                     context.getString(R.string.select_default_launcher),
                     context.getString(R.string.select_default_launcher_description),
-                    SettingsType.DEFAULT_LAUNCHER
+                    SettingsType.DEFAULT_LAUNCHER,
+                    true
                 )
             )
             add(

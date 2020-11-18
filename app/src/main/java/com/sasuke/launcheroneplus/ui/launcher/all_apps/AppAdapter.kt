@@ -12,6 +12,7 @@ import com.bumptech.glide.RequestManager
 import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
+import com.sasuke.launcheroneplus.data.model.DrawerStyle
 import com.sasuke.launcheroneplus.util.OnCustomEventListeners
 
 class AppAdapter(private val glide: RequestManager) :
@@ -25,12 +26,17 @@ class AppAdapter(private val glide: RequestManager) :
 
     lateinit var appList: MutableList<App>
     private lateinit var onClickListeners: OnCustomEventListeners
+    private var drawerStyle: DrawerStyle = DrawerStyle.VERTICAL
 
     private var primaryColor: Int = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
+        val layoutId = when (drawerStyle) {
+            DrawerStyle.VERTICAL -> R.layout.cell_app_info
+            DrawerStyle.LIST -> R.layout.cell_app_info_list
+        }
         val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.cell_app_info, parent, false)
+            LayoutInflater.from(parent.context).inflate(layoutId, parent, false)
         return AppViewHolder(view, glide).apply {
             // The rotation pivot should be at the center of the top edge.
             itemView.doOnLayout { v -> v.pivotX = v.width / 2f }
@@ -91,6 +97,10 @@ class AppAdapter(private val glide: RequestManager) :
     }
 
     fun updatePrimaryColor(color: Int) {
-        primaryColor = color
+        this.primaryColor = color
+    }
+
+    fun updateLayoutType(drawerStyle: DrawerStyle) {
+        this.drawerStyle = drawerStyle
     }
 }

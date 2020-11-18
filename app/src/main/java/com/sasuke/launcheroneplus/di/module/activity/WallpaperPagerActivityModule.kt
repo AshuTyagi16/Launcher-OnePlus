@@ -8,9 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.di.mapkey.ViewModelKey
 import com.sasuke.launcheroneplus.di.scope.PerActivityScope
-import com.sasuke.launcheroneplus.ui.base.ItemDecorator
-import com.sasuke.launcheroneplus.ui.wallpaper.list.grid.WallpaperActivityViewModel
-import com.sasuke.launcheroneplus.ui.wallpaper.list.grid.WallpaperAdapter
+import com.sasuke.launcheroneplus.ui.base.SpaceItemDecoration
 import com.sasuke.launcheroneplus.ui.wallpaper.list.pager.WallpaperPagerActivityViewModel
 import com.sasuke.launcheroneplus.ui.wallpaper.list.pager.WallpaperPagerAdapter
 import dagger.Binds
@@ -39,8 +37,8 @@ abstract class WallpaperPagerActivityModule {
 
         @Provides
         @PerActivityScope
-        fun itemDecoration(): ItemDecorator {
-            return ItemDecorator(30, 250)
+        fun itemDecoration(): SpaceItemDecoration {
+            return SpaceItemDecoration(30, 250)
         }
 
         @Provides

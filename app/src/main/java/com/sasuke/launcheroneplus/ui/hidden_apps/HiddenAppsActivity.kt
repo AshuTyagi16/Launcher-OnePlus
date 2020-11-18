@@ -12,7 +12,7 @@ import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.BaseEdgeEffectFactory
-import com.sasuke.launcheroneplus.ui.base.ItemDecorator
+import com.sasuke.launcheroneplus.ui.base.SpaceItemDecoration
 import com.sasuke.launcheroneplus.ui.hidden_apps.app_selector.AppSelectionActivity
 import com.sasuke.launcheroneplus.ui.launcher.all_apps.AppAdapter
 import com.sasuke.launcheroneplus.ui.launcher.all_apps.AppViewHolder
@@ -32,7 +32,7 @@ class HiddenAppsActivity : BaseActivity(), OnCustomEventListeners {
     lateinit var layoutManager: GridLayoutManager
 
     @Inject
-    lateinit var itemDecoration: ItemDecorator
+    lateinit var spaceItemDecoration: SpaceItemDecoration
 
     @Inject
     lateinit var baseEdgeEffectFactory: BaseEdgeEffectFactory
@@ -71,7 +71,7 @@ class HiddenAppsActivity : BaseActivity(), OnCustomEventListeners {
 
     private fun setupRecyclerView() {
         rvApps.layoutManager = layoutManager
-        rvApps.addItemDecoration(itemDecoration)
+        rvApps.addItemDecoration(spaceItemDecoration)
         rvApps.adapter = adapter
         adapter.setOnCustomEventListeners(this)
 

@@ -5,7 +5,7 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.sasuke.launcheroneplus.util.Constants
 
-class ItemDecorator(private val horizontalSpace: Int, private val verticalSpace: Int) :
+class SpaceItemDecoration(private val horizontalSpace: Int, private val verticalSpace: Int) :
     RecyclerView.ItemDecoration() {
 
     companion object {

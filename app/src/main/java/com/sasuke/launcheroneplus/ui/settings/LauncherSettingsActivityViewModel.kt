@@ -23,7 +23,10 @@ class LauncherSettingsActivityViewModel @Inject constructor(private val settingU
         _settingsLiveData.postValue(Resource.loading())
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                _settingsLiveData.postValue(Resource.success(settingUtils.getSettings()))
+                val settings = settingUtils.getSettings().filter {
+                    it.shouldShow
+                }
+                _settingsLiveData.postValue(Resource.success(settings))
             }
         }
     }

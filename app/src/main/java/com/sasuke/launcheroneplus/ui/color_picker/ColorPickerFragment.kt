@@ -4,7 +4,6 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -12,15 +11,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.transition.TransitionManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.sasuke.launcheroneplus.LauncherApp
 import com.sasuke.launcheroneplus.R
-import com.sasuke.launcheroneplus.ui.base.ItemDecorator
+import com.sasuke.launcheroneplus.ui.base.SpaceItemDecoration
 import com.sasuke.launcheroneplus.ui.base.RoundedBottomSheetDialogFragment
 import com.skydoves.colorpickerview.ColorEnvelope
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import com.transitionseverywhere.Rotate
 import kotlinx.android.synthetic.main.fragment_color_picker.*
-import org.greenrobot.eventbus.EventBus
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
@@ -36,7 +33,7 @@ class ColorPickerFragment : RoundedBottomSheetDialogFragment(), ColorAdapter.OnC
     lateinit var colorAdapter: ColorAdapter
 
     @Inject
-    lateinit var itemDecorator: ItemDecorator
+    lateinit var spaceItemDecoration: SpaceItemDecoration
 
     private var isCustom = AtomicBoolean(true)
 
@@ -102,7 +99,7 @@ class ColorPickerFragment : RoundedBottomSheetDialogFragment(), ColorAdapter.OnC
     private fun setupRecyclerView() {
         rvDefaultColors.layoutManager = layoutManager
         rvDefaultColors.adapter = colorAdapter
-        rvDefaultColors.addItemDecoration(itemDecorator)
+        rvDefaultColors.addItemDecoration(spaceItemDecoration)
         colorAdapter.setOnClickListeners(this)
     }
 
@@ -148,7 +145,6 @@ class ColorPickerFragment : RoundedBottomSheetDialogFragment(), ColorAdapter.OnC
     private fun observeLiveData() {
         colorPickerFragmentViewModel.defaultColorsLiveData.observe(viewLifecycleOwner, Observer {
             colorAdapter.setColors(it)
-            runLayoutAnimation()
         })
     }
 
@@ -170,16 +166,6 @@ class ColorPickerFragment : RoundedBottomSheetDialogFragment(), ColorAdapter.OnC
             }
 
         }
-    }
-
-    private fun runLayoutAnimation() {
-        val context = rvDefaultColors.context
-        val controller =
-            AnimationUtils.loadLayoutAnimation(context, R.anim.grid_layout_animation_from_bottom)
-
-        rvDefaultColors.layoutAnimation = controller
-        rvDefaultColors.adapter?.notifyDataSetChanged()
-        rvDefaultColors.scheduleLayoutAnimation()
     }
 
     override fun onItemClick(position: Int, color: Int) {

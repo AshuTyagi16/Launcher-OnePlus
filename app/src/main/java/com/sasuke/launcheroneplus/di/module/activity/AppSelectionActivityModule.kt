@@ -8,7 +8,7 @@ import com.sasuke.launcheroneplus.di.mapkey.ViewModelKey
 import com.sasuke.launcheroneplus.di.qualifiers.HiddenAppLayoutManager
 import com.sasuke.launcheroneplus.di.qualifiers.VisibleAppLayoutManager
 import com.sasuke.launcheroneplus.di.scope.PerActivityScope
-import com.sasuke.launcheroneplus.ui.base.ItemDecorator
+import com.sasuke.launcheroneplus.ui.base.SpaceItemDecoration
 import com.sasuke.launcheroneplus.ui.hidden_apps.app_selector.AppSelectionActivityViewModel
 import com.sasuke.launcheroneplus.ui.hidden_apps.app_selector.HiddenAppSelectionAdapter
 import com.sasuke.launcheroneplus.ui.hidden_apps.app_selector.VisibleAppSelectionAdapter
@@ -51,10 +51,10 @@ abstract class AppSelectionActivityModule {
 
         @Provides
         @PerActivityScope
-        fun itemDecorator(): ItemDecorator {
-            return ItemDecorator(
-                Constants.APP_LIST_HORIZONTAL_SPACING,
-                Constants.APP_LIST_VERTICAL_SPACING
+        fun itemDecorator(): SpaceItemDecoration {
+            return SpaceItemDecoration(
+                Constants.GRID_HORIZONTAL_SPACING,
+                Constants.GRID_VERTICAL_SPACING
             )
         }
     }

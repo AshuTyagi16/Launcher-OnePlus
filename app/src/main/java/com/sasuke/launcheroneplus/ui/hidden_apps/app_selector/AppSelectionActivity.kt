@@ -11,7 +11,7 @@ import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.di.qualifiers.HiddenAppLayoutManager
 import com.sasuke.launcheroneplus.di.qualifiers.VisibleAppLayoutManager
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
-import com.sasuke.launcheroneplus.ui.base.ItemDecorator
+import com.sasuke.launcheroneplus.ui.base.SpaceItemDecoration
 import com.sasuke.launcheroneplus.util.hide
 import com.sasuke.launcheroneplus.util.show
 import kotlinx.android.synthetic.main.activity_app_selection.*
@@ -38,7 +38,7 @@ class AppSelectionActivity : BaseActivity(), VisibleAppSelectionAdapter.OnClickL
     lateinit var hiddenAppsLayoutManager: GridLayoutManager
 
     @Inject
-    lateinit var itemDecoration: ItemDecorator
+    lateinit var spaceItemDecoration: SpaceItemDecoration
 
     private lateinit var appSelectionActivityViewModel: AppSelectionActivityViewModel
 
@@ -62,12 +62,12 @@ class AppSelectionActivity : BaseActivity(), VisibleAppSelectionAdapter.OnClickL
 
     private fun setupRecyclerView() {
         rvAllApps.layoutManager = visibleAppsLayoutManager
-        rvAllApps.addItemDecoration(itemDecoration)
+        rvAllApps.addItemDecoration(spaceItemDecoration)
         rvAllApps.adapter = adapterVisibleApps
         adapterVisibleApps.setOnClickListeners(this)
 
         rvUnHideApps.layoutManager = hiddenAppsLayoutManager
-        rvUnHideApps.addItemDecoration(itemDecoration)
+        rvUnHideApps.addItemDecoration(spaceItemDecoration)
         rvUnHideApps.adapter = adapterHiddenApps
         adapterHiddenApps.setOnClickListeners(this)
     }

@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.di.mapkey.ViewModelKey
 import com.sasuke.launcheroneplus.di.scope.PerActivityScope
-import com.sasuke.launcheroneplus.ui.base.ItemDecorator
+import com.sasuke.launcheroneplus.ui.base.SpaceItemDecoration
 import com.sasuke.launcheroneplus.ui.wallpaper.list.grid.WallpaperActivityViewModel
 import com.sasuke.launcheroneplus.ui.wallpaper.list.grid.WallpaperAdapter
 import dagger.Binds
@@ -35,8 +35,8 @@ abstract class WallpaperActivityModule {
 
         @Provides
         @PerActivityScope
-        fun itemDecoration(): ItemDecorator {
-            return ItemDecorator(10, 20)
+        fun itemDecoration(): SpaceItemDecoration {
+            return SpaceItemDecoration(10, 20)
         }
     }
 

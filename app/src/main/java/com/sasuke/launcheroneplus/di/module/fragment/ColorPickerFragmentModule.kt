@@ -3,10 +3,9 @@ package com.sasuke.launcheroneplus.di.module.fragment
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.GridLayoutManager
-import com.bumptech.glide.RequestManager
 import com.sasuke.launcheroneplus.di.mapkey.ViewModelKey
 import com.sasuke.launcheroneplus.di.scope.PerFragmentScope
-import com.sasuke.launcheroneplus.ui.base.ItemDecorator
+import com.sasuke.launcheroneplus.ui.base.SpaceItemDecoration
 import com.sasuke.launcheroneplus.ui.color_picker.ColorAdapter
 import com.sasuke.launcheroneplus.ui.color_picker.ColorPickerFragmentViewModel
 import dagger.Binds
@@ -33,8 +32,8 @@ abstract class ColorPickerFragmentModule {
 
         @Provides
         @PerFragmentScope
-        fun itemDecoration(): ItemDecorator {
-            return ItemDecorator(50, 30)
+        fun itemDecoration(): SpaceItemDecoration {
+            return SpaceItemDecoration(50, 30)
         }
     }
 

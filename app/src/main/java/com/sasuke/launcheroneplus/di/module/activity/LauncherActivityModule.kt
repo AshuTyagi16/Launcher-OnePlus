@@ -1,20 +1,22 @@
 package com.sasuke.launcheroneplus.di.module.activity
 
 import android.content.Context
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
-import androidx.recyclerview.widget.ConcatAdapter
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import com.bumptech.glide.RequestManager
+import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.di.mapkey.ViewModelKey
+import com.sasuke.launcheroneplus.di.qualifiers.GridItemDecoration
+import com.sasuke.launcheroneplus.di.qualifiers.ListDividerItemDecoration
+import com.sasuke.launcheroneplus.di.qualifiers.ListItemDecoration
 import com.sasuke.launcheroneplus.di.scope.PerActivityScope
 import com.sasuke.launcheroneplus.ui.base.BaseEdgeEffectFactory
-import com.sasuke.launcheroneplus.ui.base.ItemDecorator
+import com.sasuke.launcheroneplus.ui.base.SpaceItemDecoration
 import com.sasuke.launcheroneplus.ui.base.SnapToBlock
 import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
 import com.sasuke.launcheroneplus.ui.launcher.LauncherActivityViewModel
 import com.sasuke.launcheroneplus.ui.launcher.all_apps.AppAdapter
-import com.sasuke.launcheroneplus.ui.launcher.recent_apps.RecentAppAdapter
 import com.sasuke.launcheroneplus.ui.launcher.recent_apps.RecentAppSectionAdapter
 import com.sasuke.launcheroneplus.util.Constants
 import dagger.Binds
@@ -30,7 +32,7 @@ abstract class LauncherActivityModule {
         @Provides
         @PerActivityScope
         fun adapter(glide: RequestManager): AppAdapter {
-            return AppAdapter(glide,)
+            return AppAdapter(glide)
         }
 
         @Provides
@@ -49,11 +51,37 @@ abstract class LauncherActivityModule {
 
         @Provides
         @PerActivityScope
-        fun itemDecorator(): ItemDecorator {
-            return ItemDecorator(
-                Constants.APP_LIST_HORIZONTAL_SPACING,
-                Constants.APP_LIST_VERTICAL_SPACING
+        fun linearLayoutManager(context: Context): LinearLayoutManager {
+            return LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        }
+
+        @Provides
+        @PerActivityScope
+        @GridItemDecoration
+        fun gridSpaceItemDecoration(): SpaceItemDecoration {
+            return SpaceItemDecoration(
+                Constants.GRID_HORIZONTAL_SPACING,
+                Constants.GRID_VERTICAL_SPACING
             )
+        }
+
+        @Provides
+        @PerActivityScope
+        @ListItemDecoration
+        fun listSpaceItemDecorator(): SpaceItemDecoration {
+            return SpaceItemDecoration(
+                Constants.LIST_HORIZONTAL_SPACING,
+                Constants.LIST_VERTICAL_SPACING
+            )
+        }
+
+        @Provides
+        @PerActivityScope
+        @ListDividerItemDecoration
+        fun listDividerItemDecorator(context: Context): DividerItemDecoration {
+            return DividerItemDecoration(context, RecyclerView.VERTICAL).apply {
+                setDrawable(ContextCompat.getDrawable(context, R.drawable.divider_app_list)!!)
+            }
         }
 
         @Provides
@@ -82,7 +110,10 @@ abstract class LauncherActivityModule {
 
         @Provides
         @PerActivityScope
-        fun concatAdapter(recentAppSectionAdapter: RecentAppSectionAdapter, appAdapter: AppAdapter): ConcatAdapter {
+        fun concatAdapter(
+            recentAppSectionAdapter: RecentAppSectionAdapter,
+            appAdapter: AppAdapter
+        ): ConcatAdapter {
             return ConcatAdapter(recentAppSectionAdapter, appAdapter)
         }
     }

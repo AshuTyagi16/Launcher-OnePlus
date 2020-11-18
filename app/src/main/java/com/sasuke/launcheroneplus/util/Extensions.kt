@@ -64,3 +64,9 @@ val View.keyboardIsVisible: Boolean
     get() = WindowInsetsCompat
         .toWindowInsetsCompat(rootWindowInsets)
         .isVisible(WindowInsetsCompat.Type.ime())
+
+fun <T : RecyclerView> T.removeItemDecorations() {
+    while (itemDecorationCount > 0) {
+        removeItemDecorationAt(0)
+    }
+}

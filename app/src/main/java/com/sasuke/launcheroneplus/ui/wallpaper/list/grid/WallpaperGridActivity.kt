@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.sasuke.launcheroneplus.R
 import com.sasuke.launcheroneplus.data.model.Status
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
-import com.sasuke.launcheroneplus.ui.base.ItemDecorator
+import com.sasuke.launcheroneplus.ui.base.SpaceItemDecoration
 import com.sasuke.launcheroneplus.ui.wallpaper.list.pager.WallpaperPagerActivity
 import com.sasuke.launcheroneplus.util.Constants
 import com.sasuke.launcheroneplus.util.DebouncingSearchViewQueryTextListener
@@ -34,7 +34,7 @@ class WallpaperGridActivity : BaseActivity(),
     lateinit var layoutManager: GridLayoutManager
 
     @Inject
-    lateinit var itemDecoration: ItemDecorator
+    lateinit var spaceItemDecoration: SpaceItemDecoration
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -85,7 +85,7 @@ class WallpaperGridActivity : BaseActivity(),
         rvWallpaper.adapter = adapter
         rvWallpaper.setHasFixedSize(true)
         adapter.setOnItemClickListener(this)
-        rvWallpaper.addItemDecoration(itemDecoration)
+        rvWallpaper.addItemDecoration(spaceItemDecoration)
     }
 
     private fun setupListeners() {

@@ -4,7 +4,8 @@ data class Setting(
     val icon: Int,
     val title: String,
     val description: String,
-    val type: SettingsType
+    val type: SettingsType,
+    val shouldShow: Boolean = false
 )
 
 enum class SettingsType {

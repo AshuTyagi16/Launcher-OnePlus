@@ -16,9 +16,7 @@ import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.ConcatAdapter
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import com.bumptech.glide.RequestManager
 import com.github.nisrulz.sensey.PinchScaleDetector
 import com.github.nisrulz.sensey.Sensey
@@ -32,10 +30,13 @@ import com.sasuke.launcheroneplus.data.model.App
 import com.sasuke.launcheroneplus.data.model.DragData
 import com.sasuke.launcheroneplus.data.model.DrawerStyle
 import com.sasuke.launcheroneplus.data.model.SettingPreference
+import com.sasuke.launcheroneplus.di.qualifiers.GridItemDecoration
+import com.sasuke.launcheroneplus.di.qualifiers.ListDividerItemDecoration
+import com.sasuke.launcheroneplus.di.qualifiers.ListItemDecoration
 import com.sasuke.launcheroneplus.ui.base.BaseActivity
 import com.sasuke.launcheroneplus.ui.base.BaseEdgeEffectFactory
 import com.sasuke.launcheroneplus.ui.base.BaseViewHolder
-import com.sasuke.launcheroneplus.ui.base.ItemDecorator
+import com.sasuke.launcheroneplus.ui.base.SpaceItemDecoration
 import com.sasuke.launcheroneplus.ui.drag_drop.GridViewAdapter
 import com.sasuke.launcheroneplus.ui.hidden_apps.HiddenAppsActivity
 import com.sasuke.launcheroneplus.ui.launcher.all_apps.AppAdapter
@@ -59,16 +60,16 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     @Inject
-    lateinit var allAppadapter: AppAdapter
+    lateinit var allAppAdapter: AppAdapter
 
     @Inject
-    lateinit var layoutManager: GridLayoutManager
+    lateinit var gridLayoutManager: GridLayoutManager
 
     @Inject
-    lateinit var itemDecoration: ItemDecorator
+    lateinit var linearLayoutManager: LinearLayoutManager
 
     @Inject
-    lateinit var gridAdapter: GridViewAdapter
+    lateinit var homeShortcutGridAdapter: GridViewAdapter
 
     @Inject
     lateinit var glide: RequestManager
@@ -81,6 +82,18 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
 
     @Inject
     lateinit var recentAppSectionAdapter: RecentAppSectionAdapter
+
+    @Inject
+    @GridItemDecoration
+    lateinit var gridItemDecoration: SpaceItemDecoration
+
+    @Inject
+    @ListItemDecoration
+    lateinit var listItemDecoration: SpaceItemDecoration
+
+    @Inject
+    @ListDividerItemDecoration
+    lateinit var listDividerItemDecoration: DividerItemDecoration
 
     @Inject
     lateinit var concatAdapter: ConcatAdapter
@@ -139,25 +152,30 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
     }
 
     private fun setupRecyclerView() {
-        rvAllApps.layoutManager = layoutManager
-        rvAllApps.addItemDecoration(itemDecoration)
+        rvAllApps.layoutManager = gridLayoutManager
+        rvAllApps.addItemDecoration(
+            SpaceItemDecoration(
+                Constants.GRID_HORIZONTAL_SPACING,
+                Constants.GRID_VERTICAL_SPACING
+            )
+        )
         rvAllApps.setHasFixedSize(true)
         rvAllApps.adapter = concatAdapter
-        allAppadapter.updatePrimaryColor(primaryColor)
-        allAppadapter.setOnCustomEventListeners(this)
+        allAppAdapter.updatePrimaryColor(primaryColor)
+        allAppAdapter.setOnCustomEventListeners(this)
         recentAppSectionAdapter.setOnCustomEventListener(this)
         rvAllApps.edgeEffectFactory = baseEdgeEffectFactory
     }
 
     private fun setupGridView() {
-        gridApps.adapter = gridAdapter
-        gridAdapter.setOnClickListeners(this)
+        gridApps.adapter = homeShortcutGridAdapter
+        homeShortcutGridAdapter.setOnClickListeners(this)
         setMode(HandyGridView.MODE.LONG_PRESS)
         gridApps.setAutoOptimize(true)
         gridApps.setScrollSpeed(750)
 
         gridApps.setOnItemLongClickListener { _, _, i, _ ->
-            if (!gridApps.isTouchMode && !gridApps.isNoneMode && !gridAdapter.isFixed(i)) {//long press enter edit mode.
+            if (!gridApps.isTouchMode && !gridApps.isNoneMode && !homeShortcutGridAdapter.isFixed(i)) {//long press enter edit mode.
                 setMode(HandyGridView.MODE.TOUCH)
                 return@setOnItemLongClickListener true
             }
@@ -179,7 +197,7 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
     }
 
     private fun setupListeners() {
-        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+        gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 return if (::recentApps.isInitialized && recentApps.isNotEmpty())
                     if (position == 0) Constants.APP_LIST_SPAN_COUNT else 1
@@ -368,7 +386,7 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
                 }
                 DragEvent.ACTION_DROP -> {
                     val item = dragEvent.localState as DragData
-                    gridAdapter.addItem(item.item)
+                    homeShortcutGridAdapter.addItem(item.item)
                     showToast(getString(R.string.shortcut_added_to_home_screen))
                     dragView.visibility = View.GONE
                 }
@@ -386,18 +404,20 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
         fastscroller.setHandleStateListener(object : RecyclerViewFastScroller.HandleStateListener {
             override fun onDragged(offset: Float, position: Int) {
                 super.onDragged(offset, position)
-                rvAllApps.forEachVisibleHolder { holder: BaseViewHolder ->
-                    if (holder is AppViewHolder) {
-                        if (allAppadapter.appList[position].label[0].toUpperCase() == allAppadapter.appList[holder.bindingAdapterPosition].label[0].toUpperCase()) {
-                            AppCompatResources.getDrawable(
-                                this@LauncherActivity,
-                                R.drawable.bg_app_highlight
-                            )?.let {
-                                it.updateTint(ColorUtils.setAlphaComponent(primaryColor, 90))
-                                holder.itemView.background = it
-                            }
-                        } else
-                            holder.itemView.setBackgroundColor(Color.TRANSPARENT)
+                if (rvAllApps.layoutManager is GridLayoutManager) {
+                    rvAllApps.forEachVisibleHolder { holder: BaseViewHolder ->
+                        if (holder is AppViewHolder) {
+                            if (allAppAdapter.appList[position].label[0].toUpperCase() == allAppAdapter.appList[holder.bindingAdapterPosition].label[0].toUpperCase()) {
+                                AppCompatResources.getDrawable(
+                                    this@LauncherActivity,
+                                    R.drawable.bg_app_highlight
+                                )?.let {
+                                    it.updateTint(ColorUtils.setAlphaComponent(primaryColor, 90))
+                                    holder.itemView.background = it
+                                }
+                            } else
+                                holder.itemView.setBackgroundColor(Color.TRANSPARENT)
+                        }
                     }
                 }
             }
@@ -412,13 +432,13 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
 
         launcherActivityViewModel.appList.observe(this, {
             it?.let {
-                allAppadapter.setApps(it)
+                allAppAdapter.setApps(it)
             }
         })
 
         launcherActivityViewModel.filterAppsLiveData.observe(this, {
             it?.let {
-                allAppadapter.setApps(it)
+                allAppAdapter.setApps(it)
             }
         })
 
@@ -431,7 +451,7 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
 
     private fun setMode(mode: HandyGridView.MODE) {
         gridApps.mode = mode
-        gridAdapter.setInEditMode(mode == HandyGridView.MODE.TOUCH)
+        homeShortcutGridAdapter.setInEditMode(mode == HandyGridView.MODE.TOUCH)
     }
 
     private fun initBiometric() {
@@ -501,7 +521,7 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
 
     private fun updateUI(settingPreference: SettingPreference) {
         primaryColor = settingPreference.primaryColor
-        allAppadapter.updatePrimaryColor(primaryColor)
+        allAppAdapter.updatePrimaryColor(primaryColor)
 
         ContextCompat.getDrawable(this, R.drawable.ic_delete)?.let {
             it.updateTint(primaryColor)
@@ -510,26 +530,38 @@ class LauncherActivity : BaseActivity(), OnCustomEventListeners,
 
         when (settingPreference.drawerStyle) {
             DrawerStyle.VERTICAL -> {
-                rvAllApps.layoutManager = layoutManager
-                if (settingPreference.isFastScrollEnabled) {
-                    fastscroller.handleDrawable?.let {
-                        AppCompatResources.getDrawable(this, R.drawable.fast_scroll_handle)?.let {
-                            it.updateTint(primaryColor)
-                            fastscroller.handleDrawable = it
-                        }
-                    }
-                } else {
-                    fastscroller.handleDrawable?.let {
-                        AppCompatResources.getDrawable(this, R.drawable.fast_scroll_handle)?.let {
-                            it.updateTint(Color.TRANSPARENT)
-                            fastscroller.handleDrawable = it
-                        }
-                    }
-                }
+                rvAllApps.removeItemDecorations()
+                rvAllApps.addItemDecoration(gridItemDecoration)
+                rvAllApps.layoutManager = gridLayoutManager
+                allAppAdapter.updateLayoutType(DrawerStyle.VERTICAL)
+                rvAllApps.adapter = allAppAdapter
             }
             DrawerStyle.LIST -> {
+                rvAllApps.removeItemDecorations()
+                rvAllApps.addItemDecoration(listItemDecoration)
+                rvAllApps.addItemDecoration(listDividerItemDecoration)
+                rvAllApps.layoutManager = linearLayoutManager
+                allAppAdapter.updateLayoutType(DrawerStyle.LIST)
+                rvAllApps.adapter = allAppAdapter
             }
         }
+
+        if (settingPreference.isFastScrollEnabled) {
+            fastscroller.handleDrawable?.let {
+                AppCompatResources.getDrawable(this, R.drawable.fast_scroll_handle)?.let {
+                    it.updateTint(primaryColor)
+                    fastscroller.handleDrawable = it
+                }
+            }
+        } else {
+            fastscroller.handleDrawable?.let {
+                AppCompatResources.getDrawable(this, R.drawable.fast_scroll_handle)?.let {
+                    it.updateTint(Color.TRANSPARENT)
+                    fastscroller.handleDrawable = it
+                }
+            }
+        }
+
         clParent.coveredFadeColor =
             ColorUtils.setAlphaComponent(
                 settingPreference.backgroundColor,
